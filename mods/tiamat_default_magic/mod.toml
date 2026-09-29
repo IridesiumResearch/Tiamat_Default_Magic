@@ -1,21 +1,29 @@
-# Tiamat Default Magic: a Tiamat mod, started from the engine's template.
+# Tiamat Default Magic — the Hermetic Art: the magic door of Progress's
+# Fork, and everything behind it (docs/brief.md).
 #
-# `id` is the namespace of everything this mod registers: `beacon` in init.lua
-# is `tiamat_default_magic:beacon` to every other mod. Lowercase letters, digits and
-# underscores, starting with a letter.
+# Built so far: the Apothecary's Bench, five shared nodes a child can reach
+# long before the Fork (brief §4). The door, the tree and the Art behind it
+# follow in the brief's build order (§17).
 id = "tiamat_default_magic"
 name = "Tiamat Default Magic"
 version = "0.1.0"
-description = "A tour of the mod API: a block, a tool, a sound, an action, a dialog, an entity."
-# An SPDX licence identifier, yours to choose. The engine's scripting API is
-# MIT and its licence exception says a mod is not a derivative work of the
-# engine, so any terms are open to you.
+description = "The Hermetic Art: the athanor, the Twelve Gates, spagyrics, elementals and the Philosophers' Stone."
 license = "GPL-3.0-only"
-# Mods this one needs loaded first, with version bounds if you want them:
-#     depends = ["some_world >=0.2, <1"]
-depends = ["core >=0.1"]
-# The siblings this mod reaches through their exports when they are loaded,
-# and loads after. None is required: the mod loads on a bare engine.
-optional_depends = ["tiamat_default_progress", "tiamat_default_craft", "tiamat_default_life", "tiamat_default_world", "tiamat_default_ui"]
-# Mods this one cannot run beside:
-#     conflicts = ["another_mod"]
+# Without any of these there is no Art to practise: the world's plants and
+# ores, Life's food and fire, Craft's recipes and stations, Progress's nodes
+# and door. Hard, so a server missing one says so instead of loading a mod
+# that can do nothing (brief §2.1).
+depends = [
+  "core >=0.1",
+  "tiamat_default_world >=0.1",
+  "tiamat_default_life >=0.1",
+  "tiamat_default_craft >=0.4",
+  "tiamat_default_progress >=0.1",
+]
+# Loaded after these when they are here, so `game.exports` finds them from
+# init.lua's first line. Without the interface the Mute Book is a plain
+# dialog; without the weather, nothing at the Bench changes.
+optional_depends = ["tiamat_default_ui", "tiamat_weather"]
+
+# NO `[theme]` HERE, ON PURPOSE. The engine wears the LAST theme in load
+# order, and the interface mod owns the look.

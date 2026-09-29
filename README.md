@@ -3,49 +3,51 @@
 
 # Tiamat Default Magic
 
-One of the two doors at the Fork of the default game: the magic tree, tiers 3
-to 7. A player who has climbed the shared tree in Craft and Progress chooses
-this mod or `tiamat_default_science`, and the other door closes. Nothing of
-the tree is built yet: the mod is the engine's template as it came, and
-`docs/brief.md` is what has been decided so far and what is still the
-designer's to say. The mod itself is `mods/tiamat_default_magic/`; this
-repository sits beside the engine (`Tiamat`) and its siblings, and the
-engine's `bundle.toml` pins the commit a release carries.
+The Hermetic Art: one of the two doors at the Fork of the default game, and
+everything behind it — alchemy as it was practised, from the athanor and its
+glassware through Ripley's Twelve Gates to the Philosophers' Stone.
+`docs/brief.md` is the design, checked against the engine and the siblings;
+the mod itself is `mods/tiamat_default_magic/`. This repository sits beside
+the engine (`Tiamat`) and its siblings, and the engine's `bundle.toml` pins
+the commit a release carries.
 
-A Tiamat mod, started from the engine's template. It registers one of each
-kind of thing the API offers — a block, a tool, a sound, an action, a dialog,
-an entity — so every part has a worked example beside it. Keep what you need.
+## What is built
+
+Step 2 of the brief's build order (§17): **the Apothecary's Bench**, five
+shared nodes a child can reach long before the Fork. A picture book of
+recipes (the Mute Book), a mortar that grinds herbs into simples, flame
+powders that turn a fire blue, green, gold or sparking white, herb teas and
+a poultice, a lamp of glow caps that never goes out, and a copper still that
+makes rosewater. The door, the tree of tiers 3 to 7 and the Art behind them
+come next.
 
 ## What is here
 
 | File | What |
 |---|---|
-| `mod.toml` | The manifest: id, name, version, licence, and what this mod depends on or conflicts with. |
-| `init.lua` | Runs once at load. Everything is registered here; the hooks it installs run for ever after. |
-| `textures/block.png` | The beacon's face, 16 by 16. |
-| `sounds/ping.wav` | The beacon's sound. WAV or Ogg Vorbis. |
-| `../../stubs/game.lua` | The whole mod API as editor annotations, vendored from the engine. Documentation and completion in one file. |
-| `../../AGENTS.md` | How to write a mod, for an AI coding assistant and the person supervising it. |
-| `../../.luarc.json` | Points a Lua language server at `stubs/`. |
+| `mods/tiamat_default_magic/` | The mod. `init.lua` decides load order; `config.lua` holds every number; the rest is one file a system. |
+| `tools/make_textures.py` | Draws the placeholder textures. Standard library only; the same bytes on every machine. |
+| `tests/native/` | The mod run in the engine's real script VM, beside the REAL sibling mods, with a fake server around it. |
+| `docs/brief.md` | The design, and §2.1: what was checked and what changed. |
+| `docs/exports.md` | What other mods may call, and every id this mod registers. |
+| `docs/sibling-asks.md`, `docs/engine-asks.md` | What this mod needs from others, with what stands in until then. |
+| `stubs/game.lua`, `AGENTS.md` | The engine's API, vendored (MIT). Re-copy when the engine moves. |
 
-## Try it
+## Check it
 
-Check it without starting a server — a second, no world left behind:
+Without starting a server, from the engine repository, over a directory
+holding the engine's `core` mods, every sibling and this mod:
 
 ```sh
-cargo run -p server -- --check-mods <a directory holding this mod and its siblings>
+cargo run -p server -- --check-mods <that directory>
 ```
 
-The manifest depends on the engine's `core`, so the directory must hold that
-too: the engine's `game/` does, once this mod is linked into it.
+The native check loads the real siblings from their repositories, so the
+engine and each sibling must be checked out beside this one:
 
-It prints the mods it found in load order and every block they registered;
-a mod with a mistake in it is named, with the line.
-
-Then put this directory in the server's mods directory (`mods_path` in the
-server's config; `game/` in the engine repository) and start the server. In
-the world: dig anything with the hand, place a beacon, use it, and press the
-wave key (J unless you moved it) for the dialog.
+```sh
+cargo run --manifest-path tests/native/Cargo.toml
+```
 
 ## Your editor
 
