@@ -19,13 +19,13 @@ and what came of it. The design reasons are in `docs/brief.md` §14.
 | C-M8 `fuel_percent` at every heat station | Craft | answered (0.5.0) | the Salamander's node now helps its athanor too |
 | C-M9 which fire burnt a powder | Craft | answered (0.5.0), option (b) | **adopted**: the flare is over its own campfire |
 | C-M10 an athanor's slow fire | Craft | withdrawn | a philosophical day is 1,800 ticks instead |
-| L-M1 per-player stat ceiling | Life | answered (uncommitted in Life, 2026-09-30) | Quintessence, with tier 5 |
-| L-M2 effects and health on others | Life | answered (uncommitted) | sprayed elixirs, the panacea, talismans (tiers 4–7) |
-| L-M3 composed abilities | Life | answered (uncommitted) | **adopted**: the elixir of swiftness |
-| L-M4 the worn view | Life | answered (uncommitted) | talismans (tier 4) |
-| L-M5 steer a creature | Life | answered (uncommitted) | the Venus talisman (tier 4) |
-| L-M6 air | Life | answered (uncommitted) | the undine's gift (tier 5) |
-| L-M7 the phoenix | Life | answered (uncommitted) | the phoenix (tier 6) |
+| L-M1 per-player stat ceiling | Life | answered (Life `87a95f6`) | Quintessence, with tier 5 |
+| L-M2 effects and health on others | Life | answered (Life `87a95f6`) | sprayed elixirs, the panacea, talismans (tiers 4–7) |
+| L-M3 composed abilities | Life | answered (Life `87a95f6`) | **adopted**: the elixir of swiftness |
+| L-M4 the worn view | Life | answered (Life `87a95f6`) | talismans (tier 4) |
+| L-M5 steer a creature | Life | answered (Life `87a95f6`) | the Venus talisman (tier 4) |
+| L-M6 air | Life | answered (Life `87a95f6`) | the undine's gift (tier 5) |
+| L-M7 the phoenix | Life | answered (Life `87a95f6`) | the phoenix (tier 6) |
 | W-M1 cinnabar | World | answered (1d50d64) | quicksilver (tier 4) |
 | W-M2 the magical shells | World | not built; optional | nothing waits on it |
 | W-M3 pyrite's random tick | World | answered: it is ours | **adopted**: pyrite weathers in the rain |
