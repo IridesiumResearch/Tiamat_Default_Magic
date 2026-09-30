@@ -34,9 +34,9 @@ and what came of it. The design reasons are in `docs/brief.md` §14.
 | P-M1 a branch label and a reveal rule | Progress | **open** | the Research tab shows the path flat |
 | Wx-M1 a layered sky overlay | Weather | **open** | night-sight glows instead of brightening |
 
-Life's answers are in its working tree, not yet committed, as of this
-date; this mod calls each only when Life's exports have it, so a Life
-without them loses that effect and nothing else.
+Life's answers landed in Life `87a95f6`. This mod still calls each only
+when Life's exports have it, so an older Life loses that effect and
+nothing else.
 
 ## The asks, as they were made
 
