@@ -112,7 +112,7 @@ mod's own list of pyrite blocks a player placed.
 `cold_magical`, this mod reads `hot_fiber_stone` as salamander's wool and
 `caul` as the world-egg's membrane. Nothing waits on it.
 
-**W-M1, cinnabar.** A `cinnabar` block (tags `ore`, `mineral`; hardness
+~~**W-M1, cinnabar.**~~ *Answered (world 1d50d64, 2026-09-29):* `cinnabar` is in the world's block list. Quicksilver (tier 4) is roasted from it; the sulfur stand-in is not built. The ask was: A `cinnabar` block (tags `ore`, `mineral`; hardness
 1.8; drops itself) as crust round Volcanic Foothills fumaroles and Geyser
 Basin throats, and seams in Mineral Vein Tunnels. Science needs it too.
 *Stands in:* quicksilver from sulfur crust at a ninth of the yield, in a

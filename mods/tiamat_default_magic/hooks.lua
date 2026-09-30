@@ -17,6 +17,8 @@ local listed = {}
 local listed_materials = {}
 local dialogs = {}
 local leaves = {}
+local joins = {}
+local ticks = {}
 
 --- Runs `fn(player, rest)` when a player says `word` (case-insensitive),
 --- alone or followed by more words. A string `fn` answers is its reply, said
@@ -51,6 +53,15 @@ end
 
 function tdm.on_leave(fn)
     leaves[#leaves + 1] = fn
+end
+
+function tdm.on_join(fn)
+    joins[#joins + 1] = fn
+end
+
+--- Runs `fn(dt_ticks)` every tick, after everything subscribed before it.
+function tdm.on_tick(fn)
+    ticks[#ticks + 1] = fn
 end
 
 local function first_verdict(list, event)
@@ -89,6 +100,16 @@ function H.install()
     game.register_on_player_leave(function(event)
         for _, fn in ipairs(leaves) do fn(event) end
     end)
+
+    game.register_on_player_join(function(event)
+        for _, fn in ipairs(joins) do fn(event) end
+    end)
+
+    if #ticks > 0 then
+        game.register_on_tick(function(dt)
+            for _, fn in ipairs(ticks) do fn(dt) end
+        end)
+    end
 end
 
 return H

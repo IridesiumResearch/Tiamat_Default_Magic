@@ -151,6 +151,7 @@ Every claim in §2 and below was re-checked against `stubs/game.lua` and the sib
 | Node `label` ≤ 32, text ≤ 90 | Progress keeps 48 and 200 (`nodes.lua`); ours are tighter by choice | Unchanged: ours |
 | A flame powder is thrown on a fire by using the fire | Craft hears every use at a campfire first (a LISTED callback, and listed callbacks keep load order) and opens the fire's box | A powder is PUT ON a campfire, as food is, and burns there as a campfire recipe; at a lit kiln or bloomery (which Craft does not list) it is thrown. Ask **C-M9**; §4 |
 | Discovery families named `tiamat_default_magic:herb:*` | Progress finds a family by splitting at the FIRST colon, so that id never resolves; its own families are `biome:*`, `kill:*` (`insight.lua`) | Every family here is `tiamat_default_magic.<name>:*`, and every discovery `tiamat_default_magic.<name>` |
+| Groups named `#tiamat_default_magic:blast` | Craft's group names are `^#[%w_]+$`: no colon (`util.lua`) | This mod's groups are `#magic_<name>` (`#magic_blast`, `#magic_herb`, `#magic_tincture`, `#magic_calx`); the shared ones stay `#saltpeter`, `#oil_of_vitriol`, `#quicksilver` |
 | Pictures ≤ 2048 px | ≤ 2048 px on an edge AND ≤ 8 MiB decoded (~1448² square) | Plates are drawn at 1024² |
 
 **Long works and Quintessence (decided 2026-09-30).** See §6.1 (a philosophical day is 1,800 ticks, so the forty-day Red Stone is one hour and one recipe) and §6.8 (the bar waits for L-M1 or tier 5).
@@ -381,14 +382,14 @@ craft.register_station{
   slots = { fuel = 1, input = { from = 2, to = 4 }, tool = { from = 5, to = 6 }, output = { from = 7, to = 9 } },
   heat = true,
   block = "tiamat_default_magic:athanor", lit_block = "tiamat_default_magic:athanor_lit",
-  boost = { tool = "#tiamat_default_magic:blast", heat = 4 },       -- the 4th degree: bellows, or a salamander's ember
+  boost = { tool = "#magic_blast", heat = 4 },       -- the 4th degree: bellows, or a salamander's ember
   refuse_fuel = "The athanor wants a slow fire: wood, charcoal or coal.",
 }
 ```
 
 Recipe: 9 `brick`, 2 `iron_plate`, 1 `glass`, 9 `fired_clay` at the workbench, `requires = "magic.athanor"`. Life: `add_contact_fire("tiamat_default_magic:athanor_lit", { damage = 1, ticks = 20, after = 20 })`, `add_heat_source(..., 0.8)`.
 
-Two vessel slots (5–6): Craft's slot roles all take ranges. The group `#tiamat_default_magic:blast` holds Craft's `bellows` and this mod's `salamander_ember` (§6.9).
+Two vessel slots (5–6): Craft's slot roles all take ranges. The group `#magic_blast` holds Craft's `bellows` and this mod's `salamander_ember` (§6.9).
 
 **The four degrees of fire** (the pseudo-Geber scale every later text repeats) are recipe requirements, not new machinery:
 

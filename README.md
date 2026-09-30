@@ -26,6 +26,14 @@ nodes of tiers 3 to 7 are registered from `tree.lua`, which
 `tools/check_tree.py` reads to prove the graph sound. Most nodes unlock
 nothing yet: the athanor and the Art behind it come next.
 
+Step 4: **the athanor and tier 3.** The philosophers' furnace is a Craft
+station with two vessel slots; a bath in one sets the degree of fire,
+bellows make the 4th. Glassblowing, Gates I–III (calcination, solution,
+separation), the cupel's silver from lead, wine, vinegar, verdigris, aqua
+vitae, green vitriol and its oil, blue vitriol, a planetary tincture from
+every herb, seven elixirs, and night-sight. A philosophical day is ninety
+seconds. The sigils and the salamander come with the glyphs, next.
+
 ## What is here
 
 | File | What |

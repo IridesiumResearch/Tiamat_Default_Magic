@@ -210,4 +210,274 @@ C.toybox = {
     distillation = 5,               -- the first thing distilled
 }
 
+-- The athanor (brief §6.1) ---------------------------------------------------------
+--
+-- "The philosophers' oven": a tower furnace built to hold a low, even heat.
+-- One Craft station that burns and works on its own; the vessels in its two
+-- tool slots turn it into every apparatus, and cost no blocks.
+C.athanor = {
+    station = "athanor",                                -- qualified: tiamat_default_magic:athanor
+    name = "Athanor",
+    block = { id = "athanor", name = "Athanor", description = "The philosophers' furnace: a slow tower fire. Light it with a striker.",
+        hardness = 2.0, tags = { "stone", "hard" } },
+    lit = { id = "athanor_lit", name = "Athanor (burning)", description = "A slow fire, held even for days.",
+        hardness = 2.0, tags = { "stone", "hard", "glowing" }, light = { r = 12, g = 7, b = 2 } },
+    slots = { fuel = 1, input = { from = 2, to = 4 }, tool = { from = 5, to = 6 }, output = { from = 7, to = 9 } },
+    blast = "#magic_blast",                             -- what blows the 4th degree: Craft's bellows (and, one day, a salamander's ember)
+    blast_members = { "C:bellows" },
+    blast_heat = 4,
+    refuse_fuel = "The athanor wants a slow fire: wood, charcoal or coal.",
+    contact_fire = { damage = 1, ticks = 20, after = 20 },
+    warmth = 0.8,
+}
+
+-- The four degrees of fire: a heat the athanor must burn at, and the bath
+-- that must stand in a vessel slot. The 4th has no bath: it is heat 4,
+-- which only a blast in a vessel slot reaches.
+C.degrees = {
+    { heat = 1, bath = "bain_marie", name = "in Maria's bath (1st degree)" },
+    { heat = 1, bath = "ash_bath", name = "in the ash bath (2nd degree)" },
+    { heat = 2, bath = "sand_bath", name = "in the sand bath, on coal or charcoal (3rd degree)" },
+    { heat = 4, name = "at naked fire, bellows blowing (4th degree)" },
+}
+
+-- Tier 3's items (brief §9). `look` is the placeholder picture's kind, which
+-- tools/make_textures.py draws.
+C.lab_items = {
+    -- Vessels, and the pipe that blows them.
+    { id = "blowpipe", name = "Blowpipe", description = "An iron pipe. In a kiln's tool slot, it blows glass into vessels." },
+    { id = "phial", name = "Phial", description = "A little glass bottle. Every elixir is drunk from one." },
+    { id = "alembic", name = "Alembic", description = "The still: a cucurbit, its head and a receiver. Distils, in the athanor." },
+    { id = "retort", name = "Retort", description = "A glass retort, for distilling what is dry." },
+    { id = "bain_marie", name = "Maria's bath", description = "A copper pot of water: the 1st degree of fire, a heat that never scorches." },
+    { id = "ash_bath", name = "Ash bath", description = "A clay dish of ash: the 2nd degree of fire." },
+    { id = "sand_bath", name = "Sand bath", description = "A clay dish of sand: the 3rd degree of fire, on coal or charcoal." },
+    { id = "cupel", name = "Cupel", description = "A little cup of bone ash. Lead melted in it leaves its silver behind." },
+    -- Gate I: calxes, and what the cupel leaves.
+    { id = "litharge", name = "Litharge", description = "Lead, roasted: a yellow calx." },
+    { id = "minium", name = "Minium", description = "Litharge, roasted longer: red lead." },
+    { id = "putty", name = "Putty of tin", description = "Tin, roasted: a white calx." },
+    { id = "aes_ustum", name = "Aes ustum", description = "Burnt copper: a black calx." },
+    { id = "crocus_martis", name = "Crocus martis", description = "Iron rust, roasted golden-red." },
+    { id = "bone_ash", name = "Bone ash", description = "Bone, burnt white. Cupels are made of it." },
+    { id = "silver_grain", name = "Silver grain", description = "A bead of silver from the cupel. Nine make an ingot." },
+    -- Wine, vinegar, spirit.
+    { id = "vinum", name = "Vinum", description = "Fruit, fermented in the bath. Not for drinking: for distilling." },
+    { id = "vinegar", name = "Vinegar", description = "Vinum left another day. It turns copper green." },
+    { id = "distilled_vinegar", name = "Distilled vinegar", description = "Vinegar, distilled clear. It dissolves calxes." },
+    { id = "verdigris", name = "Verdigris", description = "Copper's green rust, grown over vinegar." },
+    { id = "verdigris_salve", name = "Verdigris salve", description = "Verdigris in honey: the Egyptians' ointment. It soothes a burn.",
+        food = { cures = { "burning" }, sound = "eat" } },
+    { id = "aqua_vitae", name = "Aqua vitae", description = "Burning water, distilled from vinum. A solvent, never a drink." },
+    { id = "spirit_of_wine", name = "Spirit of wine", description = "Aqua vitae, rectified: the spirit every tincture is drawn with." },
+    -- Vitriol.
+    { id = "green_vitriol", name = "Green vitriol", description = "Pyrite, weathered wet: a salt like green glass. V.I.T.R.I.O.L." },
+    { id = "oil_of_vitriol", name = "Oil of vitriol", description = "Green vitriol, distilled dry: a strong, heavy oil." },
+    { id = "caput_mortuum", name = "Caput mortuum", description = "The dead head: the red residue in the retort." },
+    { id = "blue_vitriol", name = "Blue vitriol", description = "Vitriol of Venus: copper in oil of vitriol, grown into deep blue crystals." },
+    -- Gate II: salts.
+    { id = "salt_of_tartar", name = "Salt of tartar", description = "Ash, dissolved and dried: potash." },
+    { id = "sal_saturni", name = "Sal saturni", description = "Saturn's salt: litharge dissolved in vinegar. Sweet, and poison." },
+    { id = "salt_of_venus", name = "Salt of Venus", description = "Burnt copper dissolved in vinegar: a green-blue salt." },
+    -- Gate III: the three principles.
+    { id = "principle_mercury", name = "Principle Mercury", description = "A plant's spirit, parted from it." },
+    { id = "principle_sulfur", name = "Principle Sulfur", description = "A plant's oil, parted from it." },
+    { id = "principle_salt", name = "Principle Salt", description = "A plant's fixed ash, parted from it." },
+}
+
+-- Spagyrics (brief §6.3): a plant's planet, by Culpeper's rulers where he
+-- names one (C) and by analogy where he does not (A). A better source is
+-- one edit here. `units` is how much of the plant a tincture takes: a
+-- handful of a cover, or one crop.
+C.planets = { "sol", "luna", "venus", "mars", "mercury", "jupiter", "saturn" }
+C.planet_names = { sol = "Sol", luna = "Luna", venus = "Venus", mars = "Mars", mercury = "Mercury", jupiter = "Jupiter", saturn = "Saturn" }
+C.herbs = {
+    { "W:roman_chamomile", "sol" },     -- C
+    { "W:peony", "sol" },               -- C
+    { "L:rice", "sol", count = 1 },     -- A
+    { "W:poppy", "luna" },              -- C
+    { "W:water_iris", "luna" },         -- C
+    { "W:blue_lunaria", "luna" },       -- A
+    { "W:reeds", "luna" },              -- A
+    { "W:glow_cap", "luna" },           -- A
+    { "L:turnip", "luna", count = 1 },  -- C
+    { "W:ladys_mantle", "venus" },      -- C
+    { "W:ladys_mantle_bloom", "venus" },-- C
+    { "W:wild_mint", "venus" },         -- C
+    { "W:bramble", "venus" },           -- C
+    { "W:rose_blooms", "venus" },       -- C
+    { "W:rose", "venus", count = 1 },   -- C
+    { "W:bluebell", "venus" },          -- A
+    { "L:wheat", "venus", count = 1 },  -- C
+    { "L:apple", "venus", count = 1 },  -- C
+    { "L:berries", "venus", count = 1 },-- C
+    { "W:gorse", "mars" },              -- C
+    { "W:allium", "mars" },             -- C
+    { "W:cactus", "mars" },             -- A
+    { "W:fern", "mercury" },            -- C
+    { "W:maidenhair", "mercury" },      -- C
+    { "W:tall_grass", "mercury" },      -- A
+    { "W:monstera", "jupiter" },        -- A
+    { "W:pitcher_plant", "jupiter" },   -- A
+    { "W:climbing_ivy", "saturn" },     -- C
+    { "W:heather", "saturn" },          -- A
+    { "W:lichen", "saturn" },           -- A
+    { "W:moss", "saturn" },             -- A
+    { "W:dead_sagebrush", "saturn" },   -- A
+    { "W:mushroom_cap", "saturn" },     -- A
+    { "L:mushroom", "saturn", count = 1 }, -- A
+}
+C.herb_units = 9                    -- a cover's handful, per tincture
+C.tincture_days = 1
+
+-- The simple elixirs: a tincture in a phial, by hand. Life's own effects
+-- where Life has one; `own` is this mod's (effects.lua). Night-sight
+-- brightens nothing until Weather's overlay (Wx-M1): until then it is a
+-- rested sleep and a faint glow round the drinker. Swiftness moves nobody
+-- until Life composes abilities (L-M3): until then it is Life's `steady`.
+C.elixirs = {
+    { id = "elixir_vigour", planet = "sol", name = "Elixir of vigour", description = "Sol's tincture: your wounds close.",
+        food = { effects = { { "regeneration", 300 } }, sound = "drink" } },
+    { id = "elixir_night_sight", planet = "luna", name = "Elixir of night-sight", description = "Luna's tincture: the dark is kinder.",
+        food = { effects = { { "rested", 2400 } }, sound = "drink" }, own = { "night_sight", 2400 } },
+    { id = "elixir_hearts_ease", planet = "venus", name = "Heart's ease", description = "Venus's tincture: it heals and calms.",
+        food = { heal = 4, effects = { { "rested", 1200 } }, sound = "drink" } },
+    { id = "elixir_fortitude", planet = "mars", name = "Elixir of fortitude", description = "Mars's tincture: blows land softer.",
+        food = { effects = { { "resistance", 600 } }, sound = "drink" } },
+    { id = "elixir_swiftness", planet = "mercury", name = "Elixir of swiftness", description = "Mercury's tincture: you tire more slowly.",
+        food = { effects = { { "steady", 1200 } }, sound = "drink" } },
+    { id = "draught_warming", planet = "jupiter", name = "Warming draught", description = "Jupiter's tincture: warm through.",
+        food = { temperature = "warm", effects = { { "warmth", 1200 } }, sound = "drink" } },
+    { id = "draught_cooling", planet = "saturn", name = "Cooling draught", description = "Saturn's tincture: cool as stone.",
+        food = { temperature = "cool", effects = { { "cooling", 1200 } }, sound = "drink" } },
+}
+
+-- This mod's own effects (brief §6.7): what Life does not have, each a
+-- timer in storage and a look every `every` ticks.
+C.own_effects = {
+    night_sight = { every = 40, particles = 6, colour = { r = 0.7, g = 0.9, b = 1.0, a = 0.35 } },
+}
+
+-- The recipes of tier 3. `degree` is a degree of fire (above); `days` is in
+-- philosophical days; `gate` is the Gate of Ripley a recipe completes, the
+-- first time (a discovery worth 25 x the gate's number).
+C.lab_recipes = {
+    -- The athanor itself, its baths and the glass.
+    { id = "athanor", station = "workbench", node = "magic.athanor",
+        inputs = { { "C:brick", count = 9 }, { "C:iron_plate", count = 2 }, { "C:glass", count = 1 }, { "C:fired_clay", count = 9 } },
+        outputs = { { "athanor", count = 1 } } },
+    { id = "ash_bath", station = "hand", node = "magic.athanor",
+        inputs = { { "C:fired_clay", count = 1 }, { "#ash", units = 9 } }, outputs = { { "ash_bath", count = 1 } } },
+    { id = "bain_marie", station = "hand", node = "magic.bain_marie",
+        inputs = { { "C:copper_pot", count = 1 }, { "L:water_bucket", count = 1 } },
+        outputs = { { "bain_marie", count = 1 }, { "L:bucket", count = 1 } } },
+    { id = "sand_bath", station = "hand", node = "magic.degrees_of_fire",
+        inputs = { { "C:fired_clay", count = 1 }, { "W:sand", units = 9 } }, outputs = { { "sand_bath", count = 1 } } },
+    { id = "blowpipe", station = "workbench", node = "magic.glassblowing",
+        inputs = { { "C:iron_bar", count = 1 } }, tools = { { "#hammer", wear = 1 } }, outputs = { { "blowpipe", count = 1 } } },
+    { id = "phial", station = "kiln", node = "magic.glassblowing", heat = 2, ticks = 200,
+        inputs = { { "C:glass", count = 1 } }, tools = { { "blowpipe", wear = 0 } }, outputs = { { "phial", count = 4 } } },
+    { id = "alembic", station = "kiln", node = "magic.glassblowing", heat = 2, ticks = 600,
+        inputs = { { "C:glass", count = 3 } }, tools = { { "blowpipe", wear = 0 } }, outputs = { { "alembic", count = 1 } } },
+    { id = "retort", station = "kiln", node = "magic.retort", heat = 2, ticks = 400,
+        inputs = { { "C:glass", count = 2 } }, tools = { { "blowpipe", wear = 0 } }, outputs = { { "retort", count = 1 } } },
+
+    -- Gate I, Calcination: metals roasted at naked fire.
+    { id = "calcine_lead", station = "athanor", node = "magic.gate_calcination", degree = 4, ticks = 600, gate = 1,
+        inputs = { { "C:lead_ingot", count = 1 } }, outputs = { { "litharge", count = 1 } } },
+    { id = "calcine_tin", station = "athanor", node = "magic.gate_calcination", degree = 4, ticks = 600, gate = 1,
+        inputs = { { "C:tin_ingot", count = 1 } }, outputs = { { "putty", count = 1 } } },
+    { id = "calcine_copper", station = "athanor", node = "magic.gate_calcination", degree = 4, ticks = 600, gate = 1,
+        inputs = { { "C:copper_ingot", count = 1 } }, outputs = { { "aes_ustum", count = 1 } } },
+    { id = "calcine_iron", station = "athanor", node = "magic.gate_calcination", degree = 4, ticks = 600, gate = 1,
+        inputs = { { "C:iron_bar", count = 1 } }, outputs = { { "crocus_martis", count = 1 } } },
+    { id = "calcine_bone", station = "athanor", node = "magic.gate_calcination", degree = 4, ticks = 400, gate = 1,
+        inputs = { { "L:bone", count = 1 } }, outputs = { { "bone_ash", count = 1 } } },
+    { id = "minium", station = "athanor", node = "magic.gate_calcination", degree = 2, days = 1,
+        inputs = { { "litharge", count = 1 } }, outputs = { { "minium", count = 1 } } },
+
+    -- The cupel: the historic silver-from-lead.
+    { id = "cupel", station = "hand", node = "magic.cupellation",
+        inputs = { { "bone_ash", count = 1 } }, outputs = { { "cupel", count = 1 } } },
+    { id = "cupellation", station = "athanor", node = "magic.cupellation", degree = 4, ticks = 1200,
+        inputs = { { "C:lead_ingot", count = 9 } }, tools = { { "cupel", wear = 0 } },
+        outputs = { { "litharge", count = 8 }, { "silver_grain", count = 1 } } },
+    { id = "silver_from_grains", station = "athanor", node = "magic.cupellation", heat = 2, ticks = 600,
+        inputs = { { "silver_grain", count = 9 } }, outputs = { { "C:silver_ingot", count = 1 } } },
+
+    -- Wine and vinegar, in Maria's bath.
+    { id = "vinum", station = "athanor", node = "magic.vinegar_and_wine", degree = 1, days = 1,
+        inputs = { { "#fruit", count = 3 }, { "L:water_bucket", count = 1 } },
+        outputs = { { "vinum", count = 1 }, { "L:bucket", count = 1 } } },
+    { id = "vinum_from_wheat", station = "athanor", node = "magic.vinegar_and_wine", degree = 1, days = 1,
+        inputs = { { "L:wheat", count = 3 }, { "L:water_bucket", count = 1 } },
+        outputs = { { "vinum", count = 1 }, { "L:bucket", count = 1 } } },
+    { id = "vinegar", station = "athanor", node = "magic.vinegar_and_wine", degree = 1, days = 1,
+        inputs = { { "vinum", count = 1 } }, outputs = { { "vinegar", count = 1 } } },
+    { id = "distilled_vinegar", station = "athanor", node = "magic.vinegar_and_wine", degree = 2, ticks = 600,
+        inputs = { { "vinegar", count = 1 } }, tools = { { "alembic", wear = 0 } }, outputs = { { "distilled_vinegar", count = 1 } } },
+
+    -- Verdigris, and the Egyptians' ointment.
+    { id = "verdigris", station = "athanor", node = "magic.verdigris", degree = 1, days = 1,
+        inputs = { { "C:copper_ingot", count = 1 }, { "vinegar", count = 1 } }, outputs = { { "verdigris", count = 3 } } },
+    { id = "verdigris_salve", station = "hand", node = "magic.verdigris",
+        inputs = { { "verdigris", count = 1 }, { "L:honey", count = 1 } }, outputs = { { "verdigris_salve", count = 2 } } },
+
+    -- Burning water, and its spirit.
+    { id = "aqua_vitae", station = "athanor", node = "magic.aqua_vitae", degree = 2, ticks = 600,
+        inputs = { { "vinum", count = 1 } }, tools = { { "alembic", wear = 0 } }, outputs = { { "aqua_vitae", count = 1 } } },
+    { id = "spirit_of_wine", station = "athanor", node = "magic.aqua_vitae", degree = 2, days = 1,
+        inputs = { { "aqua_vitae", count = 3 } }, tools = { { "alembic", wear = 0 } }, outputs = { { "spirit_of_wine", count = 1 } } },
+
+    -- Vitriol: the bath's route (the rain's waits on sibling ask W-M3).
+    { id = "green_vitriol", station = "athanor", node = "magic.green_vitriol", degree = 1, days = 3,
+        inputs = { { "W:pyrite", units = 27 }, { "L:water_bucket", count = 1 } },
+        outputs = { { "green_vitriol", count = 1 }, { "L:bucket", count = 1 } } },
+    { id = "oil_of_vitriol", station = "athanor", node = "magic.oil_of_vitriol", degree = 3, days = 1,
+        inputs = { { "green_vitriol", count = 2 } }, tools = { { "retort", wear = 0 } },
+        outputs = { { "oil_of_vitriol", count = 1 }, { "caput_mortuum", count = 1 } } },
+    { id = "blue_vitriol", station = "athanor", node = "magic.blue_vitriol", degree = 1, ticks = 600,
+        inputs = { { "C:copper_ingot", count = 1 }, { "#oil_of_vitriol", count = 1 } }, outputs = { { "blue_vitriol", count = 3 } } },
+
+    -- Gate II, Solution.
+    { id = "salt_of_tartar", station = "athanor", node = "magic.gate_solution", degree = 1, days = 1, gate = 2,
+        inputs = { { "#ash", units = 27 }, { "L:water_bucket", count = 1 } },
+        outputs = { { "salt_of_tartar", count = 1 }, { "L:bucket", count = 1 } } },
+    { id = "sal_saturni", station = "athanor", node = "magic.gate_solution", degree = 1, days = 1, gate = 2,
+        inputs = { { "litharge", count = 1 }, { "distilled_vinegar", count = 1 } }, outputs = { { "sal_saturni", count = 1 } } },
+    { id = "salt_of_venus", station = "athanor", node = "magic.gate_solution", degree = 1, days = 1, gate = 2,
+        inputs = { { "aes_ustum", count = 1 }, { "distilled_vinegar", count = 1 } }, outputs = { { "salt_of_venus", count = 1 } } },
+
+    -- Gate III, Separation: any herb into its three principles.
+    { id = "separation", station = "athanor", node = "magic.gate_separation", degree = 2, days = 1, gate = 3,
+        inputs = { { "#magic_herb", units = 27 } }, tools = { { "alembic", wear = 0 } },
+        outputs = { { "principle_mercury", count = 1 }, { "principle_sulfur", count = 1 }, { "principle_salt", count = 1 } } },
+}
+
+-- Ripley's Twelve Gates, as discoveries: the first time a player completes
+-- each, 25 x its number (brief §6.2).
+C.gates = { "Calcination", "Solution", "Separation", "Conjunction", "Putrefaction", "Congelation",
+    "Cibation", "Sublimation", "Fermentation", "Exaltation", "Multiplication", "Projection" }
+C.gate_insight = 25
+
+-- Other discoveries of tier 3.
+C.discoveries = {
+    vitriol = { insight = 10, label = "V.I.T.R.I.O.L.: visit the interior of the earth" },
+    herb = 5,                       -- each species' first tincture
+}
+
+-- Studies at Progress's research table (brief §6.12).
+C.studies = {
+    { id = "study_calx", name = "Study a calx", inputs = { { "#magic_calx", count = 1 } }, ticks = 600, insight = 15 },
+    { id = "study_tincture", name = "Study a tincture", inputs = { { "#magic_tincture", count = 1 } }, ticks = 1200, insight = 20 },
+    { id = "study_vitriol", name = "Study vitriol", inputs = { { "green_vitriol", count = 1 } }, ticks = 1800, insight = 30 },
+}
+
+-- The Mute Book's line for a node whose recipes are too many to list one
+-- by one.
+C.book_notes = {
+    ["magic.spagyric_tincture"] = "a handful of any herb + spirit of wine  ->  its planet's tincture, in the athanor, in Maria's bath (1st degree), a day",
+    ["magic.simple_elixirs"] = "a tincture + a phial  ->  that planet's elixir, by hand",
+}
+
 return C

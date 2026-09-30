@@ -24,7 +24,22 @@ local function register(spec)
     }
 end
 
-for _, spec in ipairs(C.bench_items) do
+-- Every item, in one list: the Bench's, tier 3's, a tincture for each
+-- planet, and the elixirs drawn from them.
+I.all = {}
+local function add(list)
+    for _, spec in ipairs(list) do I.all[#I.all + 1] = spec end
+end
+add(C.bench_items)
+add(C.lab_items)
+for _, planet in ipairs(C.planets) do
+    local name = C.planet_names[planet]
+    I.all[#I.all + 1] = { id = "tincture_" .. planet, name = "Tincture of " .. name,
+        description = string.format("A herb ruled by %s, drawn out in spirit of wine.", name) }
+end
+add(C.elixirs)
+
+for _, spec in ipairs(I.all) do
     register(spec)
 end
 
@@ -33,7 +48,7 @@ end
 -- in the log rather than a mod that will not load.
 local life = U.exports("tiamat_default_life")
 if life then
-    for _, spec in ipairs(C.bench_items) do
+    for _, spec in ipairs(I.all) do
         if spec.food and not life.add_food(U.id(spec.id), spec.food) then
             game.log("tiamat_default_magic: Life refused the food " .. spec.id)
         end

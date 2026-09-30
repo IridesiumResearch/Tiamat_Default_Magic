@@ -28,31 +28,29 @@ local W = ui and ui.widgets
 -- Pictures ride in the dialog's own tree, so they cost none of the
 -- server's 512 registered pictures: a content hash is enough.
 local pictures = {}
-for _, spec in ipairs(C.bench_items) do
-    local ok, hash = pcall(game.content_hash, "textures/" .. spec.id .. ".png")
-    if ok then pictures[spec.id] = hash end
+local names = {}            -- this mod's id -> the name a player reads
+local function know(id, name)
+    names[id] = name
+    local ok, hash = pcall(game.content_hash, "textures/" .. id .. ".png")
+    if ok then pictures[id] = hash end
 end
-do
-    local ok, hash = pcall(game.content_hash, "textures/" .. C.hermetic_lamp.id .. ".png")
-    if ok then pictures[C.hermetic_lamp.id] = hash end
-end
+for _, spec in ipairs(tdm.items.all) do know(spec.id, spec.name) end
+know(C.hermetic_lamp.id, C.hermetic_lamp.name)
+know(C.athanor.block.id, C.athanor.block.name)
 
 local STATIONS = {
     hand = "by hand",
     workbench = "at a workbench",
     campfire = "on a campfire, in a copper pot",
     kiln = "in a burning kiln",
+    athanor = "in the athanor",
 }
 
 --- The name a player reads for a config id: this mod's item's own name, or
 --- the other mod's id made readable ("W:roman_chamomile" -> "roman chamomile").
-local names = {}
-for _, spec in ipairs(C.bench_items) do names[spec.id] = spec.name end
-names[C.hermetic_lamp.id] = C.hermetic_lamp.name
-
 local function name_of(id)
     if names[id] then return names[id] end
-    local short = string.match(id, ":([^:]+)$") or id
+    local short = string.match(id, "[:#]([^:#]+)$") or id
     return (string.gsub(short, "_", " "))
 end
 
@@ -70,7 +68,11 @@ function P.line(r)
     local tools = {}
     for i, entry in ipairs(r.tools or {}) do tools[i] = name_of(entry[1]) end
     local with = #tools > 0 and (", with a " .. table.concat(tools, " and ")) or ""
-    return string.format("%s  ->  %s, %s%s", table.concat(parts, " + "), amount(out), STATIONS[r.station] or r.station, with)
+    local where = STATIONS[r.station] or r.station
+    if r.degree then where = where .. ", " .. C.degrees[r.degree].name end
+    local time = ""
+    if r.days then time = r.days == 1 and ", a day" or string.format(", %d days", r.days) end
+    return string.format("%s  ->  %s, %s%s%s", table.concat(parts, " + "), amount(out), where, with, time)
 end
 
 -- Widgets: the interface's look when it is here, plain ones without it.
@@ -105,24 +107,45 @@ local function recipe_row(r)
     return row(children, 44)
 end
 
---- Whether the player could learn `node` next: everything it needs is held.
-local function next_for(uuid, node)
-    return A.has(uuid, node.requires)
+--- Every node the book can have a page for: the Bench's, then the path's,
+--- each `{ id, cost, requires = { ... }, label, text }`.
+local book_nodes = {}
+for _, node in ipairs(C.bench_nodes) do
+    book_nodes[#book_nodes + 1] = { id = node.id, cost = node.cost, requires = { node.requires },
+        label = node.label, text = node.text }
+end
+for _, node in ipairs(tdm.tree) do
+    local requires = {}
+    for i, ref in ipairs(node.requires) do
+        requires[i] = string.find(ref, ".", 1, true) and ref or ("magic." .. ref)
+    end
+    book_nodes[#book_nodes + 1] = { id = "magic." .. node.id, cost = node.cost, requires = requires,
+        label = node.label, text = node.text }
 end
 
---- The book's pages for a player, as one dialog tree.
+--- Whether the player could learn `node` next: everything it needs is held.
+local function next_for(uuid, node)
+    for _, ref in ipairs(node.requires) do
+        if not A.has(uuid, ref) then return false end
+    end
+    return true
+end
+
+--- The book's pages for a player, as one dialog tree: a page for each node
+--- they hold or could learn next, never the whole tree at once.
 function P.build(uuid)
     local pages = { label("The Mute Book", 22) }
     local shown = 0
-    for _, node in ipairs(C.bench_nodes) do
+    for _, node in ipairs(book_nodes) do
         local held = A.has(uuid, node.id)
         if held or next_for(uuid, node) then
             shown = shown + 1
             local page = { label(node.label, 18), text(node.text) }
             if held then
-                for _, r in ipairs(A.recipes[node.id] or {}) do
+                for _, r in ipairs(tdm.recipes.by_node[node.id] or {}) do
                     page[#page + 1] = recipe_row(r)
                 end
+                if C.book_notes[node.id] then page[#page + 1] = text(C.book_notes[node.id]) end
             else
                 page[#page + 1] = hint(string.format("Learn it at the research table for %d insight.", node.cost))
             end

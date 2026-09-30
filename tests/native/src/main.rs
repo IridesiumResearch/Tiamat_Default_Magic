@@ -20,6 +20,8 @@ fn main() {
     creative();
     the_tree();
     the_door();
+    the_athanor();
+    spagyrics();
     determinism();
     println!("magic native check: all passed");
 }
@@ -277,6 +279,147 @@ fn the_door() {
     assert_eq!(r.said(), "You are already of The Hermetic Art.");
     assert_eq!(r.units(PLAYER, "mutus_liber"), 27);
     println!("the door: ok");
+}
+
+/// A player on the magic path, holding `nodes` (granted by an operator).
+fn adept(r: &mut Rig, nodes: &[&str]) {
+    ready(r, 0);
+    assert_eq!(r.ask("progress grant shared.keystone"), "Learned: The Keystone");
+    r.put_block(20, 64, 20, "emerald_tablet");
+    assert!(r.use_at(PLAYER, 20, 64, 20));
+    r.press(PLAYER, "tiamat_default_progress", "fork", "yes");
+    assert_eq!(r.ask("t path"), "magic");
+    for node in nodes {
+        assert!(r.ask(&format!("progress grant {node}")).starts_with("Learned"), "granting {node}");
+    }
+}
+
+/// An athanor at `(x, y, z)`: placed, its container made by Craft when it
+/// is first used, and filled slot by slot (`(slot, id, units)`).
+fn athanor(r: &mut Rig, (x, y, z): (i32, i32, i32), slots: &[(usize, &str, u32)]) -> String {
+    r.put_block(x, y, z, "athanor");
+    r.inventory.held.lock().unwrap().remove(&PLAYER);
+    assert!(r.use_at(PLAYER, x, y, z), "Craft opens the athanor");
+    let name = format!("tiamat_default_craft:{MOD}:athanor:{x},{y},{z}");
+    assert!(r.boxes.exists(&name), "the athanor's container");
+    r.boxes.holders.lock().unwrap().clear();
+    for (slot, id, units) in slots {
+        r.boxes.set(&name, *slot, Some(tiamat_core::inventory::Stack::new(r.material(id), *units).unwrap()));
+    }
+    name
+}
+
+/// Lights the athanor at `(x, y, z)` with a fire striker.
+fn light(r: &mut Rig, (x, y, z): (i32, i32, i32)) {
+    r.give(PLAYER, "tiamat_default_craft:fire_striker", 27);
+    r.hold(PLAYER, "tiamat_default_craft:fire_striker");
+    assert!(r.use_at(PLAYER, x, y, z), "struck");
+    r.inventory.held.lock().unwrap().remove(&PLAYER);
+}
+
+fn slot(r: &Rig, name: &str, n: usize) -> Option<(String, u32)> {
+    r.boxes.get(name, n).map(|s| {
+        let id = r.materials.iter().find(|(_, m)| **m == s.material).map(|(k, _)| k.clone()).unwrap_or_default();
+        (id, s.units)
+    })
+}
+
+/// The athanor burns on its own: the 4th degree with bellows calcines a
+/// metal and opens Gate I; Maria's bath ferments fruit in a philosophical
+/// day; nothing runs without the right vessel.
+fn the_athanor() {
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.athanor", "magic.degrees_of_fire", "magic.gate_calcination", "magic.bain_marie",
+        "magic.vinegar_and_wine"]);
+    let insight: i32 = r.ask("t insight").parse().unwrap();
+
+    // Gate I: copper at naked fire. Bellows in a vessel slot make heat 4.
+    let at = (30, 64, 30);
+    let name = athanor(&mut r, at, &[
+        (1, "tiamat_default_world:coal", 27 * 4),
+        (2, "tiamat_default_craft:copper_ingot", 27),
+        (5, "tiamat_default_craft:bellows", 27),
+    ]);
+    light(&mut r, at);
+    r.tick(700);
+    assert_eq!(slot(&r, &name, 7), Some((format!("{MOD}:aes_ustum"), 27)), "copper, calcined");
+    assert_eq!(slot(&r, &name, 2), None, "the copper is used");
+    let after: i32 = r.ask("t insight").parse().unwrap();
+    assert_eq!(after - insight, 25, "Gate I: Calcination");
+
+    // Without the bellows the same copper sits there: 2nd-degree heat is not naked fire.
+    let at2 = (34, 64, 30);
+    let name2 = athanor(&mut r, at2, &[
+        (1, "tiamat_default_world:coal", 27 * 4),
+        (2, "tiamat_default_craft:copper_ingot", 27),
+    ]);
+    light(&mut r, at2);
+    r.tick(700);
+    assert_eq!(slot(&r, &name2, 7), None, "no naked fire, no calx");
+
+    // Wine: berries and water in Maria's bath, one philosophical day.
+    let at3 = (38, 64, 30);
+    let name3 = athanor(&mut r, at3, &[
+        (1, "tiamat_default_world:coal", 27 * 4),
+        (2, "tiamat_default_life:berries", 27 * 3),
+        (3, "tiamat_default_life:water_bucket", 27),
+        (5, "bain_marie", 27),
+    ]);
+    light(&mut r, at3);
+    r.tick(1700);
+    assert_eq!(slot(&r, &name3, 7), None, "not before a day");
+    r.tick(200);
+    let out: Vec<_> = (7..=9).filter_map(|n| slot(&r, &name3, n)).collect();
+    assert!(out.contains(&(format!("{MOD}:vinum"), 27)), "{out:?}");
+    assert!(out.contains(&("tiamat_default_life:bucket".to_owned(), 27)), "the bucket back: {out:?}");
+    println!("the athanor: ok");
+}
+
+/// A herb and a spirit make its planet's tincture, a first species pays,
+/// the tincture in a phial is an elixir, and night-sight glows on the
+/// drinker until it runs out.
+fn spagyrics() {
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.athanor", "magic.bain_marie", "magic.glassblowing", "magic.vinegar_and_wine",
+        "magic.aqua_vitae", "magic.spagyric_tincture", "magic.simple_elixirs"]);
+    let insight: i32 = r.ask("t insight").parse().unwrap();
+
+    let at = (40, 64, 40);
+    let name = athanor(&mut r, at, &[
+        (1, "tiamat_default_world:coal", 27 * 2),
+        (2, "tiamat_default_world:roman_chamomile", 9),
+        (3, "spirit_of_wine", 27),
+        (5, "bain_marie", 27),
+    ]);
+    light(&mut r, at);
+    r.tick(1900);
+    assert_eq!(slot(&r, &name, 7), Some((format!("{MOD}:tincture_sol"), 27)), "chamomile is Sol's");
+    let after: i32 = r.ask("t insight").parse().unwrap();
+    assert_eq!(after - insight, 5, "a first tincture of roman chamomile");
+
+    // The elixir, by hand; Luna's for night-sight.
+    r.give(PLAYER, "tincture_luna", 27);
+    r.give(PLAYER, "phial", 27);
+    assert_eq!(r.ask(&format!("t make {MOD}:elixir_night_sight")), "made");
+    assert_eq!(r.units(PLAYER, "elixir_night_sight"), 27);
+    assert_eq!(r.units(PLAYER, "phial"), 0, "the phial holds it");
+
+    // Drunk through Life, it starts this mod's own effect: a glow of motes,
+    // for the drinker alone, every 40 ticks, until it runs out.
+    r.hold(PLAYER, "elixir_night_sight");
+    assert!(r.use_at_nothing(PLAYER), "Life drinks it");
+    assert_eq!(r.units(PLAYER, "elixir_night_sight"), 0, "drunk");
+    r.bursts();
+    r.tick(80);
+    let glow: Vec<_> = r.bursts().into_iter().filter(|b| b.contains("player: Some")).collect();
+    assert!(!glow.is_empty(), "the drinker glows");
+    assert!(r.stored(&format!("fx:{}:night_sight", rig::hex(PLAYER))).is_some(), "a timer, in storage");
+    r.tick(2400);
+    r.bursts();
+    r.tick(80);
+    assert!(r.bursts().iter().all(|b| !b.contains("player: Some")), "and it runs out");
+    assert!(r.stored(&format!("fx:{}:night_sight", rig::hex(PLAYER))).is_none(), "the timer is gone");
+    println!("spagyrics: ok");
 }
 
 /// The same play twice leaves the same storage.

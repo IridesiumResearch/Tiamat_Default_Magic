@@ -26,16 +26,6 @@ local A = {}
 local progress = U.exports("tiamat_default_progress")
 local craft = U.exports("tiamat_default_craft")
 
-local function qualify_list(list)
-    if not list then return nil end
-    local out = {}
-    for i, entry in ipairs(list) do
-        local copy = { U.id(entry[1]), count = entry.count, units = entry.units, wear = entry.wear }
-        out[i] = copy
-    end
-    return out
-end
-
 -- The nodes -----------------------------------------------------------------------
 
 A.nodes = {}        -- node id -> its config entry, for the book
@@ -50,42 +40,15 @@ for _, node in ipairs(C.bench_nodes) do
     end
 end
 
--- The recipes ---------------------------------------------------------------------
-
-A.recipes = {}      -- node id -> list of its recipes, in config order, for the book
-
-local function register_recipe(r)
-    local spec = {
-        id = U.id(r.id),
-        station = r.station,
-        inputs = qualify_list(r.inputs),
-        outputs = qualify_list(r.outputs),
-        tools = qualify_list(r.tools),
-        heat = r.heat,
-        ticks = r.ticks,
-        requires = r.node,
-    }
-    local ok, why = craft.register(spec)
-    if not ok then
-        game.log("tiamat_default_magic: Craft refused the recipe " .. r.id .. ": " .. tostring(why))
-        return
-    end
-    if r.node then
-        A.recipes[r.node] = A.recipes[r.node] or {}
-        table.insert(A.recipes[r.node], r)
-    end
-end
+-- The recipes, through recipes.lua, which also indexes them for the book.
 
 if craft then
-    for _, r in ipairs(C.bench_recipes) do
-        register_recipe(r)
-    end
+    tdm.recipes.register_all(C.bench_recipes)
     -- A powder on a campfire: a recipe that makes nothing, heard below.
     for _, colour in ipairs(U.sorted_keys(C.flames)) do
-        local flame = C.flames[colour]
-        register_recipe{
+        tdm.recipes.register{
             id = "burn_" .. colour, station = "campfire", ticks = C.flame_ticks,
-            inputs = { { flame.powder, count = 1 } }, outputs = {},
+            inputs = { { C.flames[colour].powder, count = 1 } }, outputs = {},
         }
     end
 end

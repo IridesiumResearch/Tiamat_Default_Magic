@@ -187,6 +187,113 @@ ITEMS = {
 }
 
 
+BRICK = (150, 84, 60)
+BRICK_DARK = (104, 56, 40)
+
+
+def furnace(glow=None):
+    """The athanor: a brick tower, its mouth dark or glowing."""
+    c = Canvas(BRICK)
+    for y in range(0, SIZE, 4):
+        c.rect(0, y, 15, y, BRICK_DARK)
+        for x in range((y // 4 % 2) * 4, SIZE, 8):
+            c.rect(x, y, x, y + 3, BRICK_DARK)
+    c.rect(5, 9, 10, 14, glow or (40, 30, 26))
+    return c
+
+
+def flask(neck, body, liquid=None):
+    """Glassware: a neck `neck` wide over a body `body` wide."""
+    c = Canvas()
+    n0 = 8 - neck // 2
+    c.rect(n0, 2, n0 + neck - 1, 7, GLASS_EDGE)
+    b0 = 8 - body // 2
+    c.rect(b0, 8, b0 + body - 1, 14, GLASS_EDGE)
+    c.rect(b0 + 1, 9, b0 + body - 2, 13, liquid or GLASS)
+    return c
+
+
+def retort():
+    c = flask(2, 8)
+    for i in range(6):
+        c.dot(9 + i, 4 + i // 2, GLASS_EDGE)    # the beak
+    return c
+
+
+def dish(fill):
+    """A clay dish of something: the baths, the cupel."""
+    c = Canvas()
+    c.rect(2, 9, 13, 9, fill)
+    c.rect(2, 10, 13, 13, CLAY)
+    c.rect(4, 14, 11, 14, CLAY_DARK)
+    return c
+
+
+def pipe():
+    c = Canvas()
+    for i in range(12):
+        c.dot(2 + i, 13 - i, (90, 96, 108))
+        c.dot(3 + i, 13 - i, (60, 64, 74))
+    return c
+
+
+def crystal(colour, light):
+    c = Canvas()
+    for x0, h in [(4, 6), (7, 9), (10, 5)]:
+        c.rect(x0, 14 - h, x0 + 2, 14, colour)
+        c.rect(x0, 14 - h, x0, 14, light)
+    return c
+
+
+# Colours of the Art's matter.
+CALX = {
+    "litharge": (230, 196, 90), "minium": (214, 70, 44), "putty": (236, 234, 226),
+    "aes_ustum": (46, 40, 38), "crocus_martis": (190, 96, 40), "bone_ash": (232, 228, 214),
+    "caput_mortuum": (110, 36, 34), "salt_of_tartar": (240, 236, 224), "sal_saturni": (246, 244, 236),
+    "salt_of_venus": (70, 160, 150), "verdigris": (70, 170, 120), "principle_salt": (220, 214, 200),
+}
+LIQUID = {
+    "vinum": (120, 30, 50), "vinegar": (170, 110, 60), "distilled_vinegar": (230, 224, 200),
+    "aqua_vitae": (224, 232, 236), "spirit_of_wine": (240, 246, 250), "oil_of_vitriol": (200, 190, 150),
+    "principle_mercury": (200, 214, 230), "principle_sulfur": (220, 170, 60),
+}
+PLANET = {
+    "sol": (240, 190, 50), "luna": (200, 210, 230), "venus": (90, 190, 110), "mars": (200, 50, 40),
+    "mercury": (150, 160, 180), "jupiter": (80, 110, 210), "saturn": (60, 56, 70),
+}
+ELIXIR = {
+    "elixir_vigour": "sol", "elixir_night_sight": "luna", "elixir_hearts_ease": "venus",
+    "elixir_fortitude": "mars", "elixir_swiftness": "mercury", "draught_warming": "jupiter",
+    "draught_cooling": "saturn",
+}
+
+LAB = {
+    "athanor": furnace,
+    "athanor_lit": lambda: furnace((250, 170, 60)),
+    "blowpipe": pipe,
+    "phial": lambda: phial(GLASS),
+    "alembic": lambda: flask(4, 10),
+    "retort": retort,
+    "bain_marie": lambda: dish((110, 160, 220)),
+    "ash_bath": lambda: dish((130, 126, 120)),
+    "sand_bath": lambda: dish((214, 196, 150)),
+    "cupel": lambda: dish((232, 228, 214)),
+    "silver_grain": lambda: heap((200, 204, 214), (240, 242, 248)),
+    "verdigris_salve": lambda: cup((110, 180, 120)),
+    "green_vitriol": lambda: crystal((80, 170, 110), (150, 220, 170)),
+    "blue_vitriol": lambda: crystal((40, 90, 210), (120, 170, 250)),
+}
+for _name, _colour in CALX.items():
+    LAB[_name] = (lambda col: lambda: heap(col, tuple(min(255, v + 40) for v in col)))(_colour)
+for _name, _colour in LIQUID.items():
+    LAB[_name] = (lambda col: lambda: flask(2, 8, col))(_colour)
+for _planet, _colour in PLANET.items():
+    LAB["tincture_" + _planet] = (lambda col: lambda: flask(2, 6, col))(_colour)
+for _name, _planet in ELIXIR.items():
+    LAB[_name] = (lambda col: lambda: phial(col))(PLANET[_planet])
+ITEMS.update(LAB)
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     for name, make in ITEMS.items():

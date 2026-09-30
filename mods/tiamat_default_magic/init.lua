@@ -31,11 +31,16 @@ end
 tdm.config = load("config")
 tdm.util = load("util")
 tdm.hooks = load("hooks")               -- one engine registration per hook, many subscribers
+tdm.recipes = load("recipes")           -- every recipe into Craft, the degrees of fire, the book's index
 tdm.items = load("items")               -- every item, from config's tables; food into Life
-tdm.blocks = load("blocks")             -- the blocks the Art must have (one, so far)
+tdm.blocks = load("blocks")             -- the door and the lamp
+tdm.athanor = load("athanor")           -- the philosophers' furnace, and the laboratory's recipes
 tdm.apprentice = load("apprentice")     -- the Apothecary's Bench: shared nodes, recipes, flames
-tdm.primer = load("primer")             -- the Mute Book
+tdm.effects = load("effects")           -- the effects Life does not have, as timers
+tdm.spagyrics = load("spagyrics")       -- herbs, tinctures, elixirs
+tdm.gates = load("gates")               -- Ripley's Gates as discoveries; the studies
 tdm.tree = load("tree")                 -- the magic tree, tiers 3 to 7, as data
+tdm.primer = load("primer")             -- the Mute Book
 tdm.path = load("path")                 -- the Emerald Tablet's path, and the tree, into Progress
 load("commands")                        -- `magic`, in chat
 
