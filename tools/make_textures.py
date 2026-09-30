@@ -314,6 +314,25 @@ for _name, _colour in {
     "sal_mirabilis": (236, 244, 246), "sal_ammoniac": (230, 226, 220),
 }.items():
     LAB[_name] = (lambda col: lambda: heap(col, tuple(min(255, v + 30) for v in col)))(_colour)
+def arbor():
+    """The Tree of Diana: silver branches on clear ground (it is cutout)."""
+    c = Canvas()
+    silver, light = (196, 204, 222), (240, 244, 252)
+    c.rect(7, 4, 8, 15, silver)
+    for i in range(5):
+        c.dot(6 - i, 9 - i, silver)
+        c.dot(9 + i, 8 - i, silver)
+        c.dot(6 - i // 2, 13 - i, silver)
+        c.dot(9 + i // 2, 12 - i, silver)
+    for x, y in [(2, 5), (13, 4), (4, 9), (11, 8), (7, 3), (8, 2)]:
+        c.dot(x, y, light)
+    return c
+
+
+LAB.update({
+    "arbor_dianae": arbor,
+    "arbor_seed": lambda: heap((200, 204, 214), (240, 244, 252)),
+})
 ITEMS.update(LAB)
 
 

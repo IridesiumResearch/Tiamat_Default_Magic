@@ -29,6 +29,7 @@ fn main() {
     salamander();
     nigredo();
     spills_and_theriac();
+    tree_of_diana();
     determinism();
     println!("magic native check: all passed");
 }
@@ -644,6 +645,41 @@ fn spills_and_theriac() {
     assert_eq!(r.ask(&format!("t make {MOD}:theriac")), "made");
     assert_eq!(r.units(PLAYER, "tiamat_default_life:antidote"), 27, "Galen's antidote");
     println!("spills and theriac: ok");
+}
+
+/// A seed of Diana, planted on stone, is one cell of silver; unwatered it
+/// waits, watered with aqua fortis it grows a cell every 2,000 ticks,
+/// trunk first; dug, it is forgotten.
+fn tree_of_diana() {
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.arbor_dianae"]);
+    let ground = (110, 64, 110);
+    let at = (110, 65, 110);
+    r.put_block(ground.0, ground.1, ground.2, "tiamat_default_world:stone");
+    r.give(PLAYER, "arbor_seed", 27);
+    r.hold(PLAYER, "arbor_seed");
+    assert!(r.use_at(PLAYER, ground.0, ground.1, ground.2), "planted");
+    assert_eq!(r.units(PLAYER, "arbor_seed"), 0);
+    let tree = r.material("arbor_dianae");
+    let cells = |r: &Rig| r.world.blocks.lock().unwrap().get(&at).filter(|b| b.0 == tree).map(|b| b.1.count_ones());
+    assert_eq!(cells(&r), Some(1), "one cell, at the bottom of the middle");
+    assert_eq!(r.world.blocks.lock().unwrap().get(&at).unwrap().1, 1 << 10);
+
+    r.tick(4100);
+    assert_eq!(cells(&r), Some(1), "unwatered, it waits");
+
+    r.give(PLAYER, "aqua_fortis", 27);
+    r.hold(PLAYER, "aqua_fortis");
+    assert!(r.use_at(PLAYER, at.0, at.1, at.2), "watered");
+    assert_eq!(r.units(PLAYER, "aqua_fortis"), 0);
+    r.tick(4100);
+    assert_eq!(cells(&r), Some(3), "a cell every 2,000 ticks");
+    let mask = r.world.blocks.lock().unwrap().get(&at).unwrap().1;
+    assert_eq!(mask, (1 << 10) | (1 << 13) | (1 << 16), "the trunk first");
+
+    r.dig_event(PLAYER, at);
+    assert!(r.stored(&format!("tree:{},{},{}", at.0, at.1, at.2)).is_none(), "dug, forgotten");
+    println!("tree of diana: ok");
 }
 
 /// The same play twice leaves the same storage.

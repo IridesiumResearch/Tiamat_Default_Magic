@@ -33,7 +33,9 @@ All are namespaced `tiamat_default_magic:` by the engine.
 
 - **Blocks:** `emerald_tablet` (the door; light 2, 9, 4), `hermetic_lamp`
   (light 6, 12, 8; transparent; never goes out), `athanor` and `athanor_lit`
-  (light 12, 7, 2; Life's contact fire and heat source).
+  (light 12, 7, 2; Life's contact fire and heat source), `arbor_dianae`
+  (the Tree of Diana: cutout, light 3, 3, 4; dug, it pays a silver ingot's
+  units by the share of the block it fills).
 - **Model and entity:** `salamander` (a familiar; drawn from
   `models/salamander.glb` with `models/salamander.png`), spawned by this
   mod, named "Salamander".
@@ -60,7 +62,8 @@ All are namespaced `tiamat_default_magic:` by the engine.
   `spirit_of_salt`, `sal_mirabilis`, `sal_ammoniac`, `aqua_regia`,
   `green_lion`, `phosphorus`, `phosphorus_spill` (used at a laid campfire
   or a fuelled kiln, bloomery or athanor, it lights it through Craft's
-  `ignite`), `conjoined_matter`, `caput_corvi`, `peacock_matter`.
+  `ignite`), `conjoined_matter`, `caput_corvi`, `peacock_matter`, and `arbor_seed`
+  (planted by using it on the ground; watered with aqua fortis).
 - **Into Progress:** the path `magic`, "The Hermetic Art", whose door is
   `emerald_tablet` (Progress registers its recipe as
   `tiamat_default_progress:door_magic`: the Keystone, 27 units of crystal,
@@ -80,7 +83,8 @@ All are namespaced `tiamat_default_magic:` by the engine.
   `tiamat_default_magic.vitriol`, and the family
   `tiamat_default_magic.herb:*` (a species' first tincture, group
   `herbs`); `tiamat_default_magic.familiar_salamander` (group
-  `familiars`); `tiamat_default_magic.peacock` (toybox); the studies
+  `familiars`); `tiamat_default_magic.peacock` and `tiamat_default_magic.tree_of_diana`
+  (toybox); the studies
   `study_calx`, `study_tincture`, `study_vitriol`, `study_quicksilver`,
   `study_aqua_regia`, `study_caput_corvi`, `study_peacock`.
 - **Into Craft:** the recipes `mutus_liber`, `mortar`, `grind_chamomile`,
@@ -124,7 +128,8 @@ the word is chat.
 `game.storage`, private to this mod: `clock` (ticks the world has run, as
 this mod counts them) and `fx:<uuid>:<effect>` (the tick a player's own
 effect ends: `night_sight`, `swiftness`), `sigil:x,y,z` (who set a
-sigil there), `weathered:x,y,z` (pyrite the rain has weathered),
+sigil there), `tree:x,y,z` (a Tree of Diana: its cells and who planted
+it) with `treefed:x,y,z` (the tick its watering ends), `weathered:x,y,z` (pyrite the rain has weathered),
 `familiar:<uuid>:salamander` (`true`, or `"dormant"` after a repath
 away), and per athanor `burned:<container>` (ticks it has burned
 without going out) and `called:<container>` (a salamander came). Who

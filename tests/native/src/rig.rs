@@ -548,8 +548,13 @@ impl WorldEdit for World {
         self.apply(pos, block);
         true
     }
-    fn set_partial(&self, _: &str, pos: BlockPos, block: &str, _: u32) -> bool {
+    /// A partial write keeps its cells: a tree grown a cell at a time is
+    /// told from a whole block.
+    fn set_partial(&self, _: &str, pos: BlockPos, block: &str, occupancy: u32) -> bool {
         self.apply(pos, block);
+        if let Some(entry) = self.blocks.lock().unwrap().get_mut(&(pos.x, pos.y, pos.z)) {
+            entry.1 = occupancy;
+        }
         true
     }
     fn merge_partial(&self, _: &str, pos: BlockPos, block: &str, _: u32) -> bool {

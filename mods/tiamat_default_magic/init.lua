@@ -39,6 +39,7 @@ tdm.apprentice = load("apprentice")     -- the Apothecary's Bench: shared nodes,
 tdm.effects = load("effects")           -- the effects Life does not have, as timers
 tdm.spagyrics = load("spagyrics")       -- herbs, tinctures, elixirs
 tdm.nigredo = load("nigredo")           -- tier 4: the strong waters, quicksilver, Gates IV and V
+tdm.arbor = load("arbor")               -- the Tree of Diana, grown a cell at a time
 tdm.gates = load("gates")               -- Ripley's Gates as discoveries; the studies
 tdm.glyph_table = load("glyph_table")   -- the glyphs, as data
 tdm.glyphs = load("glyphs")             -- every glyph into Craft; the sigils' one-click presets

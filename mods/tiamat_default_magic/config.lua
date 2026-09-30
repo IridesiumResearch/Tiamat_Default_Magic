@@ -569,6 +569,31 @@ C.peacock_colours = {
     { r = 0.8, g = 0.2, b = 0.9 }, { r = 0.2, g = 0.8, b = 0.9 },
 }
 
+-- The Tree of Diana (brief §7.4): silver amalgam in strong water grows a
+-- crystal silver tree, a cell at a time, while it has been watered with
+-- aqua fortis within `fed_ticks`. Dug, it pays silver by its share of a
+-- whole block: a full tree is an ingot. `order` is the growth, trunk first.
+C.arbor = {
+    node = "magic.arbor_dianae",
+    block = { id = "arbor_dianae", name = "Tree of Diana",
+        description = "A tree of silver crystal, grown in strong water. Water it with aqua fortis; dig it for silver.",
+        hardness = 0.6, light = { r = 3, g = 3, b = 4 }, tags = { "crystal", "glowing" } },
+    seed = { id = "arbor_seed", name = "Seed of Diana",
+        description = "Silver amalgam wet with strong water. Plant it on the ground, and water it with aqua fortis." },
+    water = "aqua_fortis",
+    drops = { ["C:silver_ingot"] = 27 },
+    every = 2000,                   -- ticks between one cell and the next
+    fed_ticks = 24000,              -- how long a watering lasts: a sun-day
+    budget = 64,                    -- trees grown a pass
+    per_player = 64,
+    order = { 10, 13, 16, 15, 17, 7, 25, 12, 14, 4, 22, 6, 8, 24, 26, 3, 5, 21, 23, 9, 11, 1, 19, 0, 2, 18, 20 },
+    discovery = 10,
+}
+C.arbor_recipes = {
+    { id = "arbor_seed", station = "hand", node = "magic.arbor_dianae",
+        inputs = { { "amalgam_silver", count = 1 }, { "aqua_fortis", count = 1 } }, outputs = { { "arbor_seed", count = 3 } } },
+}
+
 -- Ripley's Twelve Gates, as discoveries: the first time a player completes
 -- each, 25 x its number (brief §6.2).
 C.gates = { "Calcination", "Solution", "Separation", "Conjunction", "Putrefaction", "Congelation",
