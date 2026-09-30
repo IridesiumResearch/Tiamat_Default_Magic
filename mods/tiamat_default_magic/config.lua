@@ -457,6 +457,118 @@ C.lab_recipes = {
         outputs = { { "principle_mercury", count = 1 }, { "principle_sulfur", count = 1 }, { "principle_salt", count = 1 } } },
 }
 
+-- Tier 4 (brief §5.2): the menstrua and the black ----------------------------------
+
+C.tier4_items = {
+    -- Vessels.
+    { id = "aludel", name = "Aludel", description = "A pot of pots, stacked: what rises in it is caught as flowers." },
+    { id = "pelican", name = "Pelican", description = "A glass vessel whose arms bend back into its belly: what rises returns, for ever." },
+    { id = "philosophers_egg", name = "Philosophers' Egg", description = "The sealed glass ovum. Every long work of the Opus is cooked in it." },
+    -- Sublimates, quicksilver and its works.
+    { id = "flowers_of_sulfur", name = "Flowers of sulfur", description = "Sulfur, sublimed pure and yellow. A salamander's food." },
+    { id = "quicksilver", name = "Quicksilver", description = "The seventh metal, liquid: roasted out of cinnabar." },
+    { id = "vermilion", name = "Vermilion", description = "Quicksilver and sulfur, raised together: the red the Red Work imitates." },
+    { id = "amalgam_gold", name = "Gold amalgam", description = "Gold swallowed by quicksilver: soft, and the body of later works." },
+    { id = "amalgam_silver", name = "Silver amalgam", description = "Silver in quicksilver. In strong water it grows a tree." },
+    { id = "amalgam_tin", name = "Tin amalgam", description = "Tin in quicksilver: the backing of mirrors." },
+    -- Salts and the strong waters, in the order they were discovered.
+    { id = "saltpeter", name = "Saltpeter", description = "The nitre bed's crust: rotting plants, ash and earth, kept warm." },
+    { id = "aqua_fortis", name = "Aqua fortis", description = "Strong water: it eats silver and leaves gold alone." },
+    { id = "spirit_of_salt", name = "Spirit of salt", description = "Glauber's biting vapour, from salt and oil of vitriol." },
+    { id = "sal_mirabilis", name = "Sal mirabilis", description = "Glauber's wonderful salt, left in the retort." },
+    { id = "sal_ammoniac", name = "Sal ammoniac", description = "Bone and salt, sublimed: a salt that rises." },
+    { id = "aqua_regia", name = "Aqua regia", description = "Royal water: strong enough to dissolve even gold." },
+    { id = "green_lion", name = "The Green Lion", description = "Gold dissolved in royal water: the lion that devours the Sun." },
+    { id = "phosphorus", name = "Phosphorus", description = "The light-bearer, from bone ash. It glows by itself." },
+    { id = "phosphorus_spill", name = "Phosphorus spill", description = "A stick tipped with phosphorus. It lights a laid fire, or a fuelled furnace." },
+    -- The Opus: the matter of the Work, stage by stage.
+    { id = "conjoined_matter", name = "Conjoined matter", description = "The Chemical Wedding: the King and Queen of a plant, with its salt." },
+    { id = "caput_corvi", name = "Caput corvi", description = "The Raven's Head: the matter, rotted black in the Egg. The nigredo." },
+    { id = "peacock_matter", name = "Peacock matter", description = "The black, washed: it shimmers every colour, like a peacock's tail." },
+}
+
+C.tier4_recipes = {
+    -- Vessels, at the kiln with the blowpipe.
+    { id = "aludel", station = "kiln", node = "magic.aludel", heat = 2, ticks = 600,
+        inputs = { { "C:fired_clay", count = 2 }, { "C:glass", count = 2 } }, tools = { { "blowpipe", wear = 0 } },
+        outputs = { { "aludel", count = 1 } } },
+    { id = "pelican", station = "kiln", node = "magic.pelican", heat = 2, ticks = 800,
+        inputs = { { "C:glass", count = 4 } }, tools = { { "blowpipe", wear = 0 } }, outputs = { { "pelican", count = 1 } } },
+    { id = "philosophers_egg", station = "kiln", node = "magic.philosophers_egg", heat = 2, ticks = 800,
+        inputs = { { "C:glass", count = 3 }, { "flowers_of_sulfur", count = 1 } }, tools = { { "blowpipe", wear = 0 } },
+        outputs = { { "philosophers_egg", count = 1 } } },
+
+    -- Sublimation, and quicksilver from its ore.
+    { id = "flowers_of_sulfur", station = "athanor", node = "magic.flowers_of_sulfur", degree = 3, ticks = 600,
+        inputs = { { "W:sulfur", units = 27 } }, tools = { { "aludel", wear = 0 } }, outputs = { { "flowers_of_sulfur", count = 9 } } },
+    { id = "quicksilver", station = "athanor", node = "magic.quicksilver", degree = 3, ticks = 600,
+        inputs = { { "W:cinnabar", units = 27 } }, tools = { { "retort", wear = 0 } }, outputs = { { "quicksilver", count = 9 } } },
+    { id = "vermilion", station = "athanor", node = "magic.vermilion", degree = 3, ticks = 600,
+        inputs = { { "#quicksilver", count = 1 }, { "flowers_of_sulfur", count = 1 } }, tools = { { "aludel", wear = 0 } },
+        outputs = { { "vermilion", count = 1 } } },
+    { id = "amalgam_gold", station = "hand", node = "magic.amalgams", tools = { { "mortar", wear = 0 } },
+        inputs = { { "C:gold_ingot", count = 1 }, { "#quicksilver", count = 2 } }, outputs = { { "amalgam_gold", count = 1 } } },
+    { id = "amalgam_silver", station = "hand", node = "magic.amalgams", tools = { { "mortar", wear = 0 } },
+        inputs = { { "C:silver_ingot", count = 1 }, { "#quicksilver", count = 2 } }, outputs = { { "amalgam_silver", count = 1 } } },
+    { id = "amalgam_tin", station = "hand", node = "magic.amalgams", tools = { { "mortar", wear = 0 } },
+        inputs = { { "C:tin_ingot", count = 1 }, { "#quicksilver", count = 2 } }, outputs = { { "amalgam_tin", count = 1 } } },
+
+    -- The nitre bed and the strong waters.
+    { id = "saltpeter", station = "athanor", node = "magic.saltpeter", degree = 1, days = 3,
+        inputs = { { "#magic_herb", units = 27 }, { "#ash", units = 9 }, { "W:dirt", units = 27 } },
+        outputs = { { "saltpeter", count = 1 } } },
+    { id = "aqua_fortis", station = "athanor", node = "magic.aqua_fortis", degree = 3, ticks = 600,
+        inputs = { { "#saltpeter", count = 1 }, { "green_vitriol", count = 1 } }, tools = { { "retort", wear = 0 } },
+        outputs = { { "aqua_fortis", count = 1 } } },
+    { id = "spirit_of_salt", station = "athanor", node = "magic.spirit_of_salt", degree = 3, ticks = 600,
+        inputs = { { "W:salt", units = 9 }, { "#oil_of_vitriol", count = 1 } }, tools = { { "retort", wear = 0 } },
+        outputs = { { "spirit_of_salt", count = 1 }, { "sal_mirabilis", count = 1 } } },
+    { id = "sal_ammoniac", station = "athanor", node = "magic.sal_ammoniac", degree = 3, ticks = 600,
+        inputs = { { "L:bone", count = 1 }, { "W:salt", units = 9 } }, tools = { { "aludel", wear = 0 } },
+        outputs = { { "sal_ammoniac", count = 1 } } },
+    { id = "aqua_regia", station = "athanor", node = "magic.aqua_regia", degree = 1, ticks = 600,
+        inputs = { { "aqua_fortis", count = 1 }, { "sal_ammoniac", count = 1 } }, outputs = { { "aqua_regia", count = 1 } } },
+    { id = "green_lion", station = "athanor", node = "magic.aqua_regia", degree = 1, days = 1,
+        inputs = { { "C:gold_ingot", count = 1 }, { "aqua_regia", count = 1 } }, outputs = { { "green_lion", count = 1 } } },
+    { id = "phosphorus", station = "athanor", node = "magic.phosphorus", degree = 4, ticks = 1200,
+        inputs = { { "bone_ash", count = 1 }, { "#oil_of_vitriol", count = 1 }, { "C:charcoal", count = 1 } },
+        tools = { { "retort", wear = 0 } }, outputs = { { "phosphorus", count = 3 } } },
+    { id = "phosphorus_spill", station = "hand", node = "magic.phosphorus",
+        inputs = { { "phosphorus", count = 1 }, { "C:stick", count = 2 } }, outputs = { { "phosphorus_spill", count = 4 } } },
+
+    -- Theriac: Galen's antidote, which is Life's own.
+    { id = "theriac", station = "hand", node = "magic.theriac",
+        inputs = { { "#magic_tincture", count = 1 }, { "L:honey", count = 1 }, { "principle_salt", count = 1 } },
+        outputs = { { "L:antidote", count = 1 } } },
+
+    -- Gates IV and V, and the Peacock's Tail.
+    { id = "conjunction", station = "athanor", node = "magic.gate_conjunction", degree = 1, days = 1, gate = 4,
+        inputs = { { "principle_sulfur", count = 1 }, { "principle_mercury", count = 1 }, { "principle_salt", count = 1 } },
+        tools = { { "pelican", wear = 0 } }, outputs = { { "conjoined_matter", count = 1 } } },
+    { id = "putrefaction", station = "athanor", node = "magic.gate_putrefaction", degree = 1, days = 3, gate = 5,
+        inputs = { { "conjoined_matter", count = 1 } }, tools = { { "philosophers_egg", wear = 0 } },
+        outputs = { { "caput_corvi", count = 1 } } },
+    { id = "ablution", station = "athanor", node = "magic.cauda_pavonis", degree = 1, days = 1,
+        inputs = { { "caput_corvi", count = 1 }, { "distilled_vinegar", count = 1 } }, tools = { { "philosophers_egg", wear = 0 } },
+        outputs = { { "peacock_matter", count = 1 } } },
+}
+
+-- Palingenesis (Digby, Kircher): a plant's salt, warmed in a phial with a
+-- sprig of it, gives the living plant back — the world's covers only.
+C.palingenesis = { node = "magic.palingenesis", days = 1, sprig_units = 3, yield_units = 27 }
+
+-- Phosphorus spills light what a striker would, without one: a laid
+-- campfire, or a heat station with fuel in it.
+C.spill = { item = "phosphorus_spill", lights = { "C:unlit_campfire", "C:kiln", "C:bloomery", "athanor" } }
+
+-- The Peacock's Tail: an athanor washing the Raven's Head in the Egg
+-- shimmers every colour while it works.
+C.peacock = { every = 100, particles = 20, discovery = 10 }
+C.peacock_colours = {
+    { r = 0.1, g = 0.5, b = 1.0 }, { r = 0.1, g = 0.9, b = 0.5 }, { r = 0.9, g = 0.8, b = 0.1 },
+    { r = 0.8, g = 0.2, b = 0.9 }, { r = 0.2, g = 0.8, b = 0.9 },
+}
+
 -- Ripley's Twelve Gates, as discoveries: the first time a player completes
 -- each, 25 x its number (brief §6.2).
 C.gates = { "Calcination", "Solution", "Separation", "Conjunction", "Putrefaction", "Congelation",
@@ -474,6 +586,10 @@ C.studies = {
     { id = "study_calx", name = "Study a calx", inputs = { { "#magic_calx", count = 1 } }, ticks = 600, insight = 15 },
     { id = "study_tincture", name = "Study a tincture", inputs = { { "#magic_tincture", count = 1 } }, ticks = 1200, insight = 20 },
     { id = "study_vitriol", name = "Study vitriol", inputs = { { "green_vitriol", count = 1 } }, ticks = 1800, insight = 30 },
+    { id = "study_quicksilver", name = "Study quicksilver", inputs = { { "#quicksilver", count = 1 } }, ticks = 2400, insight = 40 },
+    { id = "study_aqua_regia", name = "Study aqua regia", inputs = { { "aqua_regia", count = 1 } }, ticks = 3600, insight = 60 },
+    { id = "study_caput_corvi", name = "Study the Raven's Head", inputs = { { "caput_corvi", count = 1 } }, ticks = 6000, insight = 120 },
+    { id = "study_peacock", name = "Study the Peacock's Tail", inputs = { { "peacock_matter", count = 1 } }, ticks = 6000, insight = 150 },
 }
 
 -- Sigils (brief §6.5): a carved planet's sign touching a burning athanor

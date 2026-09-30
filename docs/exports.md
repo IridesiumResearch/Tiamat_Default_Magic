@@ -53,8 +53,14 @@ All are namespaced `tiamat_default_magic:` by the engine.
   (`tincture_<planet>`: sol, luna, venus, mars, mercury, jupiter, saturn)
   and seven elixirs, all food (`elixir_vigour`, `elixir_night_sight`,
   `elixir_hearts_ease`, `elixir_fortitude`, `elixir_swiftness`,
-  `draught_warming`, `draught_cooling`); and `salamander_ember`, in
-  `#magic_blast`.
+  `draught_warming`, `draught_cooling`); `salamander_ember`, in
+  `#magic_blast`; and tier 4's `aludel`, `pelican`, `philosophers_egg`,
+  `flowers_of_sulfur`, `quicksilver`, `vermilion`, `amalgam_gold`,
+  `amalgam_silver`, `amalgam_tin`, `saltpeter`, `aqua_fortis`,
+  `spirit_of_salt`, `sal_mirabilis`, `sal_ammoniac`, `aqua_regia`,
+  `green_lion`, `phosphorus`, `phosphorus_spill` (used at a laid campfire
+  or a fuelled kiln, bloomery or athanor, it lights it through Craft's
+  `ignite`), `conjoined_matter`, `caput_corvi`, `peacock_matter`.
 - **Into Progress:** the path `magic`, "The Hermetic Art", whose door is
   `emerald_tablet` (Progress registers its recipe as
   `tiamat_default_progress:door_magic`: the Keystone, 27 units of crystal,
@@ -74,7 +80,9 @@ All are namespaced `tiamat_default_magic:` by the engine.
   `tiamat_default_magic.vitriol`, and the family
   `tiamat_default_magic.herb:*` (a species' first tincture, group
   `herbs`); `tiamat_default_magic.familiar_salamander` (group
-  `familiars`); the studies `study_calx`, `study_tincture`, `study_vitriol`.
+  `familiars`); `tiamat_default_magic.peacock` (toybox); the studies
+  `study_calx`, `study_tincture`, `study_vitriol`, `study_quicksilver`,
+  `study_aqua_regia`, `study_caput_corvi`, `study_peacock`.
 - **Into Craft:** the recipes `mutus_liber`, `mortar`, `grind_chamomile`,
   `grind_mint`, `grind_bramble`, `grind_mantle`, `flame_powder_blue`,
   `_green`, `_yellow`, `_white`, `poultice`, `hermetic_lamp` (by hand);
@@ -87,7 +95,10 @@ All are namespaced `tiamat_default_magic:` by the engine.
   recipes there, at the workbench, the kiln and by hand (`config.lua`,
   `lab_recipes`, and a `tincture_<plant>` for each herb); the groups
   `#magic_blast` (Craft's bellows), `#magic_herb`, `#magic_tincture`,
-  `#magic_calx`, and this mod's oil in `#oil_of_vitriol`; and the
+  `#magic_calx`, and this mod's oil, quicksilver and saltpeter in
+  science's `#oil_of_vitriol`, `#quicksilver` and `#saltpeter`; tier 4's
+  recipes (`config.lua`, `tier4_recipes`, and a `palingenesis_<plant>`
+  for each of the world's plants); and the
   glyphs of `glyph_table.lua` in every distinct orientation (`sol`,
   `luna`, `venus`, `mars`, `jupiter`, `saturn`, `mercury`, `fire`, `water`,
   `air`, `earth`, `quintessence`, `ouroboros`, `seal`, `emerald`, each

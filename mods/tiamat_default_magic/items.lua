@@ -39,6 +39,7 @@ for _, planet in ipairs(C.planets) do
 end
 add(C.elixirs)
 add(C.familiar_items)
+add(C.tier4_items)
 
 for _, spec in ipairs(I.all) do
     register(spec)

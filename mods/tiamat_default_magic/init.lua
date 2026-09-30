@@ -38,6 +38,7 @@ tdm.athanor = load("athanor")           -- the philosophers' furnace, and the la
 tdm.apprentice = load("apprentice")     -- the Apothecary's Bench: shared nodes, recipes, flames
 tdm.effects = load("effects")           -- the effects Life does not have, as timers
 tdm.spagyrics = load("spagyrics")       -- herbs, tinctures, elixirs
+tdm.nigredo = load("nigredo")           -- tier 4: the strong waters, quicksilver, Gates IV and V
 tdm.gates = load("gates")               -- Ripley's Gates as discoveries; the studies
 tdm.glyph_table = load("glyph_table")   -- the glyphs, as data
 tdm.glyphs = load("glyphs")             -- every glyph into Craft; the sigils' one-click presets

@@ -292,6 +292,28 @@ for _planet, _colour in PLANET.items():
     LAB["tincture_" + _planet] = (lambda col: lambda: flask(2, 6, col))(_colour)
 for _name, _planet in ELIXIR.items():
     LAB[_name] = (lambda col: lambda: phial(col))(PLANET[_planet])
+# Tier 4.
+LAB.update({
+    "aludel": lambda: flask(6, 10, (190, 150, 110)),
+    "pelican": lambda: flask(2, 10),
+    "philosophers_egg": lambda: flask(4, 8, (240, 236, 220)),
+    "quicksilver": lambda: flask(2, 8, (200, 206, 216)),
+    "phosphorus": lambda: crystal((236, 240, 200), (250, 255, 230)),
+    "phosphorus_spill": pipe,
+    "green_lion": lambda: flask(2, 8, (60, 170, 70)),
+    "aqua_fortis": lambda: flask(2, 8, (230, 200, 140)),
+    "aqua_regia": lambda: flask(2, 8, (230, 150, 60)),
+    "spirit_of_salt": lambda: flask(2, 8, (220, 230, 210)),
+    "conjoined_matter": lambda: flask(4, 8, (170, 120, 150)),
+    "caput_corvi": lambda: flask(4, 8, (24, 22, 28)),
+    "peacock_matter": lambda: flask(4, 8, (60, 150, 170)),
+})
+for _name, _colour in {
+    "flowers_of_sulfur": (240, 220, 60), "vermilion": (220, 40, 30), "amalgam_gold": (220, 190, 110),
+    "amalgam_silver": (200, 204, 214), "amalgam_tin": (190, 196, 200), "saltpeter": (240, 240, 236),
+    "sal_mirabilis": (236, 244, 246), "sal_ammoniac": (230, 226, 220),
+}.items():
+    LAB[_name] = (lambda col: lambda: heap(col, tuple(min(255, v + 30) for v in col)))(_colour)
 ITEMS.update(LAB)
 
 

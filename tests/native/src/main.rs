@@ -27,6 +27,8 @@ fn main() {
     swiftness();
     weathering();
     salamander();
+    nigredo();
+    spills_and_theriac();
     determinism();
     println!("magic native check: all passed");
 }
@@ -571,6 +573,77 @@ fn salamander() {
     r.tick(1);
     assert_eq!(r.with_model(&model).len(), 1, "back with them");
     println!("salamander: ok");
+}
+
+/// Tier 4's spine: quicksilver from the world's cinnabar; the nigredo, three
+/// philosophical days in the Egg, opening Gate V; the Peacock's Tail,
+/// shimmering while it works and paying the first time.
+fn nigredo() {
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.athanor", "magic.degrees_of_fire", "magic.bain_marie", "magic.retort",
+        "magic.quicksilver", "magic.philosophers_egg", "magic.gate_putrefaction", "magic.cauda_pavonis"]);
+
+    // Cinnabar in the retort, in the sand bath, on coal.
+    let q = (80, 64, 80);
+    let qn = athanor(&mut r, q, &[(1, "tiamat_default_world:coal", 27 * 2), (2, "tiamat_default_world:cinnabar", 27),
+        (5, "sand_bath", 27), (6, "retort", 27)]);
+    light(&mut r, q);
+    r.tick(700);
+    assert_eq!(slot(&r, &qn, 7), Some((format!("{MOD}:quicksilver"), 27 * 9)), "nine quicksilver from a block of ore");
+
+    // Putrefaction: three days of Maria's bath in the Egg.
+    let insight: i32 = r.ask("t insight").parse().unwrap();
+    let p = (84, 64, 80);
+    let pn = athanor(&mut r, p, &[(1, "tiamat_default_world:coal", 27 * 5), (2, "conjoined_matter", 27),
+        (5, "bain_marie", 27), (6, "philosophers_egg", 27)]);
+    light(&mut r, p);
+    r.tick(5300);
+    assert_eq!(slot(&r, &pn, 7), None, "not before three days");
+    r.tick(300);
+    assert_eq!(slot(&r, &pn, 7), Some((format!("{MOD}:caput_corvi"), 27)), "the Raven's Head");
+    let after: i32 = r.ask("t insight").parse().unwrap();
+    assert_eq!(after - insight, 125, "Gate V: Putrefaction");
+
+    // Washed in the Egg, it shimmers while it works.
+    r.boxes.set(&pn, 7, None);
+    r.boxes.set(&pn, 2, Some(tiamat_core::inventory::Stack::new(r.material("caput_corvi"), 27).unwrap()));
+    r.boxes.set(&pn, 3, Some(tiamat_core::inventory::Stack::new(r.material("distilled_vinegar"), 27).unwrap()));
+    r.bursts();
+    r.tick(200);
+    assert!(!r.bursts().is_empty(), "the Egg shimmers");
+    r.heard(PLAYER);
+    r.tick(1700);
+    assert_eq!(slot(&r, &pn, 7), Some((format!("{MOD}:peacock_matter"), 27)), "the Peacock's Tail");
+    let heard = r.heard(PLAYER);
+    assert!(heard.iter().any(|l| l == "Discovered: The Egg shimmers like a peacock's tail (+10 insight)"), "{heard:?}");
+    println!("nigredo: ok");
+}
+
+/// A phosphorus spill lights a fuelled kiln as a striker would; theriac is
+/// Life's own antidote.
+fn spills_and_theriac() {
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.theriac", "magic.phosphorus"]);
+    let at = (90, 64, 90);
+    r.put_block(at.0, at.1, at.2, "tiamat_default_craft:kiln");
+    r.inventory.held.lock().unwrap().remove(&PLAYER);
+    assert!(r.use_at(PLAYER, at.0, at.1, at.2), "Craft opens the kiln");
+    r.boxes.holders.lock().unwrap().clear();
+    let kiln = format!("tiamat_default_craft:kiln:{},{},{}", at.0, at.1, at.2);
+    r.boxes.set(&kiln, 1, Some(tiamat_core::inventory::Stack::new(r.material("tiamat_default_world:coal"), 27).unwrap()));
+    r.give(PLAYER, "phosphorus_spill", 27 * 2);
+    r.hold(PLAYER, "phosphorus_spill");
+    assert!(r.use_at(PLAYER, at.0, at.1, at.2), "the spill is struck");
+    assert_eq!(r.units(PLAYER, "phosphorus_spill"), 27, "one spill used");
+    let lit = r.material("tiamat_default_craft:kiln_lit");
+    assert_eq!(r.world.blocks.lock().unwrap().get(&at).map(|b| b.0), Some(lit), "the kiln burns");
+
+    r.give(PLAYER, "tincture_sol", 27);
+    r.give(PLAYER, "tiamat_default_life:honey", 27);
+    r.give(PLAYER, "principle_salt", 27);
+    assert_eq!(r.ask(&format!("t make {MOD}:theriac")), "made");
+    assert_eq!(r.units(PLAYER, "tiamat_default_life:antidote"), 27, "Galen's antidote");
+    println!("spills and theriac: ok");
 }
 
 /// The same play twice leaves the same storage.
