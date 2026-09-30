@@ -14,7 +14,7 @@ Every ask below is **open** as of 2026-09-29.
 
 ## Tiamat Default Craft
 
-**C-M10, an athanor's slow fire.** *Wanted:* a station field
+~~**C-M10, an athanor's slow fire.**~~ *Withdrawn 2026-09-30:* with a philosophical day of 1,800 ticks (brief §6.1), a Red Stone burns forty coal at Craft's own rates, which is a fair price. Kept as the record: *Wanted:* a station field
 `burn_percent` (per cent of each fuel's ticks; default 100, so nothing else
 changes), set to about 5 on the athanor. *Why:* the athanor's point, in
 every text, is a low heat held for weeks on little fuel; at Craft's rates
@@ -46,7 +46,7 @@ never raises), so this is a convenience. Science's C-S5.
 athanor. *Stands in:* the sigil refunds one input in N through
 `on_crafted`.
 
-**C-M5, long recipes, and time while unloaded.** *Wanted:* a station
+**C-M5, long recipes, and time while unloaded.** *Narrowed 2026-09-30:* every long work now fits Craft's 72,000 ticks (brief §6.1), so only the second half stands — a lit station advancing, when its chunk is next loaded, by the ticks that passed while it was not (fuel permitting). Nice to have; nothing waits on it. The original ask: *Wanted:* a station
 opting in with `long = true` accepts recipes up to 960,000 ticks (40
 philosophical days), and a lit long station advances by the ticks that
 passed while its chunk was unloaded, when it is next loaded (its fuel
@@ -98,8 +98,8 @@ stare on Life's creatures. *Stands in:* each says so and does less.
 at max 0 is not drawn. *Why:* Quintessence is a Life stat, and today every
 stat has one max and is drawn for every player — children and science
 players included. *Stands in:* the stat starts at 0 and this mod clamps it.
-Wanted before Quintessence ships (tier 3), not before the Apothecary's
-Bench, which has no bar.
+The bar is held back until this lands or tier 5 is built (brief §6.8):
+nothing before tier 5 spends it.
 
 ## Tiamat Default World
 

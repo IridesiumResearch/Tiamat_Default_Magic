@@ -163,6 +163,21 @@ C.thrown_at = { "C:kiln_lit", "C:bloomery_lit", "tiamat_weather:fire" }
 -- Fires a powder is put on, as food is.
 C.put_on = { "C:campfire_lit", "L:campfire" }
 
+-- Time (brief §6.1) ----------------------------------------------------------------
+--
+-- A philosophical day is ninety seconds: exactly one block of coal's burn
+-- (Craft's 1,800 ticks). The historical counts stand, and the forty-day Red
+-- Stone is 72,000 ticks, Craft's `max_ticks` to the tick, so every long
+-- work is one recipe. Nothing reads these yet; the athanor will.
+C.philosophical_day = 1800
+C.long_works = {                    -- in philosophical days
+    nigredo = 3,                    -- Gate V, the Raven's Head
+    white_stone = 7,
+    red_stone = 40,
+    homunculus = 40,
+    multiplication = 7,
+}
+
 -- The door (brief §3) -------------------------------------------------------------
 --
 -- The Emerald Tablet, the founding text of Hermetic alchemy: green-lit
