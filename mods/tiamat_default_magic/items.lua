@@ -41,6 +41,10 @@ add(C.elixirs)
 add(C.familiar_items)
 add(C.tier4_items)
 add({ C.arbor.seed })
+for _, kind in ipairs(C.talismans.kinds) do
+    I.all[#I.all + 1] = { id = "talisman_" .. kind.planet, name = kind.name,
+        description = "Worn: " .. kind.gift .. "." }
+end
 
 for _, spec in ipairs(I.all) do
     register(spec)

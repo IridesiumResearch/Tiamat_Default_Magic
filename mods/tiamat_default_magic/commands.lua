@@ -2,7 +2,9 @@
 -- SPDX-License-Identifier: GPL-3.0-only
 --
 -- `magic`, in chat. For anyone: `magic` says how far along the Bench the
--- speaker is; `magic book` opens the Mute Book for a player who carries one.
+-- speaker is; `magic book` opens the Mute Book for a player who carries one;
+-- `magic seal allow <name>` and `magic seal deny <name>` say who may build
+-- within the speaker's seals.
 -- A sentence that only begins with the word is chat.
 
 local C = tdm.config
@@ -17,6 +19,8 @@ tdm.on_chat("magic", function(player, rest)
             if A.has(player, node.id) then held = held + 1 end
         end
         return string.format("The Apothecary's Bench: %d of %d learned.", held, #C.bench_nodes)
+    elseif string.sub(word, 1, 5) == "seal " or word == "seal" then
+        return tdm.seal.command(player, string.sub(rest, 6))
     elseif word == "book" then
         if not P.carries(player) then return "You have no Mute Book. Make one by hand: leather, two bark strips, charcoal." end
         P.open(player)

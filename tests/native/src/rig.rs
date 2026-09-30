@@ -27,7 +27,7 @@ use tiamat_core::{
     fluid::{self, Fluid, FluidId},
     hud::{self, Values},
     identity::PlayerUuid,
-    inventory::{self, Shape, Stack, stack_capacity},
+    inventory::{self, Shape, Stack, StackKey, stack_capacity},
     light::{Light, LightSource},
     particle::{self, BadgeRequest, EmitRequest},
     proto,
@@ -167,21 +167,12 @@ impl inventory::Access for Inventory {
             .find(|s| s.material == material && s.detail == detail)
             .cloned()
     }
-    fn take(
-        &self,
-        player: [u8; 32],
-        view: &str,
-        _slot: Option<usize>,
-        material: MaterialId,
-        shape: Option<Shape>,
-        detail: Option<&str>,
-        units: u32,
-    ) -> u32 {
+    fn take(&self, player: [u8; 32], view: &str, _slot: Option<usize>, which: StackKey<'_>, units: u32) -> u32 {
         let mut views = self.views.lock().unwrap();
         let Some(list) = views.get_mut(&(player, view.to_owned())) else { return 0 };
         let mut got = 0;
         for stack in list.iter_mut() {
-            if same(stack, material, shape, detail) {
+            if stack.key() == which {
                 let take = units.saturating_sub(got).min(stack.units);
                 stack.units -= take;
                 got += take;
@@ -287,15 +278,7 @@ impl inventory::Containers for Boxes {
         }
         stack.units - left
     }
-    fn take(
-        &self,
-        name: &str,
-        slot: Option<usize>,
-        material: MaterialId,
-        shape: Option<Shape>,
-        detail: Option<&str>,
-        units: u32,
-    ) -> u32 {
+    fn take(&self, name: &str, slot: Option<usize>, which: StackKey<'_>, units: u32) -> u32 {
         let mut all = self.slots.lock().unwrap();
         let Some(list) = all.get_mut(name) else { return 0 };
         let indices: Vec<usize> = match slot {
@@ -308,7 +291,7 @@ impl inventory::Containers for Boxes {
         let mut got = 0;
         for i in indices {
             if let Some(stack) = &mut list[i]
-                && same(stack, material, shape, detail)
+                && stack.key() == which
             {
                 let take = units.saturating_sub(got).min(stack.units);
                 stack.units -= take;
@@ -893,6 +876,7 @@ impl Rig {
             material: self.material(id),
             occupancy: mask,
             units: mask.count_ones(),
+            cells: None,
         });
         assert!(out.faults.is_empty(), "faulted in a place: {:?}", out.faults);
         out.allowed
@@ -912,6 +896,28 @@ impl Rig {
         });
         assert!(out.faults.is_empty(), "faulted in a dig: {:?}", out.faults);
         out.drops
+    }
+
+    /// A whole-block dig beginning at `(x, y, z)`: whether the mods allow it,
+    /// and what they said.
+    pub fn dig_start_event(&mut self, player: [u8; 32], (x, y, z): (i32, i32, i32)) -> (bool, Option<String>) {
+        let Reading::Single { material, .. } = sight::Access::block_at(&*self.world, "", BlockPos { x, y, z }) else {
+            panic!("mixed")
+        };
+        let out = self.vm.dig_start(&DigEvent {
+            player,
+            target: tiamat_core::SubNodePos { x: x * 3 + 1, y: y * 3 + 1, z: z * 3 + 1 },
+            material,
+            brush: Brush::Block,
+        });
+        assert!(out.faults.is_empty(), "faulted in a dig start: {:?}", out.faults);
+        (out.allowed, out.reason)
+    }
+
+    /// Puts a stack of `id` into one of a player's views: `worn`, say.
+    pub fn give_view(&self, player: [u8; 32], view: &str, id: &str, units: u32) {
+        let material = self.material(id);
+        inventory::Access::give(&*self.inventory, player, view, None, Stack::new(material, units).unwrap());
     }
 
     /// The engine offering the block at `(x, y, z)` its random tick.

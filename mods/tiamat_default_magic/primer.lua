@@ -44,6 +44,7 @@ local STATIONS = {
     campfire = "on a campfire, in a copper pot",
     kiln = "in a burning kiln",
     athanor = "in the athanor",
+    anvil = "struck on an anvil",
 }
 
 --- The name a player reads for a config id: this mod's item's own name, or
@@ -54,7 +55,14 @@ local function name_of(id)
     return (string.gsub(short, "_", " "))
 end
 
+--- What a player reads for a recipe's entry: a carving by its glyph.
+local function entry_name(entry)
+    if entry.glyph then return "carved " .. name_of(entry.glyph) .. " sign" end
+    return name_of(entry[1])
+end
+
 local function amount(entry)
+    if entry.glyph then return "a " .. entry_name(entry) end
     if entry.count and entry.count > 1 then return entry.count .. " " .. name_of(entry[1]) end
     if entry.units then return "a handful of " .. name_of(entry[1]) end
     return name_of(entry[1])
@@ -66,7 +74,7 @@ function P.line(r)
     for i, entry in ipairs(r.inputs) do parts[i] = amount(entry) end
     local out = r.outputs[1]
     local tools = {}
-    for i, entry in ipairs(r.tools or {}) do tools[i] = name_of(entry[1]) end
+    for i, entry in ipairs(r.tools or {}) do tools[i] = entry_name(entry) end
     local with = #tools > 0 and (", with a " .. table.concat(tools, " and ")) or ""
     local where = STATIONS[r.station] or r.station
     if r.degree then where = where .. ", " .. C.degrees[r.degree].name end

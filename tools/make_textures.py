@@ -333,6 +333,20 @@ LAB.update({
     "arbor_dianae": arbor,
     "arbor_seed": lambda: heap((200, 204, 214), (240, 244, 252)),
 })
+def medal(colour, light):
+    """A talisman: a round medal with its sign struck in it."""
+    c = Canvas()
+    for y in range(3, 14):
+        for x in range(3, 14):
+            if (x - 8) ** 2 + (y - 8) ** 2 <= 25:
+                c.dot(x, y, colour)
+    c.rect(7, 5, 8, 11, light)
+    c.rect(5, 8, 10, 8, light)
+    return c
+
+
+for _planet, _colour in PLANET.items():
+    LAB["talisman_" + _planet] = (lambda col: lambda: medal(col, tuple(min(255, v + 60) for v in col)))(_colour)
 ITEMS.update(LAB)
 
 

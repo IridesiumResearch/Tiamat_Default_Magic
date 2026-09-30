@@ -594,6 +594,61 @@ C.arbor_recipes = {
         inputs = { { "amalgam_silver", count = 1 }, { "aqua_fortis", count = 1 } }, outputs = { { "arbor_seed", count = 3 } } },
 }
 
+-- Talismans (brief §6.6): a planet's sign struck in its metal, on the anvil,
+-- with a carved sigil block as the die (found, not taken). Worn in Life's
+-- worn slots, one passive each, refreshed every `every` ticks while worn;
+-- `slots` of them count (1, and `magic.talisman_slots` more), each at
+-- `1 + magic.talisman_grade`.
+C.talismans = {
+    node = "magic.talismans",
+    view = "tiamat_default_life:worn",
+    every = 40,
+    lasts = 80,                     -- ticks an effect is set for, a little past the next look
+    strikes = 4,
+    die = "#magic_die",             -- what a die may be carved from: stone and the ores
+    die_materials = { "W:stone", "W:granite", "W:slate", "W:calcite", "W:dark_basalt", "W:black_marble",
+        "W:gold_ore", "W:silver_ore", "W:copper_ore", "W:iron_ore", "W:tin_ore", "W:lead_ore", "W:cinnabar" },
+    kinds = {
+        { planet = "sol", metal = "C:gold_ingot", name = "Talisman of Sol", gift = "never cold" },
+        { planet = "luna", metal = "C:silver_ingot", name = "Talisman of Luna", gift = "the dark is kinder" },
+        { planet = "venus", metal = "C:copper_ingot", name = "Talisman of Venus", gift = "animals follow you" },
+        { planet = "mars", metal = "C:iron_bar", name = "Talisman of Mars", gift = "your fists strike harder" },
+        { planet = "jupiter", metal = "C:tin_ingot", name = "Talisman of Jupiter", gift = "you tire slowly" },
+        { planet = "saturn", metal = "C:lead_ingot", name = "Talisman of Saturn", gift = "you sense ore nearby" },
+        { planet = "mercury", metal = "amalgam_tin", name = "Talisman of Mercury", gift = "quick feet" },
+    },
+    venus_radius = 6,
+    mars_extra = 2,                 -- points a bare fist adds, a grade
+    saturn_radius = 4,              -- blocks: one layer of the cube read a look
+    mercury_speed = 10,             -- per cent quicker, a grade
+}
+
+-- What an ore-sense sees (Saturn's talisman now; the gnome's, later).
+C.ores = { "W:gold_ore", "W:silver_ore", "W:copper_ore", "W:iron_ore", "W:tin_ore", "W:lead_ore", "W:cinnabar",
+    "W:coal", "W:pyrite", "W:crystal", "W:orichalcum", "W:diamond", "W:chromium_ore", "W:pitchblende", "W:salt",
+    "W:sulfur" }
+
+-- The Hermetic Seal (brief §7.3): a seal glyph set by a player who knows it
+-- wards the blocks within `radius` (Greater Seal: `greater_radius`), twice
+-- that carved from black marble. Nobody but its setter, whoever they allow
+-- and an operator may dig or build there. No ward may touch another
+-- player's: a seal is refused where its ward would overlap theirs.
+C.seal = {
+    node = "magic.hermetic_seal",
+    greater = "magic.greater_seal",
+    radius = 6,
+    greater_radius = 12,
+    marble = "W:black_marble",
+    marble_times = 2,
+    refused = "A Hermetic Seal wards this place.",
+    overlaps = "Another's seal already wards ground this close.",
+}
+
+-- The Ouroboros (brief §7.3): eight ouroboros blocks ringing a burning
+-- athanor at its own height shorten its works by the setter's
+-- `magic.long_work_percent` (the Ouroboros: 20 per cent less time).
+C.ouroboros = { node = "magic.ouroboros" }
+
 -- Ripley's Twelve Gates, as discoveries: the first time a player completes
 -- each, 25 x its number (brief §6.2).
 C.gates = { "Calcination", "Solution", "Separation", "Conjunction", "Putrefaction", "Congelation",

@@ -37,7 +37,13 @@ end
 local function qualify_list(list)
     local out = {}
     for i, entry in ipairs(list or {}) do
-        out[i] = { U.id(entry[1]), count = entry.count, units = entry.units, wear = entry.wear }
+        if entry.glyph then
+            -- A carving, named by its glyph (Craft's answer to C-M1).
+            out[i] = { glyph = U.id(entry.glyph), material = U.id(entry.material), count = entry.count or 1,
+                wear = entry.wear }
+        else
+            out[i] = { U.id(entry[1]), count = entry.count, units = entry.units, wear = entry.wear }
+        end
     end
     return out
 end
@@ -64,6 +70,7 @@ function R.register(r)
         tools = #tools > 0 and tools or nil,
         heat = heat,
         ticks = ticks,
+        strikes = r.strikes,
         requires = r.node,
     }
     if not ok then

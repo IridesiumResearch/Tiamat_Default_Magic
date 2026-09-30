@@ -11,6 +11,10 @@
 
 local H = {}
 
+--- Who is here: UUID -> the name they joined with (for a person to type,
+--- never to key anything on). The engine has no list of players to ask.
+tdm.online = {}
+
 local words = {}
 local uses = {}
 local listed = {}
@@ -22,6 +26,8 @@ local ticks = {}
 local places = {}
 local digs = {}
 local entity_uses = {}
+local dig_starts = {}
+local punches = {}
 
 --- Runs `fn(player, rest)` when a player says `word` (case-insensitive),
 --- alone or followed by more words. A string `fn` answers is its reply, said
@@ -69,6 +75,18 @@ function tdm.on_use_entity(fn)
     entity_uses[#entity_uses + 1] = fn
 end
 
+--- Runs `fn(event)` when a dig begins: a refusal here reaches the player
+--- before they wait out the dig. The first answer that is not nil decides.
+function tdm.on_dig_start(fn)
+    dig_starts[#dig_starts + 1] = fn
+end
+
+--- Runs `fn(event)` when a player punches an entity. The first answer
+--- that is not nil decides.
+function tdm.on_punch(fn)
+    punches[#punches + 1] = fn
+end
+
 --- Runs `fn(event)` before a placement. The first answer that is not nil
 --- decides (a refusal); nil lets it through to the next.
 function tdm.on_place(fn)
@@ -77,8 +95,10 @@ end
 
 --- Runs `fn(event)` when a dig is about to complete. The first answer that
 --- is not nil decides: a refusal, or `{ drops = ... }` for what it yields.
-function tdm.on_dig(fn)
-    digs[#digs + 1] = fn
+--- `first` puts it ahead of the rest: a ward's refusal comes before any
+--- say about what the dig yields.
+function tdm.on_dig(fn, first)
+    if first then table.insert(digs, 1, fn) else digs[#digs + 1] = fn end
 end
 
 --- Runs `fn(dt_ticks)` every tick, after everything subscribed before it.
@@ -121,14 +141,23 @@ function H.install()
 
     game.register_on_player_leave(function(event)
         for _, fn in ipairs(leaves) do fn(event) end
+        tdm.online[event.player] = nil
     end)
 
     game.register_on_player_join(function(event)
+        tdm.online[event.player] = event.name or ""
         for _, fn in ipairs(joins) do fn(event) end
     end)
 
     if #entity_uses > 0 then
         game.register_on_use_entity(function(event) return first_verdict(entity_uses, event) end)
+    end
+
+    if #dig_starts > 0 then
+        game.register_on_dig_start(function(event) return first_verdict(dig_starts, event) end)
+    end
+    if #punches > 0 then
+        game.register_on_punch(function(event) return first_verdict(punches, event) end)
     end
 
     if #places > 0 then

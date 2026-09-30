@@ -22,6 +22,7 @@ one in `depends` or `optional_depends`. Source:
 |---|---|---|
 | `version` | integer, `1` | Bumped only when a change would break a reader. |
 | `glyphs` | `{ [id] = { mask, variants } }` | Every glyph of the Art by its short id (`"sol"`): the canonical 27-bit mask and every orientation Craft knows it by. Read-only data. |
+| `is_warded(pos, uuid)` | `{ x, y, z }` in whole blocks (the overworld); a UUID | Whether a Hermetic Seal forbids that player to dig or build there. `nil` and why for a malformed question. |
 | `familiars(uuid)` | a player's UUID in hex | Their familiars whose bodies are in the world, as `{ { kind, entity } }`; `nil` and why for a malformed UUID. |
 
 The brief's other fields (§12: the Quintessence bar, herbs, wards, the
@@ -63,7 +64,8 @@ All are namespaced `tiamat_default_magic:` by the engine.
   `green_lion`, `phosphorus`, `phosphorus_spill` (used at a laid campfire
   or a fuelled kiln, bloomery or athanor, it lights it through Craft's
   `ignite`), `conjoined_matter`, `caput_corvi`, `peacock_matter`, and `arbor_seed`
-  (planted by using it on the ground; watered with aqua fortis).
+  (planted by using it on the ground; watered with aqua fortis); and the
+  seven talismans `talisman_<planet>`, worn in Life's worn slots.
 - **Into Progress:** the path `magic`, "The Hermetic Art", whose door is
   `emerald_tablet` (Progress registers its recipe as
   `tiamat_default_progress:door_magic`: the Keystone, 27 units of crystal,
@@ -102,7 +104,9 @@ All are namespaced `tiamat_default_magic:` by the engine.
   `#magic_calx`, and this mod's oil, quicksilver and saltpeter in
   science's `#oil_of_vitriol`, `#quicksilver` and `#saltpeter`; tier 4's
   recipes (`config.lua`, `tier4_recipes`, and a `palingenesis_<plant>`
-  for each of the world's plants); and the
+  for each of the world's plants); the talismans at the anvil
+  (`talisman_<planet>`: the planet's metal, a hammer, and a sigil carved
+  from any of `#magic_die` as the die, four blows); and the
   glyphs of `glyph_table.lua` in every distinct orientation (`sol`,
   `luna`, `venus`, `mars`, `jupiter`, `saturn`, `mercury`, `fire`, `water`,
   `air`, `earth`, `quintessence`, `ouroboros`, `seal`, `emerald`, each
@@ -111,24 +115,30 @@ All are namespaced `tiamat_default_magic:` by the engine.
 - **Into the interface:** the shape crafter's presets
   `tiamat_default_magic:preset_<planet>`, the seven sigils, shown to a
   player who holds `magic.seven_metals`.
-- **Into Life:** the ability source `tiamat_default_magic:swiftness`
-  (`speed_mul` 1.3, while the elixir lasts).
+- **Into Life:** the ability sources `tiamat_default_magic:swiftness`
+  (`speed_mul` 1.3, while the elixir lasts) and
+  `tiamat_default_magic:talisman_mercury` (a tenth quicker a grade, while
+  it is worn).
 - **Random tick:** the world's `pyrite`, which weathers in the rain.
 - **Dialog:** `liber`, the Mute Book.
 
 ## Commands it accepts
 
 Chat words, said by a player and swallowed. For anyone: `magic` (how far
-along the Apothecary's Bench the speaker is) and `magic book` (opens the
-Mute Book for a player who carries one). A sentence that only begins with
-the word is chat.
+along the Apothecary's Bench the speaker is), `magic book` (opens the Mute
+Book for a player who carries one), and `magic seal allow <name>` and
+`magic seal deny <name>` (who, of the players here, may build within the
+speaker's seals). A sentence that only begins with the word is chat.
 
 ## Data it stores or sends
 
 `game.storage`, private to this mod: `clock` (ticks the world has run, as
 this mod counts them) and `fx:<uuid>:<effect>` (the tick a player's own
-effect ends: `night_sight`, `swiftness`), `sigil:x,y,z` (who set a
-sigil there), `tree:x,y,z` (a Tree of Diana: its cells and who planted
+effect ends: `night_sight`, `swiftness`), `carved:x,y,z` (who set a
+carving of the Art there; it replaced `sigil:x,y,z`),
+`seal:x,y,z` (a Hermetic Seal: its setter and radius),
+`sealallow:<setter>:<uuid>` (who a setter lets build in their wards),
+`tree:x,y,z` (a Tree of Diana: its cells and who planted
 it) with `treefed:x,y,z` (the tick its watering ends), `weathered:x,y,z` (pyrite the rain has weathered),
 `familiar:<uuid>:salamander` (`true`, or `"dormant"` after a repath
 away), and per athanor `burned:<container>` (ticks it has burned

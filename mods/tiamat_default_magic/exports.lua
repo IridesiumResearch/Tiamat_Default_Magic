@@ -23,6 +23,15 @@ for _, glyph in ipairs(tdm.glyphs.table) do
     E.glyphs[glyph.id] = { mask = glyph.mask, variants = U.plain(glyph.variants) }
 end
 
+--- Whether a Hermetic Seal forbids `uuid` to dig or build at `pos`
+--- (`{ x, y, z }`, whole blocks, the overworld).
+function E.is_warded(pos, uuid)
+    if type(pos) ~= "table" or type(uuid) ~= "string" then return nil, "is_warded takes a position and a UUID" end
+    local x, y, z = math.tointeger(pos.x), math.tointeger(pos.y), math.tointeger(pos.z)
+    if not (x and y and z) then return nil, "a position is whole blocks" end
+    return tdm.seal.warding(x, y, z, uuid) ~= nil
+end
+
 --- A player's familiars whose bodies are in the world: `{ { kind, entity } }`.
 function E.familiars(uuid)
     if type(uuid) ~= "string" or not string.match(uuid, "^%x+$") then return nil, "familiars takes a player's UUID" end

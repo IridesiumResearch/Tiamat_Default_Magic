@@ -9,7 +9,7 @@
 #[allow(dead_code)]
 mod rig;
 
-use rig::{MOD, PLAYER, Rig, Setup};
+use rig::{MOD, OTHER, PLAYER, Rig, Setup};
 
 fn main() {
     loads();
@@ -30,6 +30,9 @@ fn main() {
     nigredo();
     spills_and_theriac();
     tree_of_diana();
+    talismans();
+    the_seal();
+    ouroboros();
     determinism();
     println!("magic native check: all passed");
 }
@@ -480,9 +483,9 @@ fn sigils() {
     // before this mod hears the dig, so the sign dug here is carved of dirt.)
     assert!(r.place_event(PLAYER, (70, 64, 70), "tiamat_default_world:dirt", VENUS));
     r.put_carved(70, 64, 70, "tiamat_default_world:dirt", VENUS);
-    assert!(r.stored("sigil:70,64,70").is_some(), "its setter, remembered");
+    assert!(r.stored("carved:70,64,70").is_some(), "its setter, remembered");
     r.dig_event(PLAYER, (70, 64, 70));
-    assert!(r.stored("sigil:70,64,70").is_none(), "and forgotten");
+    assert!(r.stored("carved:70,64,70").is_none(), "and forgotten");
     println!("sigils: ok");
 }
 
@@ -680,6 +683,98 @@ fn tree_of_diana() {
     r.dig_event(PLAYER, at);
     assert!(r.stored(&format!("tree:{},{},{}", at.0, at.1, at.2)).is_none(), "dug, forgotten");
     println!("tree of diana: ok");
+}
+
+/// Talismans: struck at the anvil (the recipe, gated); worn, Mercury's is
+/// quick feet through Life and Saturn's makes ore nearby glint for the
+/// wearer alone; taken off, Mercury's speed is taken off too.
+fn talismans() {
+    rig::ABILITIES.lock().unwrap().clear();
+    let mut r = Rig::new(Setup::default());
+    ready(&mut r, 0);
+    let answer = r.ask(&format!("t can {MOD}:talisman_sol"));
+    assert!(answer.starts_with("nil") && !answer.contains("no such"), "the anvil recipe, gated: {answer}");
+
+    r.give_view(PLAYER, "tiamat_default_life:worn", "talisman_mercury", 27);
+    r.give_view(PLAYER, "tiamat_default_life:worn", "talisman_saturn", 27);
+    // Saturn counts only if it is the one that counts: with one slot, the
+    // first worn. So wear Saturn alone first.
+    r.inventory.views.lock().unwrap().remove(&(PLAYER, "tiamat_default_life:worn".to_owned()));
+    r.give_view(PLAYER, "tiamat_default_life:worn", "talisman_saturn", 27);
+    r.put_block(101, 64, 101, "tiamat_default_world:iron_ore");
+    r.bursts();
+    r.tick(400);
+    let glints: Vec<_> = r.bursts().into_iter().filter(|b| b.contains("player: Some") && b.contains("pos: [101.5")).collect();
+    assert!(!glints.is_empty(), "the ore glints for the wearer");
+
+    r.inventory.views.lock().unwrap().remove(&(PLAYER, "tiamat_default_life:worn".to_owned()));
+    r.give_view(PLAYER, "tiamat_default_life:worn", "talisman_mercury", 27);
+    r.tick(60);
+    // Life composes it with its own (the cold slows this player), so the
+    // test is the ratio: worn, a tenth quicker than without.
+    let last_speed = || {
+        rig::ABILITIES.lock().unwrap().iter().rev().find(|(p, _)| *p == PLAYER).and_then(|(_, a)| a.as_ref().map(|a| a.speed))
+    };
+    let worn = last_speed().expect("Life set a speed");
+    r.inventory.views.lock().unwrap().remove(&(PLAYER, "tiamat_default_life:worn".to_owned()));
+    r.tick(60);
+    let bare = last_speed().expect("and set it again");
+    assert!((worn / bare - 1.1).abs() < 0.01, "Mercury: a tenth quicker ({worn} against {bare})");
+    println!("talismans: ok");
+}
+
+/// A Hermetic Seal wards its ground against another player's digging and
+/// building, not its setter's; another's seal may not overlap it.
+fn the_seal() {
+    const SEAL: u32 = 134151167;
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.seven_metals", "magic.sigils", "magic.glassblowing", "magic.hermetic_seal"]);
+    r.join(OTHER);
+    r.tick(1);
+    let seal = (130, 64, 130);
+    assert!(r.place_event(PLAYER, seal, "tiamat_default_world:stone", SEAL), "set");
+    r.put_carved(seal.0, seal.1, seal.2, "tiamat_default_world:stone", SEAL);
+    assert!(r.stored(&format!("seal:{},{},{}", seal.0, seal.1, seal.2)).is_some());
+
+    // Remove the operator's pass from the setter, so the test is honest.
+    r.huds.operators.lock().unwrap().clear();
+    let near = (133, 64, 131);
+    r.put_block(near.0, near.1, near.2, "tiamat_default_world:dirt");
+    assert!(!r.place_event(OTHER, (134, 64, 130), "tiamat_default_world:dirt", 0x7FF_FFFF), "another may not build");
+    let (allowed, why) = r.dig_start_event(OTHER, near);
+    assert!(!allowed, "nor dig");
+    assert_eq!(why.as_deref(), Some("A Hermetic Seal wards this place."));
+    let (allowed, _) = r.dig_start_event(PLAYER, near);
+    assert!(allowed, "its setter may");
+    assert!(r.place_event(OTHER, (150, 64, 130), "tiamat_default_world:dirt", 0x7FF_FFFF), "beyond it, anyone may");
+    println!("the seal: ok");
+}
+
+/// Eight ouroboros blocks round a burning athanor, set by an adept who
+/// knows the Ouroboros, shorten its work.
+fn ouroboros() {
+    const OUROBOROS: u32 = 14700600;
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.athanor", "magic.degrees_of_fire", "magic.gate_calcination", "magic.seven_metals",
+        "magic.sigils", "magic.pelican", "magic.ouroboros"]);
+    let fuel = ("tiamat_default_world:coal", 27 * 4);
+    let with = (150, 64, 150);
+    let without = (160, 64, 160);
+    let a = athanor(&mut r, with, &[(1, fuel.0, fuel.1), (2, "tiamat_default_craft:copper_ingot", 27),
+        (5, "tiamat_default_craft:bellows", 27)]);
+    let b = athanor(&mut r, without, &[(1, fuel.0, fuel.1), (2, "tiamat_default_craft:copper_ingot", 27),
+        (5, "tiamat_default_craft:bellows", 27)]);
+    for (dx, dz) in [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)] {
+        let at = (with.0 + dx, with.1, with.2 + dz);
+        assert!(r.place_event(PLAYER, at, "tiamat_default_world:stone", OUROBOROS));
+        r.put_carved(at.0, at.1, at.2, "tiamat_default_world:stone", OUROBOROS);
+    }
+    light(&mut r, with);
+    light(&mut r, without);
+    r.tick(520);
+    assert_eq!(slot(&r, &a, 7), Some((format!("{MOD}:aes_ustum"), 27)), "the serpent hurries it");
+    assert_eq!(slot(&r, &b, 7), None, "not yet, without one");
+    println!("ouroboros: ok");
 }
 
 /// The same play twice leaves the same storage.
