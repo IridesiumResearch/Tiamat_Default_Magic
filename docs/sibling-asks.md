@@ -122,6 +122,7 @@ node's `branch`, ready.
 **Wx-M1, a layered sky overlay** — *open.*
 `add_overlay(uuid, source, { intensity, sky, sky_mix, saturation } | nil)`,
 blended by Weather into what it writes, since `set_sky_modifier` is one
-modifier a player and the last writer wins. For night-sight, the Luna
-talisman and woven worlds' skies. Shared with science (Wx-S2). Until then
+modifier a player and the last writer wins. For night-sight and the Luna
+talisman (a woven world's sky no longer needs it: the engine's
+`set_domain_sky` gives an instance its own, E-M2). Shared with science (Wx-S2). Until then
 this mod never calls `set_sky_modifier`.

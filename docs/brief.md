@@ -122,7 +122,7 @@ Everything in Craft's and Progress's briefs §2 still applies (no floats that re
 | Player movement | `set_player_abilities(uuid, { fly, speed, sprint, wind_sky })` — one table per player, **last writer wins**, client-predicted; `push_player(uuid, impulse)` — "added, not set", and **not** documented as predicted; `move_player` (stubs) | Life already writes abilities (cold, hunger). Swiftness and sylph flight need sibling ask **L-M3** (compose) — fallback §6.7, which must be tested for rubber-banding. |
 | The sky | `set_sky_modifier(uuid, …)` is one modifier per player, last writer wins — and **Weather writes it for every exposed player whenever its value changes** (Weather `fx.lua`) | Night-sight, the Luna talisman and a woven world's sky need Weather ask **Wx-M1** (a layered overlay). Until then this mod never calls `set_sky_modifier`. |
 | Entities | `register_model` (≤ 64 per server, all mods), `spawn_entity`, `set_entity`, `steer_entity`, `find_path` (8,000 expansions per tick shared by every search) (stubs) | Six models (§10.1), leaving the budget to Life's ~30. Familiars path only when more than 6 blocks from their master, at most one search per familiar per 20 ticks. |
-| Worlds | `register_domain{ instanced = true, generator, position }`; `create_domain(template, key, { position })`; `destroy_domain` (instances only, refused while occupied); **the generator is told `{x, y, z, seed}` and not which instance it fills** (stubs) | Woven worlds use the *offset trick* (§6.10): every world is its own far-away slice of one infinite generator, and its parameters are read from *where* it is. Engine ask **E-M1** would make it cleaner. |
+| Worlds | `register_domain{ instanced = true, generator, position }`; `create_domain(template, key, { position })`; `destroy_domain` (instances only, refused while occupied); a generator's `pos` carries `domain`, `"template/key"` for an instance (engine 61b4c3e, E-M1); `set_domain_sky(id, spec)` and `create_domain(..., { sky })` give one instance its own sky (engine 8275173, E-M2); valid coordinates are −60,000..59,999 a side (`WORLD_HALF_EXTENT_BLOCKS`) | A woven world is its own instance, its parameters written into its KEY and read back by the generator from `pos.domain`; its sky is set on the domain at weaving (§6.11). |
 | Weather | `falling_on(player)` (a **player**, not a place), `weather_at(x,y,z)`, `ignite`, `extinguish`, `on_lightning(fn)`; no way to call rain (Weather exports) | Nothing here needs to *make* weather. Rain on a placed block = `weather_at` rain/storm there **and** `get_light(pos).sun == 15`. |
 | Pictures | `register_picture` ≤ 512 per server, ≤ 2048 px an edge and ≤ 8 MiB decoded (stubs; engine `texture.rs`) | The *Mutus Liber* uses ≤ 120; art is optional (§11) — every page has a text form. |
 
@@ -571,7 +571,7 @@ Transmutation is the iconic goal and it is **deliberately late**: gold's only bi
 
 **Woven worlds** (`opus_mundi`). Five templates registered at load, one per archetype — `world_earth` (caverns and crystal, deep ores), `world_water` (archipelago on a planet-wide sea), `world_air` (floating islands over a void, sylph-haunted), `world_fire` (basalt and lava seas, obsidian), `world_quintessence` (glass, calcite and light, crystal spires) — each a compiled density field built once at load from World's own blocks.
 
-The **offset trick** (because a generator is not told which instance it fills — **E-M1**): every instance is given, at weaving, a *region* of its template's infinite coordinate space — `x0 = (slot × 2 + 1) × 2^20` — and its players are placed there and only ever there. The generator is a pure function of position, so each world is a different slice of noise; and because it can compute `slot = x // 2^21`, it can also read **parameters from the slot number** without storage: `(slot % 8)` picks the planetary vein (`planetary_veins`), `(slot // 8) % 8` the sea level band, `(slot // 64) % 7` the sky (applied per player through Weather's overlay on arrival — Wx-M1 — since a domain sky is per template; `planetary_skies` waits on it). Weaving chooses the lowest free slot whose parameters match what the player chose. Clean, deterministic, no engine change; E-M1 would retire it.
+**The instance is the world** (decided 2026-09-30, when the engine answered E-M1 and E-M2). Draft 1's *offset trick* — each world in its own far slice of the template's coordinates, a million blocks out — is dropped: valid coordinates end at ±60,000 blocks (`WORLD_HALF_EXTENT_BLOCKS`), so every slot lay past the world's edge. Instead a generator's `pos` carries `domain`, `"<template>/<key>"`, and **a woven world's parameters are written into its key**: `<weaver's first 16 hex>-<n>-<vein>-<sea>` — the weaver, their world's number, the planetary vein (`planetary_veins`) and the sea-level band. The generator reads them back from `pos.domain` and seeds its streams from the key, so two worlds of one archetype are two worlds, deterministically, with nothing stored, in every generation worker. **The sky** is set on the instance when it is woven, `create_domain(template, key, { position, sky })`, and changed with `set_domain_sky(id, spec)` — everyone inside sees it at once and anyone arriving later sees it on arrival (engine E-M2) — so `planetary_skies` needs no per-player overlay and no longer waits on Wx-M1. Each world is ordinary coordinates near its own origin.
 
 **The Loom** is a construct (§7.3): a 5×5 floor. Use its centre with the Rebis in hand: a dialog (archetype, sky, veins, sea) → consumes the Rebis, the four elemental quintessences, 27 prima materia blocks' worth of units and 1 Red Stone → `create_domain` → the weaver is transferred in. `native_spirits` spawns up to 4 wild elementals of the world's element near arrivals. `worldgate` places a standing correspondence gate in the overworld for the world, usable by anyone on its allow-list. The per-player cap is the world option `woven_worlds`.
 
@@ -802,12 +802,12 @@ What a player waits on, per tier, besides insight — the gates that make it *ta
 - **P-M1, a branch label and a reveal rule.** A node field `branch = "Menstrua"` the Research tab groups by, and an option to show a path node only when all but one of its requirements are held. A hundred nodes shown at once overwhelms a child and an adult alike.
 
 **Weather**
-- **Wx-M1, a layered sky overlay.** Weather writes `set_sky_modifier` for every player continuously, and a second writer would fight it. Ask: `add_overlay(uuid, source, { intensity, sky, sky_mix, saturation, grade } | nil)`, blended by Weather into what it writes. For night-sight, the Luna talisman and woven worlds' skies. Shared with science (the Core's darkening, the atmosphere processor).
+- **Wx-M1, a layered sky overlay.** Weather writes `set_sky_modifier` for every player continuously, and a second writer would fight it. Ask: `add_overlay(uuid, source, { intensity, sky, sky_mix, saturation, grade } | nil)`, blended by Weather into what it writes. For night-sight and the Luna talisman; a woven world's sky is the engine's `set_domain_sky` now (E-M2). Shared with science (the Core's darkening, the atmosphere processor).
 
 ### `docs/engine-asks.md`
 
-- **E-M1, the instance in the generator.** `pos.domain = "template/key"` in a generator's position. Retires the offset trick (§6.11).
-- **E-M2, a sky per instance** set at runtime (a woven world's own sky without a per-player overlay).
+- ~~**E-M1, the instance in the generator.**~~ *Landed (engine 61b4c3e):* `pos.domain`; the offset trick is dropped (§6.11).
+- ~~**E-M2, a sky per instance**~~ *Landed (engine 8275173):* `set_domain_sky`, and `sky` at `create_domain`.
 
 ---
 
@@ -834,7 +834,7 @@ Craft's and Progress's code rules apply verbatim (fan-out, lazy id resolution, s
 - **Effects:** an elixir's own effect expires on time; duration scales with the node; no `set_player_abilities` call while L-M3 is absent; no `set_sky_modifier` call while Wx-M1 is absent.
 - **Familiars:** appear under their conditions with a stubbed clock; binding; caps; path budget never exceeded (count calls).
 - **Stones:** projection yields with the world option on/off; multiplication doubles.
-- **Cosmos:** weave → instance exists, player inside at the slot offset, generator output differs between two slots; sunder with a player inside → player out, domain gone, prima materia half back.
+- **Cosmos:** weave → instance exists with its parameters in its key, player inside, generator output differs between two instances of one template, the chosen sky set on the instance; sunder with a player inside → player out, domain gone, prima materia half back.
 - **Repath:** familiars dormant, Quintessence 0, worlds sealed not destroyed; repath back → all restored.
 - **Determinism:** full suite twice → identical storage dump.
 
@@ -857,7 +857,7 @@ Craft's and Progress's code rules apply verbatim (fan-out, lazy id resolution, s
 
 ## 18. Numbers a designer will turn (`config.lua`)
 
-Every node cost; every recipe's inputs, ticks, degree and vessel; philosophical-day length (24,000); long-work durations (3 / 7 / 40); sigil percentages; ward radii; familiar spawn checks, caps, budgets and trait values; Quintessence base, regen, costs; elixir durations; study yields and ticks; discovery values; herb→planet table; emblem→first table; projection yields; world-slot bit layout; woven-world caps; tick budget.
+Every node cost; every recipe's inputs, ticks, degree and vessel; philosophical-day length (24,000); long-work durations (3 / 7 / 40); sigil percentages; ward radii; familiar spawn checks, caps, budgets and trait values; Quintessence base, regen, costs; elixir durations; study yields and ticks; discovery values; herb→planet table; emblem→first table; projection yields; woven-world key layout; woven-world caps; tick budget.
 
 ---
 

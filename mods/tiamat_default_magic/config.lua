@@ -74,6 +74,8 @@ C.bench_items = {
 
 -- The Mute Book's key, which a player may move in the settings screen.
 C.book_key = "KeyJ"
+-- The familiars' key: each press calls the next bound familiar to walk.
+C.familiar_key = "KeyK"
 
 -- The Bench's one block: light from mushrooms in a jar.
 C.hermetic_lamp = {

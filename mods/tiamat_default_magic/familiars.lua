@@ -15,7 +15,8 @@
 -- A familiar is a RECORD, `familiar:<uuid>:<kind>`: `true` while it walks
 -- with its master, `"resting"` when it does not (only `1 + magic.familiars`
 -- walk at once; the newest bound, or the one called with `magic familiar
--- <kind>`, walks), and `"dormant"` after its master repaths away. Its body
+-- <kind>` or the K key, walks), and `"dormant"` after its master repaths
+-- away. Its body
 -- is made when its master is here — spawned on join, despawned on leave —
 -- because the engine keeps an entity across a save but not its id. A body
 -- of this mod's nobody is keeping, near a joining player, is a crash's
@@ -460,6 +461,29 @@ if progress then
         end
     end)
 end
+
+--- Calls the next bound familiar after the first that walks, in the order
+--- of the four, to walk; answers what to tell the player.
+function F.next(uuid)
+    local bound, walking = {}, nil
+    for _, kind in ipairs(F.ORDER) do
+        local r = record(uuid, kind)
+        if r == true or r == "resting" then
+            bound[#bound + 1] = kind
+            if r == true and not walking then walking = #bound end
+        end
+    end
+    if #bound == 0 then return "You have no familiar." end
+    local kind = bound[(walking or 0) % #bound + 1]
+    F.walk(uuid, kind)
+    return "Your " .. kind .. " walks with you."
+end
+
+game.register_action{ id = "familiar", default_key = C.familiar_key, description = "Call your next familiar" }
+
+tdm.on_action(game.mod_id .. ":familiar", function(e)
+    if e.pressed then game.chat_to(e.player, F.next(e.player)) end
+end)
 
 --- `magic familiar [kind]`: which walk and rest, or call one to walk.
 function F.command(uuid, rest)

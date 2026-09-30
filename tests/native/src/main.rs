@@ -872,6 +872,11 @@ fn gnome_and_sylph() {
     assert_eq!(r.ask("magic familiar gnome"), "Your gnome walks with you.");
     assert_eq!(r.with_model(&format!("{MOD}:gnome")).len(), 1);
     assert!(r.with_model(&format!("{MOD}:sylph")).is_empty(), "and the sylph rests");
+    // K calls the next: after the gnome, the sylph.
+    r.heard(PLAYER);
+    r.action(PLAYER, &format!("{MOD}:familiar"));
+    assert_eq!(r.said(), "Your sylph walks with you.", "on K");
+    assert_eq!(r.with_model(&format!("{MOD}:sylph")).len(), 1);
     println!("gnome and sylph: ok");
 }
 
