@@ -81,8 +81,18 @@ All are namespaced `tiamat_default_magic:` by the engine.
   recipes there, at the workbench, the kiln and by hand (`config.lua`,
   `lab_recipes`, and a `tincture_<plant>` for each herb); the groups
   `#magic_blast` (Craft's bellows), `#magic_herb`, `#magic_tincture`,
-  `#magic_calx`, and this mod's oil in `#oil_of_vitriol`. Each is
+  `#magic_calx`, and this mod's oil in `#oil_of_vitriol`; and the
+  glyphs of `glyph_table.lua` in every distinct orientation (`sol`,
+  `luna`, `venus`, `mars`, `jupiter`, `saturn`, `mercury`, `fire`, `water`,
+  `air`, `earth`, `quintessence`, `ouroboros`, `seal`, `emerald`, each
+  `tiamat_default_magic:<name>`). The athanor is `long`. Each is
   qualified `tiamat_default_magic:<id>`.
+- **Into the interface:** the shape crafter's presets
+  `tiamat_default_magic:preset_<planet>`, the seven sigils, shown to a
+  player who holds `magic.seven_metals`.
+- **Into Life:** the ability source `tiamat_default_magic:swiftness`
+  (`speed_mul` 1.3, while the elixir lasts).
+- **Random tick:** the world's `pyrite`, which weathers in the rain.
 - **Dialog:** `liber`, the Mute Book.
 
 ## Commands it accepts
@@ -96,7 +106,9 @@ the word is chat.
 
 `game.storage`, private to this mod: `clock` (ticks the world has run, as
 this mod counts them) and `fx:<uuid>:<effect>` (the tick a player's own
-effect ends: `night_sight`). Who chose the path, and which nodes they
+effect ends: `night_sight`, `swiftness`), `sigil:x,y,z` (who set a
+sigil there) and `weathered:x,y,z` (pyrite the rain has weathered). Who
+chose the path, and which nodes they
 hold, is Progress's; an athanor's fire and work are Craft's.
 
 ## What it reads from other mods
@@ -106,7 +118,9 @@ Not exports, listed so the direction is clear: Progress's `register_path`,
 `on_crafted` and `on_first`, and its blocks `kiln_lit`, `bloomery_lit` and
 `campfire_lit`, `register_station`, `register_group` and its stations'
 slots; Life's `add_food`, `on_eat`, `add_contact_fire`,
-`add_heat_source`, and its `campfire` block; the interface's
+`add_heat_source`, `set_ability`, and its `campfire` block; Craft's
+`register_glyph`, `glyph_of`, `add_progress` and `on_crafted`'s
+container; the interface's `add_preset`; Weather's `weather_at`; the interface's
 `widgets`, for the book's look; Weather's `fire` block. It names the
 world's `roman_chamomile`, `wild_mint`, `bramble`, `ladys_mantle`,
 `glow_cap`, `sulfur`, `salt` and `rose` in its recipes.

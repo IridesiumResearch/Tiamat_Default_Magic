@@ -119,9 +119,9 @@ tdm.on_use_at(thrown_at, function(e)
     return ""
 end)
 
--- Put on: the campfire's box burnt it. Craft does not say which fire, so
--- the flare is shown at the fire the player is looking at, if they are
--- looking at one; the recipe is made as the player who lit the fire.
+-- Put on: the campfire's box burnt it, and Craft says which box (its
+-- answer to C-M9), so the flare is over that fire. Without a box — Craft
+-- could not say — it is at the fire the player is looking at, if any.
 local put_on = {}
 for _, id in ipairs(C.put_on) do
     local material = U.material(U.id(id))
@@ -142,10 +142,10 @@ for colour in pairs(C.flames) do burnt[U.id("burn_" .. colour)] = colour end
 local distilled = { [U.id("rosewater")] = true, [U.id("mint_water")] = true }
 
 if craft then
-    craft.on_crafted(function(uuid, recipe_id)
+    craft.on_crafted(function(uuid, recipe_id, _, container)
         local colour = burnt[recipe_id]
         if colour then
-            flared(uuid, fire_in_view(uuid), colour)
+            flared(uuid, U.station_pos(container, "campfire") or fire_in_view(uuid), colour)
         elseif distilled[recipe_id] then
             discover(uuid, DISTIL)
         end

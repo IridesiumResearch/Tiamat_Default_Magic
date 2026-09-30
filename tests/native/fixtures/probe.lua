@@ -16,6 +16,7 @@
 --   t path               the speaker's path, or nil
 --   t count              how many magic nodes Progress validated
 --   t effects <prefix>   the speaker's summed effects, "key=value" sorted
+--   t glyph <mask>       Craft's glyph_of a mask
 
 local p = game.exports("tiamat_default_progress")
 local c = game.exports("tiamat_default_craft")
@@ -60,6 +61,8 @@ game.register_on_chat(function(e)
         say = ok and "burnt" or ("not " .. tostring(why))
     elseif word == "magic" then
         say = tostring(m.version)
+    elseif word == "glyph" then
+        say = tostring(c.glyph_of(math.tointeger(tonumber(rest))))
     elseif word == "path" then
         say = tostring(p.path(e.player))
     elseif word == "count" then

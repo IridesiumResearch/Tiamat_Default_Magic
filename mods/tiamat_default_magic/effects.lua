@@ -16,8 +16,11 @@
 -- faint glow of motes round the drinker, and Life's own rested sleep.
 
 local C = tdm.config
+local U = tdm.util
 
 local E = {}
+
+local life = U.exports("tiamat_default_life")
 
 local live = {}             -- uuid -> { effect id -> the tick it ends }
 
@@ -76,6 +79,7 @@ function E.start(uuid, id, ticks)
         timers[id] = ends
         game.storage.set(key(uuid, id), ends)
     end
+    E.begin(uuid, id)
     return true
 end
 
@@ -85,6 +89,29 @@ function E.left(uuid, id)
     local ends = timers[id]
     if not ends then return 0 end
     return math.max(0, ends - E.now())
+end
+
+-- Abilities: an effect that changes how a player moves, through Life, under
+-- this mod's name so it composes with Life's own and anybody else's.
+
+local function ability_source(id)
+    return game.mod_id .. ":" .. id
+end
+
+--- An effect's hold on the body, put on (when it starts, and when its
+--- player comes back with time left) or taken off (when it ends).
+function E.begin(uuid, id)
+    local spec = C.own_effects[id]
+    if spec and spec.speed_mul and life and life.set_ability then
+        life.set_ability(uuid, ability_source(id), { speed_mul = spec.speed_mul })
+    end
+end
+
+local function finish(uuid, id)
+    local spec = C.own_effects[id]
+    if spec and spec.speed_mul and life and life.set_ability then
+        life.set_ability(uuid, ability_source(id), nil)
+    end
 end
 
 -- Looks ---------------------------------------------------------------------------------
@@ -108,15 +135,20 @@ tdm.on_tick(function(dt)
             if ends <= now then
                 timers[id] = nil
                 game.storage.set(key(uuid, id), nil)
+                finish(uuid, id)
             else
                 local spec = C.own_effects[id]
-                if spec and now % spec.every == 0 and LOOKS[id] then LOOKS[id](uuid, spec) end
+                if spec and spec.every and now % spec.every == 0 and LOOKS[id] then LOOKS[id](uuid, spec) end
             end
         end
     end
 end)
 
-tdm.on_join(function(event) load(event.player) end)
+tdm.on_join(function(event)
+    for id, ends in pairs(load(event.player)) do
+        if ends > E.now() then E.begin(event.player, id) end
+    end
+end)
 tdm.on_leave(function(event) live[event.player] = nil end)
 
 return E

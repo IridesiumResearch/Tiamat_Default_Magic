@@ -17,7 +17,7 @@ depends = [
   "core >=0.1",
   "tiamat_default_world >=0.1",
   "tiamat_default_life >=0.1",
-  "tiamat_default_craft >=0.4",
+  "tiamat_default_craft >=0.5",
   "tiamat_default_progress >=0.1",
 ]
 # Loaded after these when they are here, so `game.exports` finds them from

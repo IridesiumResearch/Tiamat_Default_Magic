@@ -32,7 +32,16 @@ bellows make the 4th. Glassblowing, Gates I–III (calcination, solution,
 separation), the cupel's silver from lead, wine, vinegar, verdigris, aqua
 vitae, green vitriol and its oil, blue vitriol, a planetary tincture from
 every herb, seven elixirs, and night-sight. A philosophical day is ninety
-seconds. The sigils and the salamander come with the glyphs, next.
+seconds.
+
+Step 5, in part: **the glyphs and the sigils.** Fifteen carved shapes are
+Craft's glyphs in every orientation (`tools/glyphs.py` proves them), the
+seven planetary sigils are one click in the shape crafter, and a sigil set
+against a burning athanor speeds its own metal's work. The siblings'
+answers are adopted where tier 3 can use them: the athanor works while
+nobody is near, a flame powder flares over its own fire, the elixir of
+swiftness is quick feet, and pyrite weathers to vitriol in the rain. The
+salamander comes next.
 
 ## What is here
 
@@ -41,6 +50,7 @@ seconds. The sigils and the salamander come with the glyphs, next.
 | `mods/tiamat_default_magic/` | The mod. `init.lua` decides load order; `config.lua` holds every number; the rest is one file a system. |
 | `tools/make_textures.py` | Draws the placeholder textures. Standard library only; the same bytes on every machine. |
 | `tools/check_tree.py` | Proves the tree sound from `tree.lua` and prints the pacing table (brief §13). |
+| `tools/glyphs.py` | Proves the glyph table sound from `glyph_table.lua`: no clash in any orientation. |
 | `tests/native/` | The mod run in the engine's real script VM, beside the REAL sibling mods, with a fake server around it. |
 | `docs/brief.md` | The design, and §2.1: what was checked and what changed. |
 | `docs/exports.md` | What other mods may call, and every id this mod registers. |

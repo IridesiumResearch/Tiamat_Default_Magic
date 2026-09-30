@@ -333,8 +333,8 @@ C.tincture_days = 1
 -- The simple elixirs: a tincture in a phial, by hand. Life's own effects
 -- where Life has one; `own` is this mod's (effects.lua). Night-sight
 -- brightens nothing until Weather's overlay (Wx-M1): until then it is a
--- rested sleep and a faint glow round the drinker. Swiftness moves nobody
--- until Life composes abilities (L-M3): until then it is Life's `steady`.
+-- rested sleep and a faint glow round the drinker. Swiftness is quick
+-- feet through Life's composed abilities, and Life's `steady` besides.
 C.elixirs = {
     { id = "elixir_vigour", planet = "sol", name = "Elixir of vigour", description = "Sol's tincture: your wounds close.",
         food = { effects = { { "regeneration", 300 } }, sound = "drink" } },
@@ -344,8 +344,8 @@ C.elixirs = {
         food = { heal = 4, effects = { { "rested", 1200 } }, sound = "drink" } },
     { id = "elixir_fortitude", planet = "mars", name = "Elixir of fortitude", description = "Mars's tincture: blows land softer.",
         food = { effects = { { "resistance", 600 } }, sound = "drink" } },
-    { id = "elixir_swiftness", planet = "mercury", name = "Elixir of swiftness", description = "Mercury's tincture: you tire more slowly.",
-        food = { effects = { { "steady", 1200 } }, sound = "drink" } },
+    { id = "elixir_swiftness", planet = "mercury", name = "Elixir of swiftness", description = "Mercury's tincture: quick feet.",
+        food = { effects = { { "steady", 1200 } }, sound = "drink" }, own = { "swiftness", 1200 } },
     { id = "draught_warming", planet = "jupiter", name = "Warming draught", description = "Jupiter's tincture: warm through.",
         food = { temperature = "warm", effects = { { "warmth", 1200 } }, sound = "drink" } },
     { id = "draught_cooling", planet = "saturn", name = "Cooling draught", description = "Saturn's tincture: cool as stone.",
@@ -356,6 +356,9 @@ C.elixirs = {
 -- timer in storage and a look every `every` ticks.
 C.own_effects = {
     night_sight = { every = 40, particles = 6, colour = { r = 0.7, g = 0.9, b = 1.0, a = 0.35 } },
+    -- Through Life's composed abilities (its answer to L-M3): a speed that
+    -- multiplies in with Life's own cold and hunger, under this mod's name.
+    swiftness = { speed_mul = 1.3 },
 }
 
 -- The recipes of tier 3. `degree` is a degree of fire (above); `days` is in
@@ -471,6 +474,36 @@ C.studies = {
     { id = "study_calx", name = "Study a calx", inputs = { { "#magic_calx", count = 1 } }, ticks = 600, insight = 15 },
     { id = "study_tincture", name = "Study a tincture", inputs = { { "#magic_tincture", count = 1 } }, ticks = 1200, insight = 20 },
     { id = "study_vitriol", name = "Study vitriol", inputs = { { "green_vitriol", count = 1 } }, ticks = 1800, insight = 30 },
+}
+
+-- Sigils (brief §6.5): a carved planet's sign touching a burning athanor
+-- speeds its own metal's work by the setter's `magic.sigil_percent` (the
+-- Signs of the Seven: 15), twice that carved from the metal's own ore.
+-- Craft's `add_progress` gives the ticks. Every `every` ticks an athanor is
+-- looked at, at most `budget` of them a pass.
+C.sigils = {
+    node = "magic.seven_metals",        -- who sees the one-click presets
+    every = 200,
+    budget = 64,
+    ore_times = 2,
+    -- What counts as a planet's metal in an athanor's inputs.
+    metals = {
+        sol = { "C:gold_ingot" },
+        luna = { "C:silver_ingot", "silver_grain" },
+        venus = { "C:copper_ingot", "aes_ustum", "verdigris", "salt_of_venus", "blue_vitriol" },
+        mars = { "C:iron_bar", "crocus_martis" },
+        jupiter = { "C:tin_ingot", "putty" },
+        saturn = { "C:lead_ingot", "litharge", "minium", "sal_saturni" },
+        mercury = { "W:cinnabar" },
+    },
+}
+
+-- Pyrite in the rain (weathering.lua): a random tick under open sky while
+-- one of these falls weathers it, and dug it gives green vitriol.
+C.weathering = {
+    block = "W:pyrite",
+    becomes = "green_vitriol",
+    wet = { rain = true, storm = true },
 }
 
 -- The Mute Book's line for a node whose recipes are too many to list one

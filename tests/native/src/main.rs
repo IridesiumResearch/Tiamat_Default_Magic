@@ -22,6 +22,10 @@ fn main() {
     the_door();
     the_athanor();
     spagyrics();
+    glyphs();
+    sigils();
+    swiftness();
+    weathering();
     determinism();
     println!("magic native check: all passed");
 }
@@ -173,8 +177,8 @@ fn flames() {
     r.give(PLAYER, "tiamat_default_craft:copper_ingot", 27);
     assert_eq!(r.ask(&format!("t make {MOD}:flame_powder_green")), "made");
     assert_eq!(r.units(PLAYER, "flame_powder_green"), 81, "an ingot files into three");
+    // Not looking at it: Craft says which fire burnt it.
     r.put_block(5, 64, 5, "tiamat_default_craft:campfire_lit");
-    r.aim(5, 64, 5);
     r.bursts();
     r.heard(PLAYER);
     r.say("t burn green");
@@ -420,6 +424,104 @@ fn spagyrics() {
     assert!(r.bursts().iter().all(|b| !b.contains("player: Some")), "and it runs out");
     assert!(r.stored(&format!("fx:{}:night_sight", rig::hex(PLAYER))).is_none(), "the timer is gone");
     println!("spagyrics: ok");
+}
+
+/// Venus, the canonical mask the brief draws.
+const VENUS: u32 = 100433791;
+
+/// Every glyph is Craft's in each of its orientations.
+fn glyphs() {
+    let mut r = Rig::new(Setup::default());
+    r.join(PLAYER);
+    r.tick(1);
+    assert_eq!(r.ask(&format!("t glyph {VENUS}")), format!("{MOD}:venus"));
+    // Venus turned on its side (y and z swapped) and mirrored in x: still Venus.
+    let mut turned = 0u32;
+    for i in 0..27 {
+        if VENUS >> i & 1 == 1 {
+            let (x, y, z) = (i % 3, (i / 3) % 3, i / 9);
+            turned |= 1 << ((2 - x) + 3 * z + 9 * y);
+        }
+    }
+    assert_ne!(turned, VENUS);
+    assert_eq!(r.ask(&format!("t glyph {turned}")), format!("{MOD}:venus"), "any orientation");
+    assert_eq!(r.ask("t glyph 7"), "nil", "a sliver is nothing");
+    println!("glyphs: ok");
+}
+
+/// A Venus sigil against a burning athanor that is calcining copper speeds
+/// it by its setter's knowledge; the same athanor with no sigil is slower.
+fn sigils() {
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.athanor", "magic.degrees_of_fire", "magic.gate_calcination", "magic.seven_metals",
+        "magic.sigils"]);
+    let fuel = ("tiamat_default_world:coal", 27 * 4);
+    let with = (50, 64, 50);
+    let without = (60, 64, 60);
+    let a = athanor(&mut r, with, &[(1, fuel.0, fuel.1), (2, "tiamat_default_craft:copper_ingot", 27),
+        (5, "tiamat_default_craft:bellows", 27)]);
+    let b = athanor(&mut r, without, &[(1, fuel.0, fuel.1), (2, "tiamat_default_craft:copper_ingot", 27),
+        (5, "tiamat_default_craft:bellows", 27)]);
+    // The sigil: carved from copper ore, set on the athanor's east side.
+    assert!(r.place_event(PLAYER, (51, 64, 50), "tiamat_default_world:copper_ore", VENUS), "placing is allowed");
+    r.put_carved(51, 64, 50, "tiamat_default_world:copper_ore", VENUS);
+    light(&mut r, with);
+    light(&mut r, without);
+    r.tick(520);
+    assert_eq!(slot(&r, &a, 7), Some((format!("{MOD}:aes_ustum"), 27)), "sped by the sign");
+    assert_eq!(slot(&r, &b, 7), None, "not yet, without one");
+    r.tick(120);
+    assert_eq!(slot(&r, &b, 7), Some((format!("{MOD}:aes_ustum"), 27)), "in its own time");
+    // Dug, a sign is forgotten. (Ore wants a pick, and Craft refuses a hand
+    // before this mod hears the dig, so the sign dug here is carved of dirt.)
+    assert!(r.place_event(PLAYER, (70, 64, 70), "tiamat_default_world:dirt", VENUS));
+    r.put_carved(70, 64, 70, "tiamat_default_world:dirt", VENUS);
+    assert!(r.stored("sigil:70,64,70").is_some(), "its setter, remembered");
+    r.dig_event(PLAYER, (70, 64, 70));
+    assert!(r.stored("sigil:70,64,70").is_none(), "and forgotten");
+    println!("sigils: ok");
+}
+
+/// Mercury's elixir is quick feet through Life's composed abilities, and
+/// the speed is taken off again when it runs out.
+fn swiftness() {
+    rig::ABILITIES.lock().unwrap().clear();
+    let mut r = Rig::new(Setup::default());
+    ready(&mut r, 0);
+    r.give(PLAYER, "elixir_swiftness", 27);
+    r.hold(PLAYER, "elixir_swiftness");
+    assert!(r.use_at_nothing(PLAYER), "Life drinks it");
+    r.tick(20);
+    let fast = |a: &Option<tiamat_core::phys::Abilities>| a.as_ref().is_some_and(|a| format!("{a:?}").contains("1.3"));
+    assert!(rig::ABILITIES.lock().unwrap().iter().any(|(p, a)| *p == PLAYER && fast(a)), "sped up: {:?}",
+        rig::ABILITIES.lock().unwrap().last());
+    r.tick(1300);
+    let last = rig::ABILITIES.lock().unwrap().iter().rev().find(|(p, _)| *p == PLAYER).cloned();
+    assert!(last.is_some_and(|(_, a)| !fast(&a)), "and slowed again");
+    println!("swiftness: ok");
+}
+
+/// Pyrite under open sky in the rain weathers on its random tick, and dug,
+/// it is green vitriol. Dry pyrite is pyrite. (A Creative world, so a hand
+/// may dig what wants a pick: Craft refuses before this mod hears a dig.)
+fn weathering() {
+    let mut r = Rig::new(Setup { mode: Some("Creative".into()), ..Setup::default() });
+    ready(&mut r, 0);
+    let wet = (101, 64, 100);
+    let dry = (103, 64, 100);
+    r.put_block(wet.0, wet.1, wet.2, "tiamat_default_world:pyrite");
+    r.put_block(dry.0, dry.1, dry.2, "tiamat_default_world:pyrite");
+    r.random_tick(dry);
+    assert_eq!(r.dig_event(PLAYER, dry), None, "dry pyrite is pyrite");
+    let answer = r.ask("/weather set rain 30");
+    assert!(answer.starts_with("rain over square"), "{answer}");
+    r.tick(1200);
+    r.random_tick(wet);
+    assert!(r.stored(&format!("weathered:{},{},{}", wet.0, wet.1, wet.2)).is_some(), "weathered in the rain");
+    let drops = r.dig_event(PLAYER, wet).expect("weathered pyrite says what it drops");
+    assert_eq!(drops, vec![(format!("{MOD}:green_vitriol"), 27)]);
+    assert!(r.stored(&format!("weathered:{},{},{}", wet.0, wet.1, wet.2)).is_none(), "and forgets it");
+    println!("weathering: ok");
 }
 
 /// The same play twice leaves the same storage.

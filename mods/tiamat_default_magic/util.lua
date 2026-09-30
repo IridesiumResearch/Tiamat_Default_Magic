@@ -53,6 +53,22 @@ function U.block_of(e)
     return { x = e.x // 3, y = e.y // 3, z = e.z // 3, domain = e.domain }
 end
 
+--- Where a Craft station's container stands, from its name:
+--- `tiamat_default_craft:<station>:x,y,z`, with `<domain>@` before the
+--- position off the overworld. `station` is the station's id, which may
+--- itself hold a colon (the athanor's does). Nil for any other name.
+function U.station_pos(name, station)
+    if type(name) ~= "string" then return nil end
+    local prefix = "tiamat_default_craft:" .. station .. ":"
+    if string.sub(name, 1, #prefix) ~= prefix then return nil end
+    local rest = string.sub(name, #prefix + 1)
+    local domain, where = string.match(rest, "^(.*)@([^@]+)$")
+    local x, y, z = string.match(where or rest, "^(%-?%d+),(%-?%d+),(%-?%d+)$")
+    if not x then return nil end
+    return { x = math.tointeger(tonumber(x)), y = math.tointeger(tonumber(y)), z = math.tointeger(tonumber(z)),
+        domain = domain or "overworld" }
+end
+
 --- The middle of a block's top face, in world blocks: where a flame is seen.
 function U.above(pos)
     return { x = pos.x + 0.5, y = pos.y + 0.9, z = pos.z + 0.5, domain = pos.domain }

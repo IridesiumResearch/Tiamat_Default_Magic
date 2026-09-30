@@ -35,7 +35,8 @@ use tiamat_core::{
     modload::WorldOptionValue,
 
     script::{
-        ChatEvent, DialogEvent, EngineVm, JoinEvent, LeaveEvent, ScriptVm, UseAim, UseEvent,
+        Brush, ChatEvent, DialogEvent, DigEvent, EngineVm, JoinEvent, LeaveEvent, PlaceEvent, RandomTickEvent,
+        ScriptVm, UseAim, UseEvent,
         VmLimits,
         WorldEdit,
     },
@@ -46,6 +47,8 @@ use tiamat_core::{
 };
 
 pub const MOD: &str = "tiamat_default_magic";
+/// The world's seed, the same in every run: determinism is a same-seed promise.
+pub const SEED: u64 = 0x7141_4D41_5400_0001;
 pub const PLAYER: [u8; 32] = [7; 32];
 pub const OTHER: [u8; 32] = [9; 32];
 
@@ -523,9 +526,14 @@ impl fluid::Access for World {
         }
         true
     }
-    /// The world's water is the one fluid here, number 1.
+    /// The world's water is fluid 1, and every other a mod names (the
+    /// weather's rainwater) is fluid 2: the fake keeps volumes, not kinds.
     fn fluid_id(&self, name: &str) -> Option<FluidId> {
-        (name == "tiamat_default_world:water").then_some(FluidId(1))
+        if name == "tiamat_default_world:water" {
+            Some(FluidId(1))
+        } else {
+            name.contains(':').then_some(FluidId(2))
+        }
     }
 }
 
@@ -622,10 +630,15 @@ impl ent::Access for Entities {
     fn transfer(&self, _: EntityId, _: &str, _: [f64; 3]) -> bool {
         false
     }
-    fn set_abilities(&self, _: [u8; 32], _: Option<Abilities>) -> bool {
+    fn set_abilities(&self, player: [u8; 32], abilities: Option<Abilities>) -> bool {
+        ABILITIES.lock().unwrap().push((player, abilities));
         true
     }
 }
+
+/// Every `set_player_abilities` the mods made, in order: a speed from an
+/// elixir reaches the engine through Life, and this is where it lands.
+pub static ABILITIES: Mutex<Vec<([u8; 32], Option<Abilities>)>> = Mutex::new(Vec::new());
 
 // --- The mods around this one ------------------------------------------------------
 //
@@ -745,6 +758,9 @@ impl Rig {
         vm.load_mod("probe", PROBE, &dir).unwrap_or_else(|err| panic!("the probe failed to load: {err}"));
         vm.freeze().unwrap();
         assert!(vm.faulted_mods().is_empty(), "faulted at load: {:?}", vm.faulted_mods());
+        // The world opens: `game.world_seed` is set in every VM, as the server
+        // does once the registries are frozen (Weather answers nothing before).
+        vm.set_world_seed(SEED);
 
         let materials: HashMap<String, MaterialId> = vm.registered_blocks().into_iter().collect();
         *world.names.lock().unwrap() = materials.clone();
@@ -856,6 +872,50 @@ impl Rig {
         let out = self.vm.use_block(&UseEvent { player, domain: "overworld".into(), aim: None, held });
         assert!(out.faults.is_empty(), "faulted in use: {:?}", out.faults);
         !out.allowed
+    }
+
+    /// A carved block of `id` at `(x, y, z)`: only `mask`'s cells filled.
+    pub fn put_carved(&self, x: i32, y: i32, z: i32, id: &str, mask: u32) {
+        self.world.blocks.lock().unwrap().insert((x, y, z), (self.material(id), mask));
+    }
+
+    /// The engine asking every mod whether a player may place `mask` of `id`
+    /// at `(x, y, z)`; answers whether it was allowed.
+    pub fn place_event(&mut self, player: [u8; 32], (x, y, z): (i32, i32, i32), id: &str, mask: u32) -> bool {
+        let out = self.vm.place(&PlaceEvent {
+            player,
+            block: BlockPos { x, y, z },
+            material: self.material(id),
+            occupancy: mask,
+            units: mask.count_ones(),
+        });
+        assert!(out.faults.is_empty(), "faulted in a place: {:?}", out.faults);
+        out.allowed
+    }
+
+    /// A whole-block dig completing at `(x, y, z)`: what the mods say it
+    /// drops, if they say.
+    pub fn dig_event(&mut self, player: [u8; 32], (x, y, z): (i32, i32, i32)) -> Option<Vec<(String, u32)>> {
+        let Reading::Single { material, .. } = sight::Access::block_at(&*self.world, "", BlockPos { x, y, z }) else {
+            panic!("mixed")
+        };
+        let out = self.vm.dig_complete(&DigEvent {
+            player,
+            target: tiamat_core::SubNodePos { x: x * 3 + 1, y: y * 3 + 1, z: z * 3 + 1 },
+            material,
+            brush: Brush::Block,
+        });
+        assert!(out.faults.is_empty(), "faulted in a dig: {:?}", out.faults);
+        out.drops
+    }
+
+    /// The engine offering the block at `(x, y, z)` its random tick.
+    pub fn random_tick(&mut self, (x, y, z): (i32, i32, i32)) {
+        let Reading::Single { material, .. } = sight::Access::block_at(&*self.world, "", BlockPos { x, y, z }) else {
+            panic!("mixed")
+        };
+        let out = self.vm.random_tick(&RandomTickEvent { pos: BlockPos { x, y, z }, material });
+        assert!(out.faults.is_empty(), "faulted in a random tick: {:?}", out.faults);
     }
 
     /// A button pressed on a dialog `mod_id` showed as `form` (unqualified).

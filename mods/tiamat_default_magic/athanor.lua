@@ -49,6 +49,10 @@ if craft then
         lit_block = U.id(A.lit.id),
         boost = { tool = A.blast, heat = A.blast_heat },
         refuse_fuel = A.refuse_fuel,
+        -- Time passes for it while nobody is near: the ticks its chunk was
+        -- unloaded are worked when it is next loaded, fuel permitting
+        -- (Craft's answer to C-M5). A Red Stone is started, and left.
+        long = true,
     }
     if not ok then game.log("tiamat_default_magic: Craft refused the athanor: " .. tostring(why)) end
 end

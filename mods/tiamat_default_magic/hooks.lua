@@ -19,6 +19,8 @@ local dialogs = {}
 local leaves = {}
 local joins = {}
 local ticks = {}
+local places = {}
+local digs = {}
 
 --- Runs `fn(player, rest)` when a player says `word` (case-insensitive),
 --- alone or followed by more words. A string `fn` answers is its reply, said
@@ -57,6 +59,18 @@ end
 
 function tdm.on_join(fn)
     joins[#joins + 1] = fn
+end
+
+--- Runs `fn(event)` before a placement. The first answer that is not nil
+--- decides (a refusal); nil lets it through to the next.
+function tdm.on_place(fn)
+    places[#places + 1] = fn
+end
+
+--- Runs `fn(event)` when a dig is about to complete. The first answer that
+--- is not nil decides: a refusal, or `{ drops = ... }` for what it yields.
+function tdm.on_dig(fn)
+    digs[#digs + 1] = fn
 end
 
 --- Runs `fn(dt_ticks)` every tick, after everything subscribed before it.
@@ -104,6 +118,13 @@ function H.install()
     game.register_on_player_join(function(event)
         for _, fn in ipairs(joins) do fn(event) end
     end)
+
+    if #places > 0 then
+        game.register_on_place(function(event) return first_verdict(places, event) end)
+    end
+    if #digs > 0 then
+        game.register_on_dig_complete(function(event) return first_verdict(digs, event) end)
+    end
 
     if #ticks > 0 then
         game.register_on_tick(function(dt)
