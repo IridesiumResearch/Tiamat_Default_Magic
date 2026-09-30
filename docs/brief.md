@@ -842,6 +842,8 @@ Craft's and Progress's code rules apply verbatim (fan-out, lazy id resolution, s
 
 ## 17. Build order
 
+**The release gate (2026-09-30).** `config.lua`'s `built_tier` is the highest tier whose Art is built; only nodes up to it are registered with Progress and shown in the Mute Book, so a release never shows a node that does nothing. `tools/check_tree.py` proves what ships stands alone. It is 4 today, and each tier below raises it when it lands, tests and all. The engine's 0.4.0 wants Magic with tiers 5–7 or with them held back: the gate makes either true.
+
 1. Scaffold, manifest, `config.lua`, `hooks.lua`, `store.lua`, items, blocks. **Tests: load.**
 2. **Apothecary's Bench** (§4) end to end: the child's half hour. Tag `0.1.0` — shippable before the Fork has a door.
 3. Door, `tree.lua` (all nodes registered, most unlocking nothing yet), `check_tree.py`. **Tests: tree, door.**

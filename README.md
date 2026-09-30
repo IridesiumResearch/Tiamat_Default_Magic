@@ -53,6 +53,10 @@ the Hermetic Seal wards ground; the Ouroboros hurries an athanor. And
 three more elementals: the undine in still water at night, the gnome in
 the deep caves, the sylph on peaks and in storms.
 
+**What ships** is gated: `built_tier` in `config.lua` (4 today) is the last
+tier whose Art is built, and nodes above it are not registered, so nobody
+meets a node that does nothing. Tiers 5 to 7 are next.
+
 ## What is here
 
 | File | What |

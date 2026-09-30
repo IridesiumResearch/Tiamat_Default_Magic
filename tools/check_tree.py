@@ -10,7 +10,9 @@ checks what Progress would otherwise find only at load, and more:
 - every node reaches `shared.fork` (Progress disables one that does not);
 - Progress's limits: tier 3..7, cost 0..100,000, at most 8 requires and 8
   integer effects, an id of at most 64 characters;
-- this mod's own: a label of at most 32 characters, a text of at most 90.
+- this mod's own: a label of at most 32 characters, a text of at most 90;
+- what SHIPS — the tiers up to `config.lua`'s `built_tier`, the release
+  gate — stands alone: no shipped node requires one that is held back.
 
 Then prints the pacing model's table (brief §13): nodes, insight and the
 spine's share per tier, the spine being every ancestor of the capstone.
@@ -24,6 +26,7 @@ import sys
 from pathlib import Path
 
 TREE = Path(__file__).resolve().parent.parent / "mods" / "tiamat_default_magic" / "tree.lua"
+CONFIG = TREE.parent / "config.lua"
 CAPSTONE = "magic.hermes_trismegistus"
 ROOTS = {"shared.fork"}
 
@@ -191,7 +194,16 @@ def main():
             print("  " + p)
         return 1
     on_spine = spine(by_id)
-    print(f"{len(by_id)} nodes, sound.")
+    built = int(re.search(r"^C\.built_tier\s*=\s*(\d+)", CONFIG.read_text(encoding="utf8"), re.M).group(1))
+    shipped = {nid for nid, n in by_id.items() if n["tier"] <= built}
+    held = [f"{nid} requires {ref}" for nid in shipped for ref in map(qualify, by_id[nid]["requires"])
+            if ref not in ROOTS and ref not in shipped]
+    if held:
+        print("WHAT SHIPS DOES NOT STAND ALONE:")
+        for h in held:
+            print("  " + h)
+        return 1
+    print(f"{len(by_id)} nodes, sound; tiers 3 to {built} ship ({len(shipped)} nodes), the rest held back.")
     print(f"{'tier':>4} {'nodes':>6} {'insight':>8} {'spine':>8} {'stars':>6}")
     total = [0, 0, 0, 0]
     for tier in range(3, 8):

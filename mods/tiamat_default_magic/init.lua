@@ -58,5 +58,5 @@ tdm.hooks.install()
 -- What other mods may call. One export per mod, built whole first.
 game.export(load("exports"))
 
-game.log(string.format("tiamat_default_magic ready: the Apothecary's Bench (%d nodes), the Emerald Tablet, %d path nodes",
-    #tdm.config.bench_nodes, #tdm.tree))
+game.log(string.format("tiamat_default_magic ready: the Apothecary's Bench (%d nodes), the Emerald Tablet, %d of %d path nodes (tiers 3 to %d)",
+    #tdm.config.bench_nodes, #tdm.path.shipped, #tdm.tree, tdm.config.built_tier))

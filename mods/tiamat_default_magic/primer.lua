@@ -123,12 +123,14 @@ for _, node in ipairs(C.bench_nodes) do
         label = node.label, text = node.text }
 end
 for _, node in ipairs(tdm.tree) do
-    local requires = {}
-    for i, ref in ipairs(node.requires) do
-        requires[i] = string.find(ref, ".", 1, true) and ref or ("magic." .. ref)
+    if node.tier <= C.built_tier then
+        local requires = {}
+        for i, ref in ipairs(node.requires) do
+            requires[i] = string.find(ref, ".", 1, true) and ref or ("magic." .. ref)
+        end
+        book_nodes[#book_nodes + 1] = { id = "magic." .. node.id, cost = node.cost, requires = requires,
+            label = node.label, text = node.text }
     end
-    book_nodes[#book_nodes + 1] = { id = "magic." .. node.id, cost = node.cost, requires = requires,
-        label = node.label, text = node.text }
 end
 
 --- Whether the player could learn `node` next: everything it needs is held.

@@ -26,6 +26,13 @@ local progress = U.exports("tiamat_default_progress")
 
 T.nodes = tdm.tree               -- the data; tools/check_tree.py reads the same file
 
+-- The nodes that ship: every one up to the tier whose Art is built. The
+-- rest of the tree is held back, not shown with nothing behind it.
+T.shipped = {}
+for _, node in ipairs(T.nodes) do
+    if node.tier <= C.built_tier then T.shipped[#T.shipped + 1] = node end
+end
+
 --- A node reference from tree.lua, qualified: bare names are `magic.` nodes.
 local function node_id(ref)
     return string.find(ref, ".", 1, true) and ref or ("magic." .. ref)
@@ -61,7 +68,7 @@ if progress then
     }
     if not ok then game.log("tiamat_default_magic: Progress refused the path: " .. tostring(why)) end
 
-    for _, node in ipairs(T.nodes) do
+    for _, node in ipairs(T.shipped) do
         local requires = {}
         for i, ref in ipairs(node.requires) do requires[i] = node_id(ref) end
         local effects = nil

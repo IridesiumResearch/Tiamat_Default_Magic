@@ -243,12 +243,13 @@ fn creative() {
     println!("creative: ok");
 }
 
-/// All 97 path nodes are in Progress, none disabled, and every one is
+/// Every shipped path node — tiers 3 to `built_tier`, 47 while tier 4 is
+/// the last built — is in Progress, none disabled, and every one is
 /// beyond the Fork for a player without a path.
 fn the_tree() {
     let mut r = Rig::new(Setup::default());
     ready(&mut r, 5000);
-    assert_eq!(r.ask("t count"), "97", "Progress validated the whole tree");
+    assert_eq!(r.ask("t count"), "47", "Progress validated what ships: tiers 3 and 4");
     let answer = r.ask("t learn magic.athanor");
     assert!(answer.starts_with("nil") && answer.contains("lies beyond the Fork"), "{answer}");
     let answer = r.ask("t learn magic.hermes_trismegistus");

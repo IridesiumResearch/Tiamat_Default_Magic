@@ -188,6 +188,11 @@ C.long_works = {                    -- in philosophical days
 -- The Emerald Tablet, the founding text of Hermetic alchemy: green-lit
 -- crystal, its letters in verdigris and silver. Progress adds the Keystone
 -- to the recipe and requires `shared.keystone`.
+-- The release gate: the highest tier whose Art is built. Nodes above it are
+-- not registered with Progress, so nobody meets a node that does nothing;
+-- raised a tier at a time as each lands (docs/brief.md §17).
+C.built_tier = 4
+
 C.path = {
     id = "magic",
     label = "The Hermetic Art",
