@@ -154,7 +154,18 @@ def lamp():
     return c
 
 
+def tablet():
+    """The Emerald Tablet: green crystal, a flat colour, with gilt letters in rows."""
+    c = Canvas((52, 150, 96))
+    for y in (3, 6, 9, 12):
+        for x in range(3, 13):
+            if (x * 7 + y * 3) % 5 != 0:            # letters, not a stripe
+                c.dot(x, y, (214, 186, 100))
+    return c
+
+
 ITEMS = {
+    "emerald_tablet": tablet,
     "mutus_liber": book,
     "mortar": mortar,
     "copper_still": still,

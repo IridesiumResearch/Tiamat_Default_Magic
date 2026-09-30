@@ -30,13 +30,23 @@ the Art they read are built.
 
 All are namespaced `tiamat_default_magic:` by the engine.
 
-- **Blocks:** `hermetic_lamp` (light 6, 12, 8; transparent; never goes out).
+- **Blocks:** `emerald_tablet` (the door; light 2, 9, 4) and `hermetic_lamp`
+  (light 6, 12, 8; transparent; never goes out).
 - **Items:** `mutus_liber`, `mortar`, `copper_still`; the simples
   `simple_chamomile`, `simple_mint`, `simple_bramble`, `simple_mantle`; the
   flame powders `flame_powder_blue`, `_green`, `_yellow`, `_white`; and,
   food through Life's `add_food`, `chamomile_tea`, `mint_tea`,
   `bramble_tea`, `poultice`, `rosewater`, `mint_water`.
-- **Into Progress:** the shared nodes `shared.mutus_liber`,
+- **Into Progress:** the path `magic`, "The Hermetic Art", whose door is
+  `emerald_tablet` (Progress registers its recipe as
+  `tiamat_default_progress:door_magic`: the Keystone, 27 units of crystal,
+  four copper ingots, two silver); the 97 path nodes of `tree.lua`,
+  `magic.hermetic_oath` to `magic.hermes_trismegistus`, carrying the effect
+  keys `craft.fuel_percent` and `magic.sigil_percent`,
+  `elixir_duration_percent`, `quintessence_max`,
+  `quintessence_regen_percent`, `long_work_percent`, `study_bonus_percent`,
+  `projection_percent`, `multiplication_days`, `talisman_grade`,
+  `talisman_slots` and `familiars`; the shared nodes `shared.mutus_liber`,
   `shared.apothecary`, `shared.herb_lore` (tier 1) and `shared.foxfire`,
   `shared.stillroom` (tier 2); the discoveries `tiamat_default_magic.lamp`,
   `tiamat_default_magic.distillation` and the family
@@ -61,12 +71,13 @@ the word is chat.
 
 ## Data it stores or sends
 
-Nothing yet: the Bench keeps no state of its own.
+Nothing yet: the Bench and the door keep no state of their own. Who chose
+the path, and which nodes they hold, is Progress's.
 
 ## What it reads from other mods
 
-Not exports, listed so the direction is clear: Progress's `register_node`,
-`register_discovery`, `discover` and `has`; Craft's `register`,
+Not exports, listed so the direction is clear: Progress's `register_path`,
+`register_node`, `unlock`, `register_discovery`, `discover` and `has`; Craft's `register`,
 `on_crafted` and `on_first`, and its blocks `kiln_lit`, `bloomery_lit` and
 `campfire_lit`; Life's `add_food` and its `campfire` block; the interface's
 `widgets`, for the book's look; Weather's `fire` block. It names the

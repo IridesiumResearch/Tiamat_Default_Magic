@@ -18,8 +18,13 @@ shared nodes a child can reach long before the Fork. A picture book of
 recipes (the Mute Book), a mortar that grinds herbs into simples, flame
 powders that turn a fire blue, green, gold or sparking white, herb teas and
 a poultice, a lamp of glow caps that never goes out, and a copper still that
-makes rosewater. The door, the tree of tiers 3 to 7 and the Art behind them
-come next.
+makes rosewater.
+
+Step 3: **the door and the tree.** The Emerald Tablet is the magic path's
+door in Progress; choosing it gives the Oath and the Mute Book. All 97
+nodes of tiers 3 to 7 are registered from `tree.lua`, which
+`tools/check_tree.py` reads to prove the graph sound. Most nodes unlock
+nothing yet: the athanor and the Art behind it come next.
 
 ## What is here
 
@@ -27,6 +32,7 @@ come next.
 |---|---|
 | `mods/tiamat_default_magic/` | The mod. `init.lua` decides load order; `config.lua` holds every number; the rest is one file a system. |
 | `tools/make_textures.py` | Draws the placeholder textures. Standard library only; the same bytes on every machine. |
+| `tools/check_tree.py` | Proves the tree sound from `tree.lua` and prints the pacing table (brief §13). |
 | `tests/native/` | The mod run in the engine's real script VM, beside the REAL sibling mods, with a fake server around it. |
 | `docs/brief.md` | The design, and §2.1: what was checked and what changed. |
 | `docs/exports.md` | What other mods may call, and every id this mod registers. |

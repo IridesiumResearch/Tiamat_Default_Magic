@@ -120,18 +120,28 @@ recipe named as a stand-in.
 
 ## Tiamat Default UI
 
-**U-M2, say that `widgets` answer views.** A widget built by the exported
+~~**U-M2, say that `widgets` answer views.**~~ A widget built by the exported
 builders reaches another mod as a read-only view, and `game.show_dialog`
 reads a view's colour as no numbers at all ("`text_colour` wants three or
 four numbers, got 0"). A tab's tree is copied by the interface, so tabs never
 meet it; a mod showing its own dialog in the interface's look does. *Wanted:*
 one line in `docs/exports.md`. *Stands in:* this mod deep-copies each widget
 (`util.plain`). Found building the Mute Book, 2026-09-29.
+*Answered (interface ae8954a):* `docs/exports.md`, under "Callbacks it
+accepts", now says it: everything the exports answer is a view, and a tree
+for `game.show_dialog` must be plain tables. Keep `util.plain`.
 
-**U-M1, shape-crafter presets from siblings.**
+~~**U-M1, shape-crafter presets from siblings.**~~
 `add_preset{ id, label, mask, visible = fn(player) -> bool }`: buttons
 beside Slab, Stairs and Pillar, shown when `visible` answers true. The
 biggest single thing for children: "carve the Sun" is one click, not eight.
+*Answered (interface ae8954a, 2026-09-29):* `add_preset{ id, label, mask,
+visible? }` on the interface's exports, exactly as asked. Four to a row after
+Block, Slab, Stairs and Pillar; `label` 1–8 bytes (a button is a quarter of
+the column at 800x600); `mask` in `x + 3*y + 9*z`, neither empty nor full;
+`visible(player)` asked each time the crafter is drawn, so keep it a lookup;
+eight added presets show at most, in the order added. The crafter is now a
+block's tab (the shape crafter block), so presets show where it is used.
 
 ## Tiamat Default Progress
 

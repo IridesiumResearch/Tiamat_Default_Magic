@@ -30,11 +30,12 @@ use tiamat_core::{
     inventory::{self, Shape, Stack, stack_capacity},
     light::{Light, LightSource},
     particle::{self, BadgeRequest, EmitRequest},
+    proto,
     phys::Abilities,
     modload::WorldOptionValue,
 
     script::{
-        ChatEvent, EngineVm, JoinEvent, LeaveEvent, ScriptVm, UseAim, UseEvent,
+        ChatEvent, DialogEvent, EngineVm, JoinEvent, LeaveEvent, ScriptVm, UseAim, UseEvent,
         VmLimits,
         WorldEdit,
     },
@@ -855,6 +856,17 @@ impl Rig {
         let out = self.vm.use_block(&UseEvent { player, domain: "overworld".into(), aim: None, held });
         assert!(out.faults.is_empty(), "faulted in use: {:?}", out.faults);
         !out.allowed
+    }
+
+    /// A button pressed on a dialog `mod_id` showed as `form` (unqualified).
+    pub fn press(&mut self, player: [u8; 32], mod_id: &str, form: &str, name: &str) {
+        let _ = self.vm.dialog_event(&DialogEvent {
+            player,
+            mod_id: mod_id.into(),
+            form: format!("{mod_id}:{form}"),
+            event: proto::DialogEvent::Pressed { name: name.into(), click: proto::Press::Left },
+        });
+        self.assert_healthy("a press");
     }
 
     /// The last dialog shown or updated: its form and its tree's debug text.

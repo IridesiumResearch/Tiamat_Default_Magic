@@ -35,6 +35,8 @@ tdm.items = load("items")               -- every item, from config's tables; foo
 tdm.blocks = load("blocks")             -- the blocks the Art must have (one, so far)
 tdm.apprentice = load("apprentice")     -- the Apothecary's Bench: shared nodes, recipes, flames
 tdm.primer = load("primer")             -- the Mute Book
+tdm.tree = load("tree")                 -- the magic tree, tiers 3 to 7, as data
+tdm.path = load("path")                 -- the Emerald Tablet's path, and the tree, into Progress
 load("commands")                        -- `magic`, in chat
 
 tdm.hooks.install()
@@ -42,4 +44,5 @@ tdm.hooks.install()
 -- What other mods may call. One export per mod, built whole first.
 game.export(load("exports"))
 
-game.log(string.format("tiamat_default_magic ready: the Apothecary's Bench, %d nodes", #tdm.config.bench_nodes))
+game.log(string.format("tiamat_default_magic ready: the Apothecary's Bench (%d nodes), the Emerald Tablet, %d path nodes",
+    #tdm.config.bench_nodes, #tdm.tree))

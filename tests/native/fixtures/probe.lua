@@ -13,6 +13,9 @@
 --   t make <recipe>      Craft's `perform`, by hand
 --   t burn <colour>      a flame powder put on a campfire, which burns it
 --   t magic              this mod's export version
+--   t path               the speaker's path, or nil
+--   t count              how many magic nodes Progress validated
+--   t effects <prefix>   the speaker's summed effects, "key=value" sorted
 
 local p = game.exports("tiamat_default_progress")
 local c = game.exports("tiamat_default_craft")
@@ -57,6 +60,21 @@ game.register_on_chat(function(e)
         say = ok and "burnt" or ("not " .. tostring(why))
     elseif word == "magic" then
         say = tostring(m.version)
+    elseif word == "path" then
+        say = tostring(p.path(e.player))
+    elseif word == "count" then
+        local n = 0
+        for _, node in ipairs(p.nodes()) do
+            if node.path == "magic" then n = n + 1 end
+        end
+        say = tostring(n)
+    elseif word == "effects" then
+        local fx = p.effects_of(e.player, rest ~= "" and rest or nil)
+        local keys = {}
+        for k in pairs(fx) do keys[#keys + 1] = k end
+        table.sort(keys)
+        for i, k in ipairs(keys) do keys[i] = k .. "=" .. fx[k] end
+        say = table.concat(keys, " ")
     end
     game.chat_to(e.player, say or "?")
     return false

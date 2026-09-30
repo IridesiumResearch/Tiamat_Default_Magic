@@ -163,6 +163,31 @@ C.thrown_at = { "C:kiln_lit", "C:bloomery_lit", "tiamat_weather:fire" }
 -- Fires a powder is put on, as food is.
 C.put_on = { "C:campfire_lit", "L:campfire" }
 
+-- The door (brief §3) -------------------------------------------------------------
+--
+-- The Emerald Tablet, the founding text of Hermetic alchemy: green-lit
+-- crystal, its letters in verdigris and silver. Progress adds the Keystone
+-- to the recipe and requires `shared.keystone`.
+C.path = {
+    id = "magic",
+    label = "The Hermetic Art",
+    sentence = "As above, so below. This binds you; the other door closes.",
+    refusal = "The letters on the Tablet will not hold still for you.",
+    inputs = {
+        { "W:crystal", units = 27 },
+        { "C:copper_ingot", count = 4 },
+        { "C:silver_ingot", count = 2 },
+    },
+    oath = "magic.hermetic_oath",       -- cost 0, given the moment the door is chosen
+    welcome = "You have taken the Oath. Seek the Athanor.",
+}
+
+C.emerald_tablet = {
+    id = "emerald_tablet", name = "The Emerald Tablet",
+    description = "As above, so below. Use it, holding the Keystone's knowledge, to take the Hermetic path.",
+    hardness = 2.6, light = { r = 2, g = 9, b = 4 }, tags = { "crystal", "glowing" },
+}
+
 -- Toybox discoveries (brief §6.12): insight for play itself.
 C.toybox = {
     flame = 3,                      -- each colour of flame, the first time

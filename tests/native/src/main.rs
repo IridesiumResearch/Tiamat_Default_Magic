@@ -18,6 +18,8 @@ fn main() {
     flames();
     the_book();
     creative();
+    the_tree();
+    the_door();
     determinism();
     println!("magic native check: all passed");
 }
@@ -219,6 +221,62 @@ fn creative() {
     r.tick(1);
     assert_eq!(r.ask("magic"), "The Apothecary's Bench: 5 of 5 learned.");
     println!("creative: ok");
+}
+
+/// All 97 path nodes are in Progress, none disabled, and every one is
+/// beyond the Fork for a player without a path.
+fn the_tree() {
+    let mut r = Rig::new(Setup::default());
+    ready(&mut r, 5000);
+    assert_eq!(r.ask("t count"), "97", "Progress validated the whole tree");
+    let answer = r.ask("t learn magic.athanor");
+    assert!(answer.starts_with("nil") && answer.contains("lies beyond the Fork"), "{answer}");
+    let answer = r.ask("t learn magic.hermes_trismegistus");
+    assert!(answer.starts_with("nil"), "{answer}");
+    assert_eq!(r.ask("t insight"), "5000", "nothing was spent");
+    println!("the tree: ok");
+}
+
+/// The Emerald Tablet: its recipe waits for the Keystone; choosing it binds
+/// the player, gives the Oath free and the Mute Book once, and opens the
+/// tree, whose effects Progress then sums.
+fn the_door() {
+    let mut r = Rig::new(Setup::default());
+    ready(&mut r, 500);
+    let answer = r.ask("t can tiamat_default_progress:door_magic");
+    assert!(answer.starts_with("nil") && !answer.contains("no such"), "the door's recipe, gated: {answer}");
+
+    // Without the Keystone the Tablet is shut.
+    r.put_block(20, 64, 20, "emerald_tablet");
+    assert!(r.use_at(PLAYER, 20, 64, 20));
+    assert_eq!(r.said(), "The door is shut to you. Learn the Keystone first.");
+
+    // With it, the Tablet asks, and Yes binds.
+    assert_eq!(r.ask("progress grant shared.keystone"), "Learned: The Keystone");
+    assert!(r.use_at(PLAYER, 20, 64, 20));
+    let (form, tree) = r.last_dialog().expect("the Fork's question");
+    assert_eq!(form, "tiamat_default_progress:fork");
+    assert!(tree.contains("As above, so below."), "{tree}");
+    r.heard(PLAYER);
+    r.press(PLAYER, "tiamat_default_progress", "fork", "yes");
+    let heard = r.heard(PLAYER);
+    assert!(heard.iter().any(|l| l == "You have taken the Oath. Seek the Athanor."), "{heard:?}");
+    assert_eq!(r.ask("t path"), "magic");
+    assert_eq!(r.ask("t has magic.hermetic_oath"), "true", "the Oath, free");
+    assert_eq!(r.ask("t insight"), "500", "and it cost nothing");
+    assert_eq!(r.units(PLAYER, "mutus_liber"), 27, "the Mute Book, once");
+
+    // The tree is open now, and its effects are summed.
+    assert_eq!(r.ask("t learn magic.seven_metals"), "true");
+    assert_eq!(r.ask("t learn magic.sigils"), "true");
+    assert_eq!(r.ask("t effects magic."), "magic.sigil_percent=15");
+    assert_eq!(r.ask("t insight"), "320");
+
+    // Using the Tablet again says so, and gives no second book.
+    assert!(r.use_at(PLAYER, 20, 64, 20));
+    assert_eq!(r.said(), "You are already of The Hermetic Art.");
+    assert_eq!(r.units(PLAYER, "mutus_liber"), 27);
+    println!("the door: ok");
 }
 
 /// The same play twice leaves the same storage.

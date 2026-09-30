@@ -4,12 +4,24 @@
 -- The blocks this mod registers (brief §8). There will be five, and each is
 -- a block only because it must be one; everything else the Art makes is an
 -- item, and everything it builds is carved from the world's own blocks. So
--- far there is the Bench's one: light needs a block, because the engine has
--- no light an item gives.
+-- far there are two: the Bench's lamp (light needs a block, because the
+-- engine has no light an item gives) and the door (Progress's door must be
+-- a block a player uses).
 
 local C = tdm.config
 
 local B = {}
+
+local tablet = C.emerald_tablet
+B.emerald_tablet = game.register_block{
+    id = tablet.id,
+    name = tablet.name,
+    description = tablet.description,
+    hardness = tablet.hardness,
+    tags = tablet.tags,
+    light_emit = tablet.light,
+    textures = { all = "textures/" .. tablet.id .. ".png" },
+}
 
 local lamp = C.hermetic_lamp
 B.hermetic_lamp = game.register_block{
