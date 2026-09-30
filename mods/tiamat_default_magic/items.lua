@@ -38,6 +38,7 @@ for _, planet in ipairs(C.planets) do
         description = string.format("A herb ruled by %s, drawn out in spirit of wine.", name) }
 end
 add(C.elixirs)
+add(C.familiar_items)
 
 for _, spec in ipairs(I.all) do
     register(spec)

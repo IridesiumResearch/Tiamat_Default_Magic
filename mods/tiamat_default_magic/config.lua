@@ -224,7 +224,7 @@ C.athanor = {
         hardness = 2.0, tags = { "stone", "hard", "glowing" }, light = { r = 12, g = 7, b = 2 } },
     slots = { fuel = 1, input = { from = 2, to = 4 }, tool = { from = 5, to = 6 }, output = { from = 7, to = 9 } },
     blast = "#magic_blast",                             -- what blows the 4th degree: Craft's bellows (and, one day, a salamander's ember)
-    blast_members = { "C:bellows" },
+    blast_members = { "C:bellows", "salamander_ember" },
     blast_heat = 4,
     refuse_fuel = "The athanor wants a slow fire: wood, charcoal or coal.",
     contact_fire = { damage = 1, ticks = 20, after = 20 },
@@ -496,6 +496,37 @@ C.sigils = {
         saturn = { "C:lead_ingot", "litharge", "minium", "sal_saturni" },
         mercury = { "W:cinnabar" },
     },
+}
+
+-- Familiars (brief §6.9): found, then bound. The salamander first.
+C.familiars = {
+    think_every = 10,               -- a bound familiar looks for its master
+    near = 3,                       -- blocks: close enough, it stops
+    lost = 32,                      -- blocks: further, it is set down beside them
+    orphans = 64,                   -- blocks: an untracked familiar this near a joining player is cleared
+    per_server = 60,                -- familiars, wild and bound, in the whole world
+    base = 1,                       -- bound at once, before `magic.familiars`
+}
+C.salamander = {
+    node = "magic.salamander",
+    model = { id = "salamander", file = "models/salamander.glb", texture = "models/salamander.png" },
+    name = "Salamander",
+    collider = { width = 1.2, height = 1.0 },
+    health = 10,
+    speed = 1.3,
+    check_every = 600,              -- ticks between looks into the athanors
+    burn_days = 1,                  -- an athanor burning this long draws one
+    reach = 16,                     -- blocks: an adept this near the athanor is the one it came for
+    food = { "W:sulfur", "flowers_of_sulfur" },
+    food_units = 9,
+    ember = "salamander_ember",
+    appears = "Something stirs in the athanor's fire.",
+    bound = "The salamander curls round your ankle. It is yours.",
+    discovery = 30,
+}
+C.familiar_items = {
+    { id = "salamander_ember", name = "Salamander's ember",
+        description = "It never cools. In an athanor's vessel slot it blows the 4th degree, like bellows." },
 }
 
 -- Pyrite in the rain (weathering.lua): a random tick under open sky while

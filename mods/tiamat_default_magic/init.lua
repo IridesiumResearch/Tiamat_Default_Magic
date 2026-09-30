@@ -43,6 +43,7 @@ tdm.glyph_table = load("glyph_table")   -- the glyphs, as data
 tdm.glyphs = load("glyphs")             -- every glyph into Craft; the sigils' one-click presets
 tdm.sigils = load("sigils")             -- a planet's sign at the athanor
 tdm.weathering = load("weathering")     -- pyrite in the rain
+tdm.familiars = load("familiars")       -- the living work: the salamander
 tdm.tree = load("tree")                 -- the magic tree, tiers 3 to 7, as data
 tdm.primer = load("primer")             -- the Mute Book
 tdm.path = load("path")                 -- the Emerald Tablet's path, and the tree, into Progress

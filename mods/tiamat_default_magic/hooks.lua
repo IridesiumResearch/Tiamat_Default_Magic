@@ -21,6 +21,7 @@ local joins = {}
 local ticks = {}
 local places = {}
 local digs = {}
+local entity_uses = {}
 
 --- Runs `fn(player, rest)` when a player says `word` (case-insensitive),
 --- alone or followed by more words. A string `fn` answers is its reply, said
@@ -59,6 +60,13 @@ end
 
 function tdm.on_join(fn)
     joins[#joins + 1] = fn
+end
+
+--- Runs `fn(event)` when a player uses an entity. The first answer that is
+--- not nil handles it; nil lets the next mod (and at last the block behind)
+--- have it.
+function tdm.on_use_entity(fn)
+    entity_uses[#entity_uses + 1] = fn
 end
 
 --- Runs `fn(event)` before a placement. The first answer that is not nil
@@ -118,6 +126,10 @@ function H.install()
     game.register_on_player_join(function(event)
         for _, fn in ipairs(joins) do fn(event) end
     end)
+
+    if #entity_uses > 0 then
+        game.register_on_use_entity(function(event) return first_verdict(entity_uses, event) end)
+    end
 
     if #places > 0 then
         game.register_on_place(function(event) return first_verdict(places, event) end)

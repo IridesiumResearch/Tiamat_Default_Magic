@@ -26,6 +26,7 @@ fn main() {
     sigils();
     swiftness();
     weathering();
+    salamander();
     determinism();
     println!("magic native check: all passed");
 }
@@ -522,6 +523,54 @@ fn weathering() {
     assert_eq!(drops, vec![(format!("{MOD}:green_vitriol"), 27)]);
     assert!(r.stored(&format!("weathered:{},{},{}", wet.0, wet.1, wet.2)).is_none(), "and forgets it");
     println!("weathering: ok");
+}
+
+/// The salamander: the model parses as the engine parses it; an athanor
+/// burning a philosophical day draws one for the adept beside it; sulfur
+/// binds it, with its ember; it leaves with its master and comes back.
+fn salamander() {
+    let bytes = std::fs::read(concat!(env!("CARGO_MANIFEST_DIR"), "/../../mods/tiamat_default_magic/models/salamander.glb"))
+        .expect("the model file");
+    tiamat_core::model::load(&bytes, &tiamat_core::model::Limits::default()).expect("the engine reads the model");
+
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.athanor", "magic.degrees_of_fire", "magic.gate_calcination", "magic.salamander"]);
+    let model = format!("{MOD}:salamander");
+    let at = (105, 64, 100);
+    athanor(&mut r, at, &[(1, "tiamat_default_world:coal", 27 * 3)]);
+    light(&mut r, at);
+    r.heard(PLAYER);
+    r.tick(1300);
+    assert!(r.with_model(&model).is_empty(), "not before a day's burning");
+    r.tick(1300);
+    let wild = r.with_model(&model);
+    assert_eq!(wild.len(), 1, "one comes");
+    assert!(r.heard(PLAYER).iter().any(|l| l == "Something stirs in the athanor's fire."));
+    r.tick(1300);
+    assert_eq!(r.with_model(&model).len(), 1, "and only one, for one fire");
+
+    // Empty-handed, it wants sulfur; with a handful, it is bound.
+    let (handled, said) = r.use_entity(PLAYER, wild[0]);
+    assert!(handled);
+    assert_eq!(said.as_deref(), Some("It flickers, hungry. It wants sulfur."));
+    let insight: i32 = r.ask("t insight").parse().unwrap();
+    r.give(PLAYER, "tiamat_default_world:sulfur", 9);
+    r.hold(PLAYER, "tiamat_default_world:sulfur");
+    let (handled, _) = r.use_entity(PLAYER, wild[0]);
+    assert!(handled, "bound");
+    assert_eq!(r.units(PLAYER, "tiamat_default_world:sulfur"), 0, "it ate the sulfur");
+    assert_eq!(r.units(PLAYER, "salamander_ember"), 27, "and left its ember");
+    let after: i32 = r.ask("t insight").parse().unwrap();
+    assert_eq!(after - insight, 30, "a salamander, bound");
+    assert_eq!(r.stored(&format!("familiar:{}:salamander", rig::hex(PLAYER))).as_deref(), Some("Flag(true)"));
+
+    // It leaves with its master and comes back with them.
+    r.leave(PLAYER);
+    assert!(r.with_model(&model).is_empty(), "gone with them");
+    r.join(PLAYER);
+    r.tick(1);
+    assert_eq!(r.with_model(&model).len(), 1, "back with them");
+    println!("salamander: ok");
 }
 
 /// The same play twice leaves the same storage.

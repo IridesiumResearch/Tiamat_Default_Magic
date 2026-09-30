@@ -36,7 +36,7 @@ use tiamat_core::{
 
     script::{
         Brush, ChatEvent, DialogEvent, DigEvent, EngineVm, JoinEvent, LeaveEvent, PlaceEvent, RandomTickEvent,
-        ScriptVm, UseAim, UseEvent,
+        ScriptVm, UseAim, UseEntityEvent, UseEvent,
         VmLimits,
         WorldEdit,
     },
@@ -916,6 +916,25 @@ impl Rig {
         };
         let out = self.vm.random_tick(&RandomTickEvent { pos: BlockPos { x, y, z }, material });
         assert!(out.faults.is_empty(), "faulted in a random tick: {:?}", out.faults);
+    }
+
+    /// The player uses the entity `target` with what they hold. Answers
+    /// whether somebody handled it, and what they were told.
+    pub fn use_entity(&mut self, player: [u8; 32], target: u64) -> (bool, Option<String>) {
+        let held = inventory::Access::held(&*self.inventory, player);
+        let out = self.vm.use_entity(&UseEntityEvent { player, target: EntityId(target), owner: None, held });
+        assert!(out.faults.is_empty(), "faulted in a use: {:?}", out.faults);
+        (!out.allowed, out.reason)
+    }
+
+    /// Every entity drawn as `model`, by id.
+    pub fn with_model(&self, model: &str) -> Vec<u64> {
+        let mut ids: Vec<u64> = self.entities.0.lock().unwrap().iter()
+            .filter(|(_, e)| e.model.as_deref() == Some(model))
+            .map(|(id, _)| *id)
+            .collect();
+        ids.sort();
+        ids
     }
 
     /// A button pressed on a dialog `mod_id` showed as `form` (unqualified).

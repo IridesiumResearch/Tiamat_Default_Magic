@@ -21,10 +21,11 @@ one in `depends` or `optional_depends`. Source:
 | Field | Shape | What it does |
 |---|---|---|
 | `version` | integer, `1` | Bumped only when a change would break a reader. |
+| `glyphs` | `{ [id] = { mask, variants } }` | Every glyph of the Art by its short id (`"sol"`): the canonical 27-bit mask and every orientation Craft knows it by. Read-only data. |
+| `familiars(uuid)` | a player's UUID in hex | Their familiars whose bodies are in the world, as `{ { kind, entity } }`; `nil` and why for a malformed UUID. |
 
-That is all, for now. The brief's fields (§12: the Quintessence bar, herbs,
-glyphs, familiars, wards, the Opus's subscribers) are added as the parts of
-the Art they read are built.
+The brief's other fields (§12: the Quintessence bar, herbs, wards, the
+Opus's subscribers) are added as the parts of the Art they read are built.
 
 ## Identifiers it registers
 
@@ -33,6 +34,9 @@ All are namespaced `tiamat_default_magic:` by the engine.
 - **Blocks:** `emerald_tablet` (the door; light 2, 9, 4), `hermetic_lamp`
   (light 6, 12, 8; transparent; never goes out), `athanor` and `athanor_lit`
   (light 12, 7, 2; Life's contact fire and heat source).
+- **Model and entity:** `salamander` (a familiar; drawn from
+  `models/salamander.glb` with `models/salamander.png`), spawned by this
+  mod, named "Salamander".
 - **Items:** `mutus_liber`, `mortar`, `copper_still`; the simples
   `simple_chamomile`, `simple_mint`, `simple_bramble`, `simple_mantle`; the
   flame powders `flame_powder_blue`, `_green`, `_yellow`, `_white`; and,
@@ -49,7 +53,8 @@ All are namespaced `tiamat_default_magic:` by the engine.
   (`tincture_<planet>`: sol, luna, venus, mars, mercury, jupiter, saturn)
   and seven elixirs, all food (`elixir_vigour`, `elixir_night_sight`,
   `elixir_hearts_ease`, `elixir_fortitude`, `elixir_swiftness`,
-  `draught_warming`, `draught_cooling`).
+  `draught_warming`, `draught_cooling`); and `salamander_ember`, in
+  `#magic_blast`.
 - **Into Progress:** the path `magic`, "The Hermetic Art", whose door is
   `emerald_tablet` (Progress registers its recipe as
   `tiamat_default_progress:door_magic`: the Keystone, 27 units of crystal,
@@ -68,7 +73,8 @@ All are namespaced `tiamat_default_magic:` by the engine.
   `gate_12` (25 insight times the number, group `gates`),
   `tiamat_default_magic.vitriol`, and the family
   `tiamat_default_magic.herb:*` (a species' first tincture, group
-  `herbs`); the studies `study_calx`, `study_tincture`, `study_vitriol`.
+  `herbs`); `tiamat_default_magic.familiar_salamander` (group
+  `familiars`); the studies `study_calx`, `study_tincture`, `study_vitriol`.
 - **Into Craft:** the recipes `mutus_liber`, `mortar`, `grind_chamomile`,
   `grind_mint`, `grind_bramble`, `grind_mantle`, `flame_powder_blue`,
   `_green`, `_yellow`, `_white`, `poultice`, `hermetic_lamp` (by hand);
@@ -107,7 +113,10 @@ the word is chat.
 `game.storage`, private to this mod: `clock` (ticks the world has run, as
 this mod counts them) and `fx:<uuid>:<effect>` (the tick a player's own
 effect ends: `night_sight`, `swiftness`), `sigil:x,y,z` (who set a
-sigil there) and `weathered:x,y,z` (pyrite the rain has weathered). Who
+sigil there), `weathered:x,y,z` (pyrite the rain has weathered),
+`familiar:<uuid>:salamander` (`true`, or `"dormant"` after a repath
+away), and per athanor `burned:<container>` (ticks it has burned
+without going out) and `called:<container>` (a salamander came). Who
 chose the path, and which nodes they
 hold, is Progress's; an athanor's fire and work are Craft's.
 

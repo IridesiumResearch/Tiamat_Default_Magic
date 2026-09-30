@@ -282,6 +282,7 @@ LAB = {
     "verdigris_salve": lambda: cup((110, 180, 120)),
     "green_vitriol": lambda: crystal((80, 170, 110), (150, 220, 170)),
     "blue_vitriol": lambda: crystal((40, 90, 210), (120, 170, 250)),
+    "salamander_ember": lambda: heap((240, 110, 30), (255, 220, 90)),
 }
 for _name, _colour in CALX.items():
     LAB[_name] = (lambda col: lambda: heap(col, tuple(min(255, v + 40) for v in col)))(_colour)
