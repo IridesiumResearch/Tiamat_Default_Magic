@@ -9,9 +9,9 @@
 -- goes in and where.
 --
 -- A dialog, not a tab on the interface's screen: a tab is drawn for every
--- player, and the book is only for whoever has one. It opens when the book
--- is used, anywhere, and on `magic book` in chat: the engine's actions,
--- which would give it a key, are inert until its Task 13 (engine ask E-M3).
+-- player, and the book is only for whoever has one. It opens on its key
+-- (J, unless the player moved it), when the book is used, anywhere, and on
+-- `magic book` in chat — each for a player who carries one.
 
 local C = tdm.config
 local U = tdm.util
@@ -190,6 +190,12 @@ tdm.on_use(function(e)
     if not (e.held and e.held.material == BOOK) then return nil end
     P.open(e.player)
     return ""
+end)
+
+game.register_action{ id = "mutus_liber", default_key = C.book_key, description = "Read the Mute Book" }
+
+tdm.on_action(game.mod_id .. ":mutus_liber", function(e)
+    if e.pressed and P.carries(e.player) then P.open(e.player) end
 end)
 
 tdm.on_dialog(FORM, function(e)

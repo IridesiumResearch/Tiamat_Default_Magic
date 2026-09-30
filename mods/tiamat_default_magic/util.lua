@@ -76,8 +76,10 @@ end
 
 --- A plain copy of data another mod handed over. What crosses an export is
 --- a read-only VIEW, which Lua code reads like a table but the engine's own
---- calls do not — `game.show_dialog` sees a view's colour as no numbers at
---- all — so a widget built by the interface is copied before it is shown.
+--- calls did not: before engine 71bf0673 `game.show_dialog` saw a view's
+--- colour as no numbers at all, and the fault disabled the mod. Engines since
+--- read views, so this copy is only for servers older than that; it costs a
+--- few small tables a page, and can go when no such server is left.
 function U.plain(value)
     if type(value) ~= "table" and type(value) ~= "userdata" then return value end
     local out = {}

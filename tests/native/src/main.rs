@@ -216,6 +216,11 @@ fn the_book() {
     assert!(!tree.contains("Herb Lore"), "never the whole tree at once");
     assert!(tree.contains("leather + 2 bark strip + charcoal  ->  The Mute Book, by hand"), "{tree}");
 
+    // Its key opens it too.
+    r.dialogs.shown.lock().unwrap().clear();
+    r.action(PLAYER, &format!("{MOD}:mutus_liber"));
+    assert_eq!(r.last_dialog().map(|d| d.0), Some(format!("{MOD}:liber")), "on J");
+
     // Using the book at a block opens it too.
     r.put_block(3, 64, 3, "tiamat_default_world:stone");
     r.hold(PLAYER, "mutus_liber");

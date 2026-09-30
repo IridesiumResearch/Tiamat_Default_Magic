@@ -120,6 +120,8 @@ All are namespaced `tiamat_default_magic:` by the engine.
   `tiamat_default_magic:talisman_mercury` (a tenth quicker a grade, while
   it is worn).
 - **Random tick:** the world's `pyrite`, which weathers in the rain.
+- **Action:** `mutus_liber` (default key J): the Mute Book, for a player
+  who carries one.
 - **Dialog:** `liber`, the Mute Book.
 
 ## Commands it accepts

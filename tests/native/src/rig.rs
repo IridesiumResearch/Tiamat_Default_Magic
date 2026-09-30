@@ -35,7 +35,7 @@ use tiamat_core::{
     modload::WorldOptionValue,
 
     script::{
-        Brush, ChatEvent, DialogEvent, DigEvent, EngineVm, JoinEvent, LeaveEvent, PlaceEvent, RandomTickEvent,
+        ActionEvent, Brush, ChatEvent, DialogEvent, DigEvent, EngineVm, JoinEvent, LeaveEvent, PlaceEvent, RandomTickEvent,
         ScriptVm, UseAim, UseEntityEvent, UseEvent,
         VmLimits,
         WorldEdit,
@@ -969,6 +969,12 @@ impl Rig {
             .collect();
         ids.sort();
         ids
+    }
+
+    /// A player pressing the key bound to the qualified action `id`.
+    pub fn action(&mut self, player: [u8; 32], id: &str) {
+        let _ = self.vm.action(&ActionEvent { player, id: id.into(), pressed: true });
+        self.assert_healthy("an action");
     }
 
     /// A button pressed on a dialog `mod_id` showed as `form` (unqualified).

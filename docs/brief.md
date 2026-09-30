@@ -146,7 +146,7 @@ Every claim in §2 and below was re-checked against `stubs/game.lua` and the sib
 | World owns pyrite's random tick | It does not; World ticks snow, ivy, rose bushes, grass, alpine surfaces and sulfur (World `hooks.lua`) | The rain route may use `register_random_tick` on pyrite (one handler a material, so agree it with World first: **W-M3**) |
 | Weather writes the sky modifier continuously | Only when its value changes, and `nil` when there is no weather (Weather `fx.lua`) | Wx-M1 still stands (one modifier a player, last writer wins) |
 | UI engine-ask 16, the black shape editor, is open | Landed 2026-09-28 (engine `0921437`) | Note removed |
-| The *Mutus Liber* on J, familiars on K | `register_action` is "stored now, inert until Task 13" (stubs) | Both open by USING the item (`register_on_use{ anywhere = true }`) and by chat (`magic book`) until actions work |
+| The *Mutus Liber* on J, familiars on K | The stubs said `register_action` was "inert until Task 13"; on 2026-09-30 the engine answered that actions fire (E-M3) | The book is on J, and opens by USING it and by chat (`magic book`) as well; familiars are called by `magic familiar <kind>` |
 | Lapis Infinitus "projection ×10" | Effects sum: Exaltation's 100 + Lapis's 900 = ×11 | Lapis carries 800, so the total is ×10 |
 | Node `label` ≤ 32, text ≤ 90 | Progress keeps 48 and 200 (`nodes.lua`); ours are tighter by choice | Unchanged: ours |
 | A flame powder is thrown on a fire by using the fire | Craft hears every use at a campfire first (a LISTED callback, and listed callbacks keep load order) and opens the fire's box | A powder is PUT ON a campfire, as food is, and burns there as a campfire recipe; at a lit kiln or bloomery (which Craft does not list) it is thrown. Ask **C-M9**; §4 |
@@ -707,7 +707,7 @@ Groups registered with Craft: `#saltpeter`, `#oil_of_vitriol`, `#quicksilver` (s
 
 ### 10.3 Screens
 
-- **The *Mutus Liber*** (opened by using the book, or `magic book` in chat; action `mutus_liber`, default key **J**, once the engine's actions work — §2.1; a dialog `tiamat_default_magic:liber` in the interface's look, not a tab: the interface draws a tab for every player, and the book is only for whoever carries one): pages of pictures, one per node the player holds or can next learn — never the whole tree at once. Text line under each picture for readers.
+- **The *Mutus Liber*** (action `mutus_liber`, default key **J**; also opened by using the book, or `magic book` in chat): pages of pictures, one per node the player holds or can next learn — never the whole tree at once. Text line under each picture for readers.
 - **Familiars** (a UI tab): each bound familiar, its traits, dismiss/summon buttons; action `familiar` (default key **K**, once actions work) summons the first.
 - **Athanor dial** (a tab beside Craft's station screen): the long work's stage, colour, time left.
 - **The Loom** (dialog).

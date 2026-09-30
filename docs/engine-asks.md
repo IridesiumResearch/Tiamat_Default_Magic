@@ -10,13 +10,16 @@ marked, as the record; the open ones are copied, without the history, to the
 engine's `docs/engine-asks/tiamat_default_magic.md`, so the engine side
 finds every mod's open asks in one place.
 
-## E-M3, actions that fire — open, 2026-09-29
+## E-M3, actions that fire — answered 2026-09-30
 
 *Wanted:* `register_on_action` delivering presses. *Why:* the stubs say
 `register_action` is "stored now, inert until Task 13", and the brief binds
 the *Mutus Liber* to J and the familiars to K. *Stands in:* the book opens
 when it is used (`register_on_use{ anywhere = true }`) and on `magic book`
-in chat. Nothing to build here; this records that the mod waits on Task 13.
+in chat. *Answered (engine 3acedd1e):* actions fire, and nothing was
+needed of the engine; the stubs' note was stale. The book is on J
+(`tiamat_default_magic:mutus_liber`); the familiars are called by
+`magic familiar <kind>`.
 
 ## E-M2, a sky per instance — open, 2026-09-28
 

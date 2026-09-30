@@ -44,14 +44,9 @@ for _, kind in ipairs(K.kinds) do
         tools = { { "#hammer", wear = 1 }, { glyph = kind.planet, material = K.die, count = 1, wear = 0 } },
         outputs = { { id, count = 1 } },
     }
+    local m = U.material(U.id(id))
+    if m then by_material[m] = kind end
 end
-function T.bind_materials()
-    for _, kind in ipairs(K.kinds) do
-        local m = U.material(U.id(kind.id))
-        if m then by_material[m] = kind end
-    end
-end
-T.bind_materials()
 
 local ORES = {}
 for _, id in ipairs(C.ores) do

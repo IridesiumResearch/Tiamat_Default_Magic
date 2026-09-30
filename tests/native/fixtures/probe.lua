@@ -17,10 +17,7 @@
 --   t count              how many magic nodes Progress validated
 --   t effects <prefix>   the speaker's summed effects, "key=value" sorted
 --   t glyph <mask>       Craft's glyph_of a mask
---   t fluid <x> <y> <z>  a block's fluid, its volume, and the world's water's id
 --   t band <x> <y> <z>   the world's depth band there
---   t time               the time of day
---   t surface <x> <z>    a column's top from y 72: its y, fluid and volume
 
 local p = game.exports("tiamat_default_progress")
 local c = game.exports("tiamat_default_craft")
@@ -67,21 +64,10 @@ game.register_on_chat(function(e)
         say = tostring(m.version)
     elseif word == "glyph" then
         say = tostring(c.glyph_of(math.tointeger(tonumber(rest))))
-    elseif word == "fluid" then
-        local x, y, z = string.match(rest, "^(%-?%d+) (%-?%d+) (%-?%d+)$")
-        local f = game.get_fluid{ x = math.tointeger(tonumber(x)), y = math.tointeger(tonumber(y)), z = math.tointeger(tonumber(z)) }
-        say = string.format("%s %s %s", tostring(f and f.fluid), tostring(f and f.volume),
-            tostring(game.fluid_id and game.fluid_id("tiamat_default_world:water")))
     elseif word == "band" then
         local w = game.exports("tiamat_default_world")
         local x, y, z = string.match(rest, "^(%-?%d+) (%-?%d+) (%-?%d+)$")
         say = tostring(w and w.depth_band(tonumber(x), tonumber(y), tonumber(z)))
-    elseif word == "time" then
-        say = tostring(game.time_of_day())
-    elseif word == "surface" then
-        local x, z = string.match(rest, "^(%-?%d+) (%-?%d+)$")
-        local top = game.surface_at{ x = math.tointeger(tonumber(x)), z = math.tointeger(tonumber(z)), from = 72, depth = 24 }
-        say = top and string.format("%d %s %s", top.y, tostring(top.fluid), tostring(top.volume)) or "nil"
     elseif word == "path" then
         say = tostring(p.path(e.player))
     elseif word == "count" then

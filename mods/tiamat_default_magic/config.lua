@@ -72,6 +72,9 @@ C.bench_items = {
         food = { temperature = "cool", effects = { { "cooling", 2400 } }, sound = "drink" } },
 }
 
+-- The Mute Book's key, which a player may move in the settings screen.
+C.book_key = "KeyJ"
+
 -- The Bench's one block: light from mushrooms in a jar.
 C.hermetic_lamp = {
     id = "hermetic_lamp", name = "Hermetic Lamp",
