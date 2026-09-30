@@ -33,6 +33,8 @@ fn main() {
     talismans();
     the_seal();
     ouroboros();
+    undine();
+    gnome_and_sylph();
     determinism();
     println!("magic native check: all passed");
 }
@@ -775,6 +777,97 @@ fn ouroboros() {
     assert_eq!(slot(&r, &a, 7), Some((format!("{MOD}:aes_ustum"), 27)), "the serpent hurries it");
     assert_eq!(slot(&r, &b, 7), None, "not yet, without one");
     println!("ouroboros: ok");
+}
+
+/// The undine: found in still water at night, bound with rosewater; it
+/// takes a whole block of water from where it stands and gives it back as a
+/// bucket; a second familiar bound, the first rests.
+fn undine() {
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.athanor", "magic.degrees_of_fire", "magic.gate_calcination", "magic.salamander",
+        "magic.bain_marie", "magic.undine"]);
+    let model = format!("{MOD}:undine");
+    // A pond's surface under the player's feet. The fake world keeps no
+    // fluid kinds, so the weather's puddle rules can empty it; it is filled
+    // again every tick, as a real pond would still be there.
+    let pond = |r: &mut Rig, ticks: u32| {
+        for _ in 0..ticks {
+            r.put_water(100, 60, 100);
+            r.tick(1);
+        }
+    };
+    *r.sounds.time.lock().unwrap() = 0.5;
+    pond(&mut r, 700);
+    assert!(r.with_model(&model).is_empty(), "not by day");
+    *r.sounds.time.lock().unwrap() = 0.9;
+    r.heard(PLAYER);
+    pond(&mut r, 700);
+    let wild = r.with_model(&model);
+    assert_eq!(wild.len(), 1, "at night, in still water");
+    assert!(r.heard(PLAYER).iter().any(|l| l == "Something moves in the still water."));
+
+    r.give(PLAYER, "rosewater", 27);
+    r.hold(PLAYER, "rosewater");
+    assert!(r.use_entity(PLAYER, wild[0]).0, "bound");
+    assert_eq!(r.ask("magic familiar"), "Your familiars: undine (walking).");
+
+    // It stands in water: it takes the block, and gives it as a bucket.
+    let id = wild[0];
+    {
+        let mut map = r.entities.0.lock().unwrap();
+        map.get_mut(&id).unwrap().transform = tiamat_core::ent::Transform::from_world(120.5, 61.0, 120.5);
+    }
+    r.put_water(120, 61, 120);
+    r.tick(10);
+    assert!(r.world.fluids.lock().unwrap().get(&(120, 61, 120)).is_none(), "the water is taken, not copied");
+    r.give(PLAYER, "tiamat_default_life:bucket", 27);
+    r.hold(PLAYER, "tiamat_default_life:bucket");
+    assert!(r.use_entity(PLAYER, id).0);
+    assert_eq!(r.units(PLAYER, "tiamat_default_life:water_bucket"), 27, "a bucket of it");
+    assert_eq!(r.units(PLAYER, "tiamat_default_life:bucket"), 0);
+    r.give(PLAYER, "tiamat_default_life:bucket", 27);
+    let (_, said) = r.use_entity(PLAYER, id);
+    assert_eq!(said.as_deref(), Some("It has no water to give."), "and it gave all it had");
+    println!("undine: ok");
+}
+
+/// The gnome, found deep and bound with silver, makes ore glint round its
+/// master; the sylph comes in a storm, and one familiar walks at a time.
+fn gnome_and_sylph() {
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.athanor", "magic.degrees_of_fire", "magic.gate_calcination", "magic.salamander",
+        "magic.cupellation", "magic.gnome", "magic.aludel", "magic.sylph"]);
+    // Down in the Gloam: the first depth the world calls its dark caves.
+    // The Spindle's ground at its heart is some forty thousand blocks up.
+    let deep = (0..400).map(|i| 40_000 - 100 * i).find(|y| r.ask(&format!("t band 100 {y} 100")) == "dark_caves")
+        .expect("the world has a Gloam");
+    r.stand(PLAYER, 100.5, deep as f64 - 50.0, 100.5);
+    r.tick(700);
+    let gnomes = r.with_model(&format!("{MOD}:gnome"));
+    assert_eq!(gnomes.len(), 1, "a gnome in the deep");
+    r.give(PLAYER, "silver_grain", 27);
+    r.hold(PLAYER, "silver_grain");
+    assert!(r.use_entity(PLAYER, gnomes[0]).0, "bound");
+    r.put_block(102, deep - 50, 101, "tiamat_default_world:iron_ore");
+    r.bursts();
+    r.tick(400);
+    assert!(r.bursts().iter().any(|b| b.contains("player: Some") && b.contains("pos: [102.5")), "ore glints");
+
+    // Up in a storm, a sylph; bound, it walks and the gnome rests.
+    r.stand(PLAYER, 100.5, 64.0, 100.5);
+    assert!(r.ask("/weather set storm 30").starts_with("storm over square"));
+    r.tick(1400);
+    let sylphs = r.with_model(&format!("{MOD}:sylph"));
+    assert_eq!(sylphs.len(), 1, "a sylph in the storm");
+    r.give(PLAYER, "aqua_vitae", 27);
+    r.hold(PLAYER, "aqua_vitae");
+    assert!(r.use_entity(PLAYER, sylphs[0]).0, "bound");
+    assert_eq!(r.ask("magic familiar"), "Your familiars: gnome (resting), sylph (walking).");
+    assert!(r.with_model(&format!("{MOD}:gnome")).is_empty(), "the gnome rests");
+    assert_eq!(r.ask("magic familiar gnome"), "Your gnome walks with you.");
+    assert_eq!(r.with_model(&format!("{MOD}:gnome")).len(), 1);
+    assert!(r.with_model(&format!("{MOD}:sylph")).is_empty(), "and the sylph rests");
+    println!("gnome and sylph: ok");
 }
 
 /// The same play twice leaves the same storage.

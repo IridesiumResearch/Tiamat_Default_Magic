@@ -439,6 +439,9 @@ pub struct World {
     pub edits: Mutex<Vec<(BlockPos, String)>>,
     pub aimed: Mutex<Option<(i32, i32, i32)>>,
     pub names: Mutex<HashMap<String, MaterialId>>,
+    /// Each registered fluid's number, as the server assigns them (the
+    /// world's water is 1). The fake keeps a volume per block, not a kind.
+    pub fluid_ids: Mutex<HashMap<String, FluidId>>,
 }
 
 impl World {
@@ -475,8 +478,13 @@ impl sight::Access for World {
             face: [0, 1, 0],
         })
     }
+    /// A column's top, as the engine finds it: a fluid's surface stops it,
+    /// unless asked to look through (not here: nothing in this mod asks).
     fn surface_at(&self, domain: &str, column: [i32; 2], from: i32, depth: u32, _: Skip) -> Option<Surface> {
         for y in (from - depth as i32..=from).rev() {
+            if let Some(volume) = self.fluids.lock().unwrap().get(&(column[0], y, column[1])) {
+                return Some(Surface { y, material: MaterialId(0), occupancy: 0, fluid: Some(Fluid::new(FluidId(1), *volume)) });
+            }
             if let Reading::Single { material, occupancy } = self.block_at(domain, BlockPos { x: column[0], y, z: column[1] })
                 && occupancy != 0
             {
@@ -509,14 +517,9 @@ impl fluid::Access for World {
         }
         true
     }
-    /// The world's water is fluid 1, and every other a mod names (the
-    /// weather's rainwater) is fluid 2: the fake keeps volumes, not kinds.
+    /// A fluid's number, from the table the rig set when the world opened.
     fn fluid_id(&self, name: &str) -> Option<FluidId> {
-        if name == "tiamat_default_world:water" {
-            Some(FluidId(1))
-        } else {
-            name.contains(':').then_some(FluidId(2))
-        }
+        self.fluid_ids.lock().unwrap().get(name).copied()
     }
 }
 
@@ -749,6 +752,14 @@ impl Rig {
         // The world opens: `game.world_seed` is set in every VM, as the server
         // does once the registries are frozen (Weather answers nothing before).
         vm.set_world_seed(SEED);
+        // And the fluids are numbered, as the server numbers them once the
+        // registry is built, and the VM told: the world's water first.
+        let mut names: Vec<String> = vm.registered_fluids().into_iter().map(|f| f.fluid).collect();
+        names.sort_by_key(|n| (n != "tiamat_default_world:water", n.clone()));
+        let fluid_ids: Vec<(String, FluidId)> =
+            names.into_iter().enumerate().map(|(i, n)| (n, FluidId(i as u8 + 1))).collect();
+        vm.set_fluid_ids(&fluid_ids);
+        *world.fluid_ids.lock().unwrap() = fluid_ids.into_iter().collect();
 
         let materials: HashMap<String, MaterialId> = vm.registered_blocks().into_iter().collect();
         *world.names.lock().unwrap() = materials.clone();
@@ -918,6 +929,18 @@ impl Rig {
     pub fn give_view(&self, player: [u8; 32], view: &str, id: &str, units: u32) {
         let material = self.material(id);
         inventory::Access::give(&*self.inventory, player, view, None, Stack::new(material, units).unwrap());
+    }
+
+    /// Stands a player's body at a place, in blocks.
+    pub fn stand(&self, player: [u8; 32], x: f64, y: f64, z: f64) {
+        let id = if player == PLAYER { 1 } else { 2 };
+        let mut map = self.entities.0.lock().unwrap();
+        map.get_mut(&id).unwrap().transform = Transform::from_world(x, y, z);
+    }
+
+    /// A whole block of the world's water at `(x, y, z)`.
+    pub fn put_water(&self, x: i32, y: i32, z: i32) {
+        self.world.fluids.lock().unwrap().insert((x, y, z), 27);
     }
 
     /// The engine offering the block at `(x, y, z)` its random tick.

@@ -32,7 +32,8 @@ function E.is_warded(pos, uuid)
     return tdm.seal.warding(x, y, z, uuid) ~= nil
 end
 
---- A player's familiars whose bodies are in the world: `{ { kind, entity } }`.
+--- A player's bound familiars: `{ { kind, entity } }`, entity nil for one
+--- resting or not here.
 function E.familiars(uuid)
     if type(uuid) ~= "string" or not string.match(uuid, "^%x+$") then return nil, "familiars takes a player's UUID" end
     return tdm.familiars.list(uuid)

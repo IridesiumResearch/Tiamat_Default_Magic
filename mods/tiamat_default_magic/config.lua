@@ -720,6 +720,50 @@ C.salamander = {
     bound = "The salamander curls round your ankle. It is yours.",
     discovery = 30,
 }
+-- The three that are found in the world (brief §6.9). Each is looked for
+-- round the adepts who know it, one adept a tick, every `find_every` ticks.
+C.find_every = 600
+C.undine = {
+    node = "magic.undine",
+    model = { id = "undine", file = "models/undine.glb", texture = "models/undine.png" },
+    name = "Undine", collider = { width = 1.0, height = 1.6 }, health = 10, speed = 1.0,
+    food = { "rosewater" }, food_units = 27,
+    appears = "Something moves in the still water.",
+    bound = "The undine rises from the water. It is yours.",
+    hungry = "It ripples, wanting rosewater.",
+    discovery = 30,
+    look = 6,                       -- blocks: the columns looked into for still water, this far out
+    night = { from = 0.75, to = 0.25 }, -- time of day: it comes after dusk and before dawn
+    carry = 4,                      -- blocks of water it carries, filled where it stands in water
+    douse = 6,                      -- blocks: fires this near it are put out
+}
+C.gnome = {
+    node = "magic.gnome",
+    model = { id = "gnome", file = "models/gnome.glb", texture = "models/gnome.png" },
+    name = "Gnome", collider = { width = 0.9, height = 1.5 }, health = 10, speed = 1.1,
+    food = { "silver_grain" }, food_units = 27,
+    appears = "A small figure watches you from the dark.",
+    bound = "The gnome doffs its cap. It is yours.",
+    hungry = "It holds out its hand for silver.",
+    discovery = 30,
+    bands = { dark_caves = true },  -- World's depth bands it lives in: the Gloam and below
+    sense = 8,                      -- blocks: ore within this glints, a layer a thought
+}
+C.sylph = {
+    node = "magic.sylph",
+    model = { id = "sylph", file = "models/sylph.glb", texture = "models/sylph.png" },
+    name = "Sylph", collider = { width = 0.9, height = 1.8 }, health = 8, speed = 1.4,
+    food = { "aqua_vitae" }, food_units = 27,
+    appears = "The wind turns, and something rides it.",
+    bound = "The sylph settles on your shoulder. It is yours.",
+    hungry = "It swirls, wanting aqua vitae.",
+    discovery = 30,
+    biomes = { alpine_highlands = true, frozen_wastes = true, icefall = true },
+    weathers = { storm = true, blizzard = true },
+    safe = 3,                       -- blocks a body falls unhurt (Life's own rule)
+    mercy = 2,                      -- health healed a block fallen past that: a soft landing
+}
+
 C.familiar_items = {
     { id = "salamander_ember", name = "Salamander's ember",
         description = "It never cools. In an athanor's vessel slot it blows the 4th degree, like bellows." },

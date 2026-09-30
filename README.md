@@ -44,6 +44,15 @@ swiftness is quick feet, and pyrite weathers to vitriol in the rain. And
 the first familiar: an athanor burning a philosophical day draws a
 salamander for the adept beside it, and a handful of sulfur binds it.
 
+Step 6: **tier 4, the menstrua and the black.** The aludel, the pelican
+and the Philosophers' Egg; quicksilver from cinnabar, the strong waters in
+the order they were discovered, phosphorus, theriac and palingenesis;
+Gates IV and V, the nigredo, and the Peacock's Tail. The Tree of Diana
+grows silver a cell at a time. Talismans struck on a carved die and worn;
+the Hermetic Seal wards ground; the Ouroboros hurries an athanor. And
+three more elementals: the undine in still water at night, the gnome in
+the deep caves, the sylph on peaks and in storms.
+
 ## What is here
 
 | File | What |

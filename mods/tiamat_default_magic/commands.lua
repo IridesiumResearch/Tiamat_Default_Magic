@@ -19,6 +19,8 @@ tdm.on_chat("magic", function(player, rest)
             if A.has(player, node.id) then held = held + 1 end
         end
         return string.format("The Apothecary's Bench: %d of %d learned.", held, #C.bench_nodes)
+    elseif string.sub(word, 1, 9) == "familiar " or word == "familiar" then
+        return tdm.familiars.command(player, string.sub(rest, 10))
     elseif string.sub(word, 1, 5) == "seal " or word == "seal" then
         return tdm.seal.command(player, string.sub(rest, 6))
     elseif word == "book" then

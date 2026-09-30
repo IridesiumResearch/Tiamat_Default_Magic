@@ -37,9 +37,9 @@ All are namespaced `tiamat_default_magic:` by the engine.
   (light 12, 7, 2; Life's contact fire and heat source), `arbor_dianae`
   (the Tree of Diana: cutout, light 3, 3, 4; dug, it pays a silver ingot's
   units by the share of the block it fills).
-- **Model and entity:** `salamander` (a familiar; drawn from
-  `models/salamander.glb` with `models/salamander.png`), spawned by this
-  mod, named "Salamander".
+- **Models and entities:** the familiars `salamander`, `undine`, `gnome`
+  and `sylph`, each drawn from `models/<kind>.glb` with the picture beside
+  it, spawned by this mod and named for their kind.
 - **Items:** `mutus_liber`, `mortar`, `copper_still`; the simples
   `simple_chamomile`, `simple_mint`, `simple_bramble`, `simple_mantle`; the
   flame powders `flame_powder_blue`, `_green`, `_yellow`, `_white`; and,
@@ -84,7 +84,7 @@ All are namespaced `tiamat_default_magic:` by the engine.
   `gate_12` (25 insight times the number, group `gates`),
   `tiamat_default_magic.vitriol`, and the family
   `tiamat_default_magic.herb:*` (a species' first tincture, group
-  `herbs`); `tiamat_default_magic.familiar_salamander` (group
+  `herbs`); `tiamat_default_magic.familiar_<kind>` for each of the four (group
   `familiars`); `tiamat_default_magic.peacock` and `tiamat_default_magic.tree_of_diana`
   (toybox); the studies
   `study_calx`, `study_tincture`, `study_vitriol`, `study_quicksilver`,
@@ -128,7 +128,8 @@ Chat words, said by a player and swallowed. For anyone: `magic` (how far
 along the Apothecary's Bench the speaker is), `magic book` (opens the Mute
 Book for a player who carries one), and `magic seal allow <name>` and
 `magic seal deny <name>` (who, of the players here, may build within the
-speaker's seals). A sentence that only begins with the word is chat.
+speaker's seals), and `magic familiar [kind]` (which familiars walk and
+rest, or call one to walk). A sentence that only begins with the word is chat.
 
 ## Data it stores or sends
 
@@ -140,8 +141,9 @@ carving of the Art there; it replaced `sigil:x,y,z`),
 `sealallow:<setter>:<uuid>` (who a setter lets build in their wards),
 `tree:x,y,z` (a Tree of Diana: its cells and who planted
 it) with `treefed:x,y,z` (the tick its watering ends), `weathered:x,y,z` (pyrite the rain has weathered),
-`familiar:<uuid>:salamander` (`true`, or `"dormant"` after a repath
-away), and per athanor `burned:<container>` (ticks it has burned
+`familiar:<uuid>:<kind>` (`true` while it walks, `"resting"`, or
+`"dormant"` after a repath away), `undine_water:<uuid>` (blocks of water
+an undine carries), and per athanor `burned:<container>` (ticks it has burned
 without going out) and `called:<container>` (a salamander came). Who
 chose the path, and which nodes they
 hold, is Progress's; an athanor's fire and work are Craft's.

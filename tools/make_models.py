@@ -118,7 +118,62 @@ def salamander():
     return boxes, c
 
 
-MODELS = {"salamander": salamander}
+def undine():
+    """A water spirit: a slim figure rising from a swirl."""
+    boxes = [
+        ((-0.5, 0.0, -0.5), (0.5, 0.3, 0.5), HIDE),         # the swirl it stands in
+        ((-0.3, 0.3, -0.25), (0.3, 1.1, 0.25), HIDE),       # body
+        ((-0.28, 1.1, -0.28), (0.28, 1.6, 0.28), FACE),     # head
+        ((0.3, 0.6, -0.1), (0.45, 1.0, 0.1), HIDE),         # arms
+        ((-0.45, 0.6, -0.1), (-0.3, 1.0, 0.1), HIDE),
+    ]
+    c = Canvas((70, 140, 220))
+    for x, y in [(1, 3), (5, 6), (2, 11), (6, 13), (3, 1)]:
+        c.dot(x, y, (180, 220, 250))
+    face(c, (110, 180, 240))
+    return boxes, c
+
+
+def gnome():
+    """An earth spirit: a stout little figure in a pointed cap."""
+    boxes = [
+        ((-0.35, 0.0, -0.3), (0.35, 0.8, 0.3), HIDE),       # body
+        ((-0.3, 0.8, -0.3), (0.3, 1.2, 0.3), FACE),         # head
+        ((-0.33, 1.2, -0.33), (0.33, 1.3, 0.33), HIDE),     # the cap's brim
+        ((-0.15, 1.3, -0.15), (0.15, 1.5, 0.15), HIDE),     # its point
+    ]
+    c = Canvas((120, 80, 50))
+    c.rect(0, 0, 7, 3, (200, 50, 40))                      # a red cap
+    face(c, (230, 190, 160))
+    c.rect(9, 11, 14, 15, (240, 240, 236))                  # a white beard
+    return boxes, c
+
+
+def sylph():
+    """An air spirit: a pale, light figure with wings."""
+    boxes = [
+        ((-0.25, 0.4, -0.2), (0.25, 1.3, 0.2), HIDE),       # body
+        ((-0.25, 1.3, -0.25), (0.25, 1.8, 0.25), FACE),     # head
+        ((0.25, 0.8, -0.05), (0.9, 1.5, 0.05), HIDE),       # wings
+        ((-0.9, 0.8, -0.05), (-0.25, 1.5, 0.05), HIDE),
+    ]
+    c = Canvas((226, 236, 246))
+    for x, y in [(1, 2), (5, 5), (2, 10), (6, 12)]:
+        c.dot(x, y, (190, 210, 240))
+    face(c, (240, 244, 250))
+    return boxes, c
+
+
+def face(c, skin):
+    """The right half of a familiar's picture: its face, eyes and a smile."""
+    c.rect(8, 0, 15, 15, skin)
+    for x in (10, 13):
+        c.rect(x, 5, x + 1, 7, (30, 20, 20))
+        c.dot(x, 5, (250, 250, 250))
+    c.rect(10, 10, 13, 10, (120, 60, 60))
+
+
+MODELS = {"salamander": salamander, "undine": undine, "gnome": gnome, "sylph": sylph}
 
 
 def main():
