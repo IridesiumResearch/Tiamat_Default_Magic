@@ -18,6 +18,7 @@
 --   t effects <prefix>   the speaker's summed effects, "key=value" sorted
 --   t glyph <mask>       Craft's glyph_of a mask
 --   t band <x> <y> <z>   the world's depth band there
+--   t q                  the speaker's quintessence, "amount/ceiling"
 
 local p = game.exports("tiamat_default_progress")
 local c = game.exports("tiamat_default_craft")
@@ -68,6 +69,9 @@ game.register_on_chat(function(e)
         local w = game.exports("tiamat_default_world")
         local x, y, z = string.match(rest, "^(%-?%d+) (%-?%d+) (%-?%d+)$")
         say = tostring(w and w.depth_band(tonumber(x), tonumber(y), tonumber(z)))
+    elseif word == "q" then
+        local amount, ceiling = m.quintessence(e.player)
+        say = tostring(amount) .. "/" .. tostring(ceiling)
     elseif word == "path" then
         say = tostring(p.path(e.player))
     elseif word == "count" then

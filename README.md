@@ -53,9 +53,18 @@ the Hermetic Seal wards ground; the Ouroboros hurries an athanor. And
 three more elementals: the undine in still water at night, the gnome in
 the deep caves, the sylph on peaks and in storms.
 
-**What ships** is gated: `built_tier` in `config.lua` (4 today) is the last
+**What ships** is gated: `built_tier` in `config.lua` (5 today) is the last
 tier whose Art is built, and nodes above it are not registered, so nobody
-meets a node that does nothing. Tiers 5 to 7 are next.
+meets a node that does nothing.
+
+Step 7: **tier 5, the White Work.** Gates VI to VIII; the White Stone,
+seven philosophical days in the Egg, which makes silver if the world
+allows transmutation; Citrinitas, aurum potabile, the lesser Elixir of
+Life and the quintessence; the Quintessence bar, drawn only for magic
+players; Maria's kerotakis, electrum and orichalcum tools; the Caduceus;
+the Circle of Four, so two familiars walk; the undine's water-breathing,
+the gnome's tunnels, the sylph's wings; the Assay and Atalanta Fugiens's
+emblems. The gate is at 5. Tiers 6 and 7 are next.
 
 ## What is here
 

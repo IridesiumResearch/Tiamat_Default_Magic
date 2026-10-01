@@ -22,11 +22,13 @@ one in `depends` or `optional_depends`. Source:
 |---|---|---|
 | `version` | integer, `1` | Bumped only when a change would break a reader. |
 | `glyphs` | `{ [id] = { mask, variants } }` | Every glyph of the Art by its short id (`"sol"`): the canonical 27-bit mask and every orientation Craft knows it by. Read-only data. |
+| `quintessence(uuid)` | a player's UUID in hex | Their quintessence and its ceiling, two numbers; the ceiling is 0 off the magic path. |
+| `spend_quintessence(uuid, n)` | a UUID; a whole number | Takes `n` if they have it: `true`, else `false` and nothing taken. |
 | `is_warded(pos, uuid)` | `{ x, y, z }` in whole blocks (the overworld); a UUID | Whether a Hermetic Seal forbids that player to dig or build there. `nil` and why for a malformed question. |
 | `familiars(uuid)` | a player's UUID in hex | Their familiars whose bodies are in the world, as `{ { kind, entity } }`; `nil` and why for a malformed UUID. |
 
-The brief's other fields (§12: the Quintessence bar, herbs, wards, the
-Opus's subscribers) are added as the parts of the Art they read are built.
+The brief's other fields (§12: herbs, the Opus's subscribers) are added as
+the parts of the Art they read are built.
 
 ## Identifiers it registers
 
@@ -65,7 +67,13 @@ All are namespaced `tiamat_default_magic:` by the engine.
   or a fuelled kiln, bloomery or athanor, it lights it through Craft's
   `ignite`), `conjoined_matter`, `caput_corvi`, `peacock_matter`, and `arbor_seed`
   (planted by using it on the ground; watered with aqua fortis); and the
-  seven talismans `talisman_<planet>`, worn in Life's worn slots.
+  seven talismans `talisman_<planet>`, worn in Life's worn slots; and tier
+  5's `fixed_mercury`, `eagle`, `sal_alembroth`, `white_stone`,
+  `solar_sulfur`, `aurum_potabile` (food: full healing, every cure, and a
+  full well), `elixir_vitae` (food; quintessence flows twice as fast),
+  `quintessence` (food: twenty to the well), `kerotakis`, `electrum`,
+  `living_orichalcum`, the orichalcum `pick`, `axe`, `spade` and `chisel`
+  (`orichalcum_<tool>`: engine tools and Craft's tier 4), and `caduceus`.
 - **Into Progress:** the path `magic`, "The Hermetic Art", whose door is
   `emerald_tablet` (Progress registers its recipe as
   `tiamat_default_progress:door_magic`: the Keystone, 27 units of crystal,
@@ -86,9 +94,12 @@ All are namespaced `tiamat_default_magic:` by the engine.
   `tiamat_default_magic.herb:*` (a species' first tincture, group
   `herbs`); `tiamat_default_magic.familiar_<kind>` for each of the four (group
   `familiars`); `tiamat_default_magic.peacock` and `tiamat_default_magic.tree_of_diana`
-  (toybox); the studies
+  (toybox); `tiamat_default_magic.transmutation` (a first transmutation,
+  200, group `milestones`); the family `tiamat_default_magic.emblem:*`
+  (Atalanta Fugiens' emblems, group `emblems`); the studies
   `study_calx`, `study_tincture`, `study_vitriol`, `study_quicksilver`,
-  `study_aqua_regia`, `study_caput_corvi`, `study_peacock`.
+  `study_aqua_regia`, `study_caput_corvi`, `study_peacock`,
+  `study_white_stone`, `study_solar_sulfur`, `study_aurum_potabile`.
 - **Into Craft:** the recipes `mutus_liber`, `mortar`, `grind_chamomile`,
   `grind_mint`, `grind_bramble`, `grind_mantle`, `flame_powder_blue`,
   `_green`, `_yellow`, `_white`, `poultice`, `hermetic_lamp` (by hand);
@@ -115,15 +126,20 @@ All are namespaced `tiamat_default_magic:` by the engine.
 - **Into the interface:** the shape crafter's presets
   `tiamat_default_magic:preset_<planet>`, the seven sigils, shown to a
   player who holds `magic.seven_metals`.
-- **Into Life:** the ability sources `tiamat_default_magic:swiftness`
+- **Into Life:** the stat `tiamat_default_magic:quintessence` ("Quintessence",
+  its ceiling set per player: 0 off the path, so the bar is drawn only for
+  magic players); weapons, the orichalcum tools; the ability sources `tiamat_default_magic:swiftness`
   (`speed_mul` 1.3, while the elixir lasts) and
   `tiamat_default_magic:talisman_mercury` (a tenth quicker a grade, while
-  it is worn).
+  it is worn) and `tiamat_default_magic:flight` (the Sylph's Wings).
 - **Random tick:** the world's `pyrite`, which weathers in the rain.
 - **Actions:** `mutus_liber` (default key J): the Mute Book, for a player
   who carries one; `familiar` (default key K): the next bound familiar
   walks.
 - **Dialog:** `liber`, the Mute Book.
+
+**World option:** `transmutation` (on by default): whether the Stones make
+silver and gold by projection.
 
 ## Commands it accepts
 

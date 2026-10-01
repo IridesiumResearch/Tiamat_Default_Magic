@@ -25,5 +25,11 @@ depends = [
 # dialog; without the weather, nothing at the Bench changes.
 optional_depends = ["tiamat_default_ui", "tiamat_weather"]
 
+[[world_option]]
+id = "transmutation"
+name = "Transmutation"
+description = "May the Stones make silver and gold? Off: they still heal and still open the Great Arcanum, but projection makes nothing."
+default = 1
+
 # NO `[theme]` HERE, ON PURPOSE. The engine wears the LAST theme in load
 # order, and the interface mod owns the look.

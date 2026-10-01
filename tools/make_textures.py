@@ -347,6 +347,22 @@ def medal(colour, light):
 
 for _planet, _colour in PLANET.items():
     LAB["talisman_" + _planet] = (lambda col: lambda: medal(col, tuple(min(255, v + 60) for v in col)))(_colour)
+# Tier 5.
+LAB.update({
+    "fixed_mercury": lambda: heap((200, 206, 216), (240, 242, 248)),
+    "eagle": lambda: flask(4, 8, (236, 236, 240)),
+    "sal_alembroth": lambda: heap((236, 232, 220), (250, 248, 240)),
+    "white_stone": lambda: crystal((240, 240, 244), (255, 255, 255)),
+    "solar_sulfur": lambda: crystal((240, 200, 50), (255, 236, 140)),
+    "aurum_potabile": lambda: phial((240, 190, 50)),
+    "elixir_vitae": lambda: phial((220, 60, 80)),
+    "quintessence": lambda: phial((250, 240, 200)),
+    "kerotakis": lambda: dish((200, 200, 210)),
+    "electrum": lambda: heap((226, 210, 140), (250, 236, 180)),
+    "living_orichalcum": lambda: heap((206, 106, 70), (250, 176, 120)),
+    "caduceus": pipe,
+    "orichalcum_pick": pipe, "orichalcum_axe": pipe, "orichalcum_spade": pipe, "orichalcum_chisel": pipe,
+})
 ITEMS.update(LAB)
 
 

@@ -32,6 +32,7 @@ and what came of it. The design reasons are in `docs/brief.md` §14.
 | U-M1 shape-crafter presets | Interface | answered (ae8954a) | **adopted**: the seven sigils |
 | U-M2 widgets are views | Interface | answered (ae8954a) | the book copies them |
 | P-M1 a branch label and a reveal rule | Progress | **open** | the Research tab shows the path flat |
+| P-M2 a study bonus any node may carry | Progress | **open** | the Assay pays more for this mod's studies only |
 | Wx-M1 a layered sky overlay | Weather | **open** | night-sight glows instead of brightening |
 
 Life's answers landed in Life `87a95f6`. This mod still calls each only
@@ -116,6 +117,15 @@ Block, Slab, Stairs and Pillar; at most eight added presets show at once.
 path node only when all but one of its requirements are held. This path has
 97 nodes; the Research tab shows them flat. `tree.lua` already carries each
 node's `branch`, ready.
+
+**P-M2, a study bonus any node may carry** — *open, 2026-10-01.* Progress
+pays a study's insight and keeps what each pays to itself, so the Assay
+("every study at the research table pays 25 % more") can only add to
+this mod's own studies, whose insight it knows. *Wanted:* Progress reads an
+effect key — `progress.study_percent`, or this mod's
+`magic.study_bonus_percent` — from `effects_of` when it pays a study, as
+Craft reads `craft.*`. *Stands in:* this mod awards the bonus on its own
+studies through `award`.
 
 ### Tiamat Weather
 

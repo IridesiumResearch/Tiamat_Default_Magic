@@ -102,14 +102,14 @@ end
 --- player comes back with time left) or taken off (when it ends).
 function E.begin(uuid, id)
     local spec = C.own_effects[id]
-    if spec and spec.speed_mul and life and life.set_ability then
-        life.set_ability(uuid, ability_source(id), { speed_mul = spec.speed_mul })
+    if spec and (spec.speed_mul or spec.fly) and life and life.set_ability then
+        life.set_ability(uuid, ability_source(id), { speed_mul = spec.speed_mul or 1, fly = spec.fly == true })
     end
 end
 
 local function finish(uuid, id)
     local spec = C.own_effects[id]
-    if spec and spec.speed_mul and life and life.set_ability then
+    if spec and (spec.speed_mul or spec.fly) and life and life.set_ability then
         life.set_ability(uuid, ability_source(id), nil)
     end
 end

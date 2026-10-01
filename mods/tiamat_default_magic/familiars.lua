@@ -65,6 +65,12 @@ local WATER_ID = nil        -- the world's water's fluid number, asked once the 
 local BUCKET = U.material("tiamat_default_life:bucket")
 local WATER_BUCKET = U.id("tiamat_default_life:water_bucket")
 
+-- The elementals' second gifts (tier 5), each a node of its own.
+local GIFTS = C.gifts
+local function gifted(uuid, gift)
+    return progress ~= nil and progress.has(uuid, GIFTS[gift].node) == true
+end
+
 local wild = {}             -- entity -> { kind, adept, container? }
 local bodies = {}           -- uuid -> { kind -> entity }
 local owner_of = {}         -- entity -> { uuid, kind }
@@ -314,13 +320,24 @@ tdm.on_use_entity(function(e)
         bodies[e.player][w.kind] = e.target
         owner_of[e.target] = { uuid = e.player, kind = w.kind }
         F.walk(e.player, w.kind)
-        if w.kind == "salamander" then game.give(e.player, { material = EMBER, count = 1 }) end
+        if w.kind == "salamander" and progress and progress.has(e.player, S.forge) then
+            game.give(e.player, { material = EMBER, count = 1 })
+        end
         game.chat_to(e.player, K.bound)
         if progress then progress.discover(e.player, game.mod_id .. ".familiar_" .. w.kind) end
         return ""
     end
-    -- Your own undine gives you a bucket of the water it carries.
     local mine = owner_of[e.target]
+    -- Your own gnome, empty-handed, tunnels; your own sylph lends you wings.
+    if mine and mine.uuid == e.player and e.held == nil then
+        if mine.kind == "gnome" and gifted(e.player, "gnome_delving") then return F.delve(e.player) end
+        if mine.kind == "sylph" and gifted(e.player, "sylph_flight") then
+            if not tdm.quintessence.spend(e.player, GIFTS.sylph_flight.cost) then return C.caduceus.dry end
+            tdm.effects.start(e.player, "flight", GIFTS.sylph_flight.ticks)
+            return "The sylph lifts you."
+        end
+    end
+    -- Your own undine gives you a bucket of the water it carries.
     if mine and mine.uuid == e.player and mine.kind == "undine" and e.held and e.held.material == BUCKET then
         local carried = game.storage.get(water_key(e.player)) or 0
         if carried <= 0 then return "It has no water to give." end
@@ -344,6 +361,10 @@ local layer = {}            -- uuid -> the layer of the gnome's cube read next
 local WORK = {}
 
 function WORK.undine(uuid, id, me)
+    -- The Undine's Gift: its master breathes water while it walks with them.
+    if gifted(uuid, "undine_tides") and life and life.add_effect then
+        life.add_effect(uuid, GIFTS.undine_tides.effect, GIFTS.undine_tides.ticks)
+    end
     -- It fills itself, a whole block at a time, from the water it stands in:
     -- the water is taken from the world, so none is made.
     local carried = game.storage.get(water_key(uuid)) or 0
@@ -381,6 +402,46 @@ function WORK.gnome(uuid, id, me)
             end
         end
     end
+end
+
+-- The Gnome's Delving: a tunnel two high, up to `reach` ahead, through the
+-- world's own ground only; each block dug is its master's.
+local DIGS = {}
+for _, id in ipairs(C.gifts.gnome_delving.digs) do
+    local m = U.material(U.id(id))
+    if m then DIGS[m] = true end
+end
+
+function F.delve(uuid)
+    local body = game.player_entity(uuid)
+    local me = body and game.entity(body)
+    if not me then return "" end
+    local G = GIFTS.gnome_delving
+    -- The way the player faces, to the nearest of the four: a choice of
+    -- direction, not a quantity the world keeps.
+    local dx, dz = 0, 0
+    if math.abs(me.facing.x) >= math.abs(me.facing.z) then dx = me.facing.x >= 0 and 1 or -1
+    else dz = me.facing.z >= 0 and 1 or -1 end
+    local x, y, z = math.floor(me.pos.x), math.floor(me.pos.y), math.floor(me.pos.z)
+    local dug = 0
+    for step = 1, G.reach do
+        local bx, bz = x + dx * step, z + dz * step
+        for h = 0, G.height - 1 do
+            local at = { x = bx, y = y + h, z = bz }
+            local b = game.get_block(at)
+            if b and b.occupancy ~= 0 then
+                local fluid = game.get_fluid(at)
+                if not DIGS[b.material] or b.occupancy ~= game.OCCUPANCY_FULL or (fluid and fluid.volume > 0)
+                    or (tdm.seal and tdm.seal.warding(at.x, at.y, at.z, uuid)) then
+                    return dug > 0 and string.format("The gnome digs %d blocks, and stops.", dug) or "The gnome will not dig that."
+                end
+                game.set_block(at, "engine:air")
+                game.give(uuid, { material = b.material, units = U.UNITS })
+                dug = dug + 1
+            end
+        end
+    end
+    return string.format("The gnome digs %d blocks.", dug)
 end
 
 local thought = 0
@@ -446,6 +507,15 @@ tdm.on_leave(function(event)
     bodies[event.player] = nil
     layer[event.player] = nil
 end)
+
+-- The Salamander's Forge: the ember is the Forge's gift, given when it is
+-- learned with a salamander bound, or at the binding if it is known.
+if progress then
+    progress.on_unlock(function(uuid, node)
+        local r = node == S.forge and record(uuid, "salamander")
+        if r == true or r == "resting" then game.give(uuid, { material = EMBER, count = 1 }) end
+    end)
+end
 
 -- The path: repathing away sends every familiar to sleep, and back wakes them.
 if progress then

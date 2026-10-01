@@ -35,6 +35,10 @@ fn main() {
     ouroboros();
     undine();
     gnome_and_sylph();
+    quintessence();
+    the_white_stone();
+    caduceus();
+    the_gifts();
     determinism();
     println!("magic native check: all passed");
 }
@@ -243,13 +247,13 @@ fn creative() {
     println!("creative: ok");
 }
 
-/// Every shipped path node — tiers 3 to `built_tier`, 47 while tier 4 is
+/// Every shipped path node — tiers 3 to `built_tier`, 68 while tier 5 is
 /// the last built — is in Progress, none disabled, and every one is
 /// beyond the Fork for a player without a path.
 fn the_tree() {
     let mut r = Rig::new(Setup::default());
     ready(&mut r, 5000);
-    assert_eq!(r.ask("t count"), "47", "Progress validated what ships: tiers 3 and 4");
+    assert_eq!(r.ask("t count"), "68", "Progress validated what ships: tiers 3 to 5");
     let answer = r.ask("t learn magic.athanor");
     assert!(answer.starts_with("nil") && answer.contains("lies beyond the Fork"), "{answer}");
     let answer = r.ask("t learn magic.hermes_trismegistus");
@@ -573,7 +577,9 @@ fn salamander() {
     let (handled, _) = r.use_entity(PLAYER, wild[0]);
     assert!(handled, "bound");
     assert_eq!(r.units(PLAYER, "tiamat_default_world:sulfur"), 0, "it ate the sulfur");
-    assert_eq!(r.units(PLAYER, "salamander_ember"), 27, "and left its ember");
+    assert_eq!(r.units(PLAYER, "salamander_ember"), 0, "its ember is the Forge's gift");
+    assert!(r.ask("progress grant magic.salamander_forge").starts_with("Learned"));
+    assert_eq!(r.units(PLAYER, "salamander_ember"), 27, "the Forge learned: its ember");
     let after: i32 = r.ask("t insight").parse().unwrap();
     assert_eq!(after - insight, 30, "a salamander, bound");
     assert_eq!(r.stored(&format!("familiar:{}:salamander", rig::hex(PLAYER))).as_deref(), Some("Flag(true)"));
@@ -879,6 +885,141 @@ fn gnome_and_sylph() {
     assert_eq!(r.said(), "Your sylph walks with you.", "on K");
     assert_eq!(r.with_model(&format!("{MOD}:sylph")).len(), 1);
     println!("gnome and sylph: ok");
+}
+
+/// Quintessence: no bar off the path; from the Oath a ceiling of 10 that
+/// fills a point every 200 ticks; a drink fills it to the ceiling; the
+/// Fifth Essence raises the ceiling.
+fn quintessence() {
+    let mut r = Rig::new(Setup::default());
+    ready(&mut r, 0);
+    assert_eq!(r.ask("t q"), "0/0", "no bar off the path");
+    adept(&mut r, &[]);
+    r.tick(1);
+    assert_eq!(r.ask("t q"), "0/10", "from the Oath, an empty well of ten");
+    r.tick(600);
+    assert_eq!(r.ask("t q"), "3/10", "a point every 200 ticks");
+    r.give(PLAYER, "quintessence", 27);
+    r.hold(PLAYER, "quintessence");
+    assert!(r.use_at_nothing(PLAYER), "drunk");
+    assert_eq!(r.ask("t q"), "10/10", "filled, to its ceiling");
+    assert!(r.ask("progress grant magic.quintessence").starts_with("Learned"));
+    assert_eq!(r.ask("t q"), "10/30", "the Fifth Essence deepens it");
+    println!("quintessence: ok");
+}
+
+/// The Albedo: seven philosophical days in the Egg make the White Stone;
+/// projected on nine tin ingots it makes nine of silver, a first
+/// transmutation is a milestone, and with Atalanta Fugiens known, an emblem.
+fn the_white_stone() {
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.athanor", "magic.bain_marie", "magic.albedo", "magic.atalanta_fugiens"]);
+    let at = (170, 64, 170);
+    let name = athanor(&mut r, at, &[(1, "tiamat_default_world:coal", 27 * 8), (2, "peacock_matter", 27),
+        (3, "fixed_mercury", 27), (4, "tincture_luna", 27), (5, "bain_marie", 27), (6, "philosophers_egg", 27)]);
+    light(&mut r, at);
+    r.tick(12400);
+    assert_eq!(slot(&r, &name, 7), None, "not before seven days");
+    r.tick(400);
+    assert_eq!(slot(&r, &name, 7), Some((format!("{MOD}:white_stone"), 27)), "the White Stone");
+
+    r.give(PLAYER, "white_stone", 27);
+    r.give(PLAYER, "tiamat_default_craft:tin_ingot", 27 * 9);
+    r.heard(PLAYER);
+    r.say(&format!("t make {MOD}:projection_white"));
+    let heard = r.heard(PLAYER);
+    assert_eq!(heard.last().map(String::as_str), Some("made"));
+    assert_eq!(r.units(PLAYER, "tiamat_default_craft:silver_ingot"), 27 * 9, "nine of silver");
+    assert_eq!(r.units(PLAYER, "white_stone"), 0, "the Stone is spent");
+    assert!(heard.iter().any(|l| l == "Discovered: A first transmutation (+200 insight)"), "{heard:?}");
+    assert!(heard.iter().any(|l| l.starts_with("Discovered: Emblem XXI")), "{heard:?}");
+    println!("the white stone: ok");
+}
+
+/// The Caduceus: Hermes' Stride carries its holder along the way they face
+/// for five quintessence; an elixir used on a friend is theirs, for ten.
+fn caduceus() {
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.quintessence", "magic.caduceus"]);
+    r.join(OTHER);
+    r.give(PLAYER, "quintessence", 27);
+    r.hold(PLAYER, "quintessence");
+    assert!(r.use_at_nothing(PLAYER));
+    assert_eq!(r.ask("t q"), "20/30");
+
+    let before = r.where_is(PLAYER);
+    r.give(PLAYER, "caduceus", 27);
+    r.hold(PLAYER, "caduceus");
+    rig::MOVES.lock().unwrap().clear();
+    assert!(r.use_at_nothing(PLAYER), "the Stride");
+    let after = rig::MOVES.lock().unwrap().iter().rev().find(|(p, _)| *p == PLAYER).map(|m| m.1).expect("a move");
+    let moved = ((after[0] - before[0]).powi(2) + (after[2] - before[2]).powi(2)).sqrt();
+    assert!(moved > 6.0, "a long step: {before:?} -> {after:?}");
+    assert_eq!(r.ask("t q"), "15/30", "for five");
+
+    r.give(PLAYER, "elixir_vigour", 27);
+    r.hold(PLAYER, "elixir_vigour");
+    r.heard(OTHER);
+    let (handled, _) = r.use_entity_of(PLAYER, 2, Some(OTHER));
+    assert!(handled, "given");
+    assert_eq!(r.units(PLAYER, "elixir_vigour"), 0, "the elixir is theirs now");
+    assert_eq!(r.ask("t q"), "5/30", "for ten");
+    assert!(r.heard(OTHER).iter().any(|l| l == "Somebody shares an elixir with you."));
+    println!("caduceus: ok");
+}
+
+/// The elementals' second gifts, with the Circle of Four (two walk at once):
+/// the gnome tunnels through the world's ground and gives its master what it
+/// dug; the sylph lends wings for quintessence.
+fn the_gifts() {
+    rig::ABILITIES.lock().unwrap().clear();
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.athanor", "magic.degrees_of_fire", "magic.gate_calcination", "magic.salamander",
+        "magic.cupellation", "magic.gnome", "magic.aludel", "magic.sylph", "magic.bain_marie", "magic.undine",
+        "magic.elemental_circle", "magic.gnome_delving", "magic.sylph_flight", "magic.quintessence"]);
+    let deep = (0..400).map(|i| 40_000 - 100 * i).find(|y| r.ask(&format!("t band 100 {y} 100")) == "dark_caves")
+        .expect("the world has a Gloam");
+    r.stand(PLAYER, 100.5, deep as f64, 100.5);
+    r.tick(700);
+    let gnome = r.with_model(&format!("{MOD}:gnome"))[0];
+    r.give(PLAYER, "silver_grain", 27);
+    r.hold(PLAYER, "silver_grain");
+    assert!(r.use_entity(PLAYER, gnome).0);
+
+    r.stand(PLAYER, 100.5, 64.0, 100.5);
+    assert!(r.ask("/weather set storm 30").starts_with("storm over square"));
+    r.tick(1400);
+    let sylph = r.with_model(&format!("{MOD}:sylph"))[0];
+    r.give(PLAYER, "aqua_vitae", 27);
+    r.hold(PLAYER, "aqua_vitae");
+    assert!(r.use_entity(PLAYER, sylph).0);
+    assert_eq!(r.ask("magic familiar"), "Your familiars: gnome (walking), sylph (walking).", "two walk, with the Circle");
+
+    // The gnome tunnels: stone ahead of its master is dug and given to them.
+    let pos = r.where_is(PLAYER);
+    let (x, y, z) = (pos[0].floor() as i32, pos[1].floor() as i32, pos[2].floor() as i32);
+    for step in 1..=3 {
+        r.put_block(x, y, z + step, "tiamat_default_world:stone");
+        r.put_block(x, y + 1, z + step, "tiamat_default_world:stone");
+    }
+    r.put_block(x, y, z + 4, "tiamat_default_craft:chest");
+    r.inventory.held.lock().unwrap().remove(&PLAYER);
+    let (handled, said) = r.use_entity(PLAYER, gnome);
+    assert!(handled);
+    assert_eq!(said.as_deref(), Some("The gnome digs 6 blocks, and stops."), "stopped by what somebody built");
+    assert_eq!(r.units(PLAYER, "tiamat_default_world:stone"), 27 * 6, "the stone is its master's");
+
+    // The sylph's wings, for ten quintessence.
+    r.give(PLAYER, "quintessence", 27);
+    r.hold(PLAYER, "quintessence");
+    assert!(r.use_at_nothing(PLAYER));
+    r.inventory.held.lock().unwrap().remove(&PLAYER);
+    let (handled, said) = r.use_entity(PLAYER, sylph);
+    assert!(handled);
+    assert_eq!(said.as_deref(), Some("The sylph lifts you."));
+    r.tick(20);
+    assert!(rig::ABILITIES.lock().unwrap().iter().any(|(p, a)| *p == PLAYER && a.as_ref().is_some_and(|a| a.fly)), "flying");
+    println!("the gifts: ok");
 }
 
 /// The same play twice leaves the same storage.

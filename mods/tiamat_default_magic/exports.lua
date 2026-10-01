@@ -23,6 +23,18 @@ for _, glyph in ipairs(tdm.glyphs.table) do
     E.glyphs[glyph.id] = { mask = glyph.mask, variants = U.plain(glyph.variants) }
 end
 
+--- A player's quintessence, and its ceiling (0 off the magic path).
+function E.quintessence(uuid)
+    if type(uuid) ~= "string" then return nil, "quintessence takes a player's UUID" end
+    return tdm.quintessence.amount(uuid), tdm.quintessence.ceiling(uuid)
+end
+
+--- Takes `n` of a player's quintessence if they have it: true, else false.
+function E.spend_quintessence(uuid, n)
+    if type(uuid) ~= "string" or math.type(n) ~= "integer" or n < 0 then return nil, "spend_quintessence(uuid, n)" end
+    return tdm.quintessence.spend(uuid, n)
+end
+
 --- Whether a Hermetic Seal forbids `uuid` to dig or build at `pos`
 --- (`{ x, y, z }`, whole blocks, the overworld).
 function E.is_warded(pos, uuid)

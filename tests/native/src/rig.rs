@@ -609,7 +609,10 @@ impl ent::Access for Entities {
         near.sort_by(|a, b| a.1.total_cmp(&b.1).then(a.0.cmp(&b.0)));
         near.into_iter().map(|(id, _)| EntityId(id)).collect()
     }
-    fn move_player(&self, _: [u8; 32], _: [f64; 3]) -> bool {
+    /// Recorded, not done: the world mod sets players down on terrain this
+    /// fake does not have, so a real move would fling them through it.
+    fn move_player(&self, player: [u8; 32], to: [f64; 3]) -> bool {
+        MOVES.lock().unwrap().push((player, to));
         true
     }
     fn select_slot(&self, _: [u8; 32], _: u16) -> bool {
@@ -630,6 +633,9 @@ impl ent::Access for Entities {
 /// Every `set_player_abilities` the mods made, in order: a speed from an
 /// elixir reaches the engine through Life, and this is where it lands.
 pub static ABILITIES: Mutex<Vec<([u8; 32], Option<Abilities>)>> = Mutex::new(Vec::new());
+
+/// Every `move_player` the mods asked for, in order.
+pub static MOVES: Mutex<Vec<([u8; 32], [f64; 3])>> = Mutex::new(Vec::new());
 
 // --- The mods around this one ------------------------------------------------------
 //
@@ -931,6 +937,12 @@ impl Rig {
         inventory::Access::give(&*self.inventory, player, view, None, Stack::new(material, units).unwrap());
     }
 
+    /// Where a player's body stands, in world blocks.
+    pub fn where_is(&self, player: [u8; 32]) -> [f64; 3] {
+        let id = if player == PLAYER { 1 } else { 2 };
+        self.entities.0.lock().unwrap().get(&id).unwrap().transform.to_world()
+    }
+
     /// Stands a player's body at a place, in blocks.
     pub fn stand(&self, player: [u8; 32], x: f64, y: f64, z: f64) {
         let id = if player == PLAYER { 1 } else { 2 };
@@ -955,8 +967,13 @@ impl Rig {
     /// The player uses the entity `target` with what they hold. Answers
     /// whether somebody handled it, and what they were told.
     pub fn use_entity(&mut self, player: [u8; 32], target: u64) -> (bool, Option<String>) {
+        self.use_entity_of(player, target, None)
+    }
+
+    /// The same, at an entity that is `owner`'s body.
+    pub fn use_entity_of(&mut self, player: [u8; 32], target: u64, owner: Option<[u8; 32]>) -> (bool, Option<String>) {
         let held = inventory::Access::held(&*self.inventory, player);
-        let out = self.vm.use_entity(&UseEntityEvent { player, target: EntityId(target), owner: None, held });
+        let out = self.vm.use_entity(&UseEntityEvent { player, target: EntityId(target), owner, held });
         assert!(out.faults.is_empty(), "faulted in a use: {:?}", out.faults);
         (!out.allowed, out.reason)
     }

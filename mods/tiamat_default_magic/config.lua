@@ -191,7 +191,7 @@ C.long_works = {                    -- in philosophical days
 -- The release gate: the highest tier whose Art is built. Nodes above it are
 -- not registered with Progress, so nobody meets a node that does nothing;
 -- raised a tier at a time as each lands (docs/brief.md §17).
-C.built_tier = 4
+C.built_tier = 5
 
 C.path = {
     id = "magic",
@@ -369,6 +369,10 @@ C.own_effects = {
     -- Through Life's composed abilities (its answer to L-M3): a speed that
     -- multiplies in with Life's own cold and hunger, under this mod's name.
     swiftness = { speed_mul = 1.3 },
+    -- The Elixir of Life: quintessence fills twice as fast (quintessence.lua).
+    quintessence_flow = {},
+    -- The Sylph's Wings: flight, through Life's composed abilities.
+    flight = { fly = true },
 }
 
 -- The recipes of tier 3. `degree` is a degree of fire (above); `days` is in
@@ -659,6 +663,170 @@ C.seal = {
 -- `magic.long_work_percent` (the Ouroboros: 20 per cent less time).
 C.ouroboros = { node = "magic.ouroboros" }
 
+-- Tier 5 (brief §5.3): the White Work ------------------------------------------------
+
+C.tier5_items = {
+    { id = "fixed_mercury", name = "Fixed mercury", description = "Quicksilver made to sit still: Gate VI, Congelation." },
+    { id = "eagle", name = "The Eagle", description = "The matter raised and purified in the aludel: Gate VIII, Sublimation." },
+    { id = "sal_alembroth", name = "Sal alembroth", description = "The salt of wisdom: quicksilver and sal ammoniac, sublimed together." },
+    { id = "white_stone", name = "The White Stone", description = "The Albedo: seven days in the Egg. Projected on base metal, it makes silver." },
+    { id = "solar_sulfur", name = "Solar sulfur", description = "The White Stone yellowed: Citrinitas, the Yellow King." },
+    { id = "aurum_potabile", name = "Aurum potabile", description = "Drinkable gold. It heals every hurt and cures every ill.",
+        food = { heal = 27, cures = { "poison", "wither", "radiation", "burning" }, effects = { { "regeneration", 1200 } }, sound = "drink" } },
+    { id = "elixir_vitae", name = "Elixir of life (lesser)", description = "Strength and healing together, and your quintessence flows.",
+        food = { effects = { { "regeneration", 2400 }, { "resistance", 2400 } }, sound = "drink" } },
+    { id = "quintessence", name = "Quintessence", description = "Spirit circulated a thousand times: the fifth essence. Drunk, it fills your well.",
+        food = { sound = "drink" } },
+    { id = "kerotakis", name = "Kerotakis", description = "Maria's reflux palette, for tinting metals in the athanor." },
+    { id = "electrum", name = "Electrum", description = "Gold and silver, one metal: the ancients' pale gold." },
+    { id = "living_orichalcum", name = "Living orichalcum", description = "The glimmer, attuned: orichalcum that answers the hand." },
+}
+
+C.tier5_recipes = {
+    -- Gate VI, Congelation: quicksilver fixed with an alkali.
+    { id = "congelation", station = "athanor", node = "magic.gate_congelation", degree = 3, ticks = 1200, gate = 6,
+        inputs = { { "#quicksilver", count = 1 }, { "salt_of_tartar", count = 1 } }, tools = { { "aludel", wear = 0 } },
+        outputs = { { "fixed_mercury", count = 1 } } },
+    -- Gate VII, Cibation: the matter fed, a portion at a time, grows.
+    { id = "cibation", station = "athanor", node = "magic.gate_cibation", degree = 1, days = 2, gate = 7,
+        inputs = { { "peacock_matter", count = 1 }, { "spirit_of_wine", count = 3 } }, tools = { { "philosophers_egg", wear = 0 } },
+        outputs = { { "peacock_matter", count = 2 } } },
+    -- Gate VIII, Sublimation: the Eagle flies.
+    { id = "sublimation", station = "athanor", node = "magic.gate_sublimation", degree = 3, ticks = 1200, gate = 8,
+        inputs = { { "fixed_mercury", count = 1 }, { "flowers_of_sulfur", count = 1 } }, tools = { { "aludel", wear = 0 } },
+        outputs = { { "eagle", count = 1 } } },
+    { id = "sal_alembroth", station = "athanor", node = "magic.sal_alembroth", degree = 3, ticks = 1200,
+        inputs = { { "#quicksilver", count = 1 }, { "sal_ammoniac", count = 1 } }, tools = { { "aludel", wear = 0 } },
+        outputs = { { "sal_alembroth", count = 1 } } },
+    -- The Albedo, and the yellowing.
+    { id = "albedo", station = "athanor", node = "magic.albedo", degree = 1, days = 7,
+        inputs = { { "peacock_matter", count = 1 }, { "fixed_mercury", count = 1 }, { "tincture_luna", count = 1 } },
+        tools = { { "philosophers_egg", wear = 0 } }, outputs = { { "white_stone", count = 1 } } },
+    { id = "citrinitas", station = "athanor", node = "magic.citrinitas", degree = 1, days = 3,
+        inputs = { { "white_stone", count = 1 }, { "tincture_sol", count = 1 }, { "eagle", count = 1 } },
+        tools = { { "philosophers_egg", wear = 0 } }, outputs = { { "solar_sulfur", count = 1 } } },
+    -- The medicines.
+    { id = "aurum_potabile", station = "athanor", node = "magic.aurum_potabile", degree = 2, days = 1,
+        inputs = { { "green_lion", count = 1 }, { "solar_sulfur", count = 1 }, { "spirit_of_wine", count = 1 } },
+        tools = { { "pelican", wear = 0 } }, outputs = { { "aurum_potabile", count = 3 } } },
+    { id = "elixir_vitae", station = "athanor", node = "magic.elixir_vitae", degree = 1, days = 1,
+        inputs = { { "L:antidote", count = 1 }, { "tincture_sol", count = 1 }, { "tincture_luna", count = 1 } },
+        tools = { { "pelican", wear = 0 } }, outputs = { { "elixir_vitae", count = 2 } } },
+    { id = "quintessence", station = "athanor", node = "magic.quintessence", degree = 2, days = 3,
+        inputs = { { "spirit_of_wine", count = 3 } }, tools = { { "pelican", wear = 0 } },
+        outputs = { { "quintessence", count = 1 } } },
+    -- Maria's kerotakis, and what it tints.
+    { id = "kerotakis", station = "kiln", node = "magic.kerotakis", heat = 2, ticks = 600,
+        inputs = { { "C:iron_plate", count = 1 }, { "C:glass", count = 1 } }, tools = { { "blowpipe", wear = 0 } },
+        outputs = { { "kerotakis", count = 1 } } },
+    { id = "electrum", station = "athanor", node = "magic.kerotakis", degree = 4, ticks = 1200,
+        inputs = { { "C:gold_ingot", count = 1 }, { "C:silver_ingot", count = 1 } }, tools = { { "kerotakis", wear = 0 } },
+        outputs = { { "electrum", count = 2 } } },
+    -- Orichalcum, awakened, and its tools.
+    { id = "living_orichalcum", station = "athanor", node = "magic.orichalcum_awakened", degree = 4, ticks = 2400,
+        inputs = { { "W:orichalcum", units = 27 }, { "amalgam_silver", count = 1 } }, tools = { { "kerotakis", wear = 0 } },
+        outputs = { { "living_orichalcum", count = 1 } } },
+}
+
+-- Projection of the White Stone (brief §6.10), while the world allows
+-- transmutation: one stone and nine base ingots make nine of silver.
+C.white_projection = {
+    node = "magic.albedo",
+    base = "#magic_white_base", base_members = { "C:tin_ingot", "C:lead_ingot", "quicksilver" },
+    makes = "C:silver_ingot", count = 9,
+    milestone = 200,                -- the first transmutation, once
+}
+C.transmutation_option = "tiamat_default_magic:transmutation"
+
+-- Orichalcum tools: Craft's tier 4, engine tools that dig.
+C.orichalcum_tools = {
+    { id = "orichalcum_pick", name = "Orichalcum pick", type = "pick", speed = 4.2, ingots = 3 },
+    { id = "orichalcum_axe", name = "Orichalcum axe", type = "axe", speed = 4.6, ingots = 3 },
+    { id = "orichalcum_spade", name = "Orichalcum spade", type = "spade", speed = 4.6, ingots = 3 },
+    { id = "orichalcum_chisel", name = "Orichalcum chisel", type = "chisel", speed = 1.4, ingots = 1, brush = "subnode" },
+}
+C.orichalcum = { node = "magic.orichalcum_awakened", tier = 4, uses = 1200, weapon = 8 }
+
+-- Quintessence (brief §6.8): one bar, Life's, drawn only for magic players
+-- (Life's per-player ceiling, its answer to L-M1). Ceiling `base` plus
+-- `magic.quintessence_max`; `regen` points every `every` ticks, times
+-- (1 + `magic.quintessence_regen_percent`), doubled while the Elixir of
+-- Life flows.
+C.quintessence = {
+    id = "quintessence",            -- qualified: tiamat_default_magic:quintessence
+    name = "Quintessence", colour = { 214, 190, 90 },
+    ceiling = 100,                  -- the stat's own, above anyone's
+    base = 10,
+    every = 200, regen = 1,
+    refills = { quintessence = 20, aurum_potabile = 1000 },
+    flow = { "quintessence_flow", 12000 }, -- the own effect the Elixir of Life starts, and its ticks
+}
+
+-- The Assay: this mod's studies pay `magic.study_bonus_percent` more (and
+-- every study would, if Progress read the key: sibling ask P-M2).
+C.assay = { node = "magic.assay" }
+
+-- Atalanta Fugiens (Maier, 1617): an emblem for a first, once the book is
+-- known. Fifty emblems in all; these are the firsts the Art has so far.
+C.emblems = {
+    node = "magic.atalanta_fugiens", insight = 10,
+    by_discovery = {
+        ["gate_1"] = "I: the wind carried it in his belly",
+        ["gate_2"] = "II: the earth is its nurse",
+        ["gate_3"] = "III: go to the woman who washes the sheets",
+        ["gate_4"] = "IV: join the brother to the sister",
+        ["gate_5"] = "V: put a toad to the woman's breast",
+        ["gate_6"] = "VI: sow your gold in white earth",
+        ["gate_7"] = "VII: the young bird falls from the nest",
+        ["gate_8"] = "VIII: take the egg and smite it with fire",
+        ["peacock"] = "IX: enclose the old man in the house of dew",
+        ["familiar_salamander"] = "XXIX: as the salamander lives in fire",
+        ["familiar_undine"] = "XXV: the dragon dies not unless slain",
+        ["familiar_gnome"] = "XXVI: the fruit of human wisdom",
+        ["familiar_sylph"] = "XLVI: two eagles come together",
+        ["tree_of_diana"] = "XIV: this is the dragon that devours its tail",
+        ["transmutation"] = "XXI: make a circle of man and woman",
+    },
+}
+
+C.tier5_studies = {
+    { id = "study_white_stone", name = "Study the White Stone", inputs = { { "white_stone", count = 1 } }, ticks = 9000, insight = 300 },
+    { id = "study_solar_sulfur", name = "Study solar sulfur", inputs = { { "solar_sulfur", count = 1 } }, ticks = 9000, insight = 350 },
+    { id = "study_aurum_potabile", name = "Study aurum potabile", inputs = { { "aurum_potabile", count = 1 } }, ticks = 6000, insight = 250 },
+}
+
+-- The Caduceus (brief §5.3): Hermes' staff, assembled from two carvings.
+-- Used, it is Hermes' Stride, a step of `stride` blocks the way its holder
+-- faces for `stride_cost` quintessence; an elixir used on another player
+-- with it known is given to them, for `spray_cost`.
+C.caduceus = {
+    node = "magic.caduceus",
+    item = { id = "caduceus", name = "Caduceus", description = "Hermes' staff. Use it to stride; with it, an elixir used on a friend is theirs." },
+    stride = 8, stride_cost = 5, spray_cost = 10,
+    dry = "Your well of quintessence is dry.",
+}
+C.caduceus_recipe = {
+    id = "caduceus", station = "workbench", node = "magic.caduceus",
+    inputs = {
+        { glyph = "mercury", material = "W:silver_ore", count = 1 },
+        { glyph = "ouroboros", material = "W:gold_ore", count = 1 },
+        { "C:stick", count = 1 }, { "#quicksilver", count = 2 }, { "quintessence", count = 1 },
+    },
+    outputs = { { "caduceus", count = 1 } },
+}
+
+-- The elementals' second gifts (brief §5.3), each a node.
+C.gifts = {
+    undine_tides = { node = "magic.undine_tides", effect = "water_breathing", ticks = 80 },
+    gnome_delving = { node = "magic.gnome_delving", reach = 16, height = 2,
+        -- What a gnome may tunnel: the world's own ground and ore, nothing
+        -- anybody built, so a tunnel never opens a chest or a station.
+        digs = { "W:stone", "W:granite", "W:slate", "W:calcite", "W:dark_basalt", "W:basalt", "W:dirt", "W:sand",
+            "W:gravel", "W:white_sand", "W:dry_clay", "W:wet_clay", "W:cobble", "W:coal", "W:copper_ore", "W:tin_ore",
+            "W:iron_ore", "W:lead_ore", "W:silver_ore", "W:gold_ore", "W:cinnabar", "W:pyrite", "W:salt", "W:sulfur" } },
+    sylph_flight = { node = "magic.sylph_flight", cost = 10, ticks = 200 },
+}
+
 -- Ripley's Twelve Gates, as discoveries: the first time a player completes
 -- each, 25 x its number (brief §6.2).
 C.gates = { "Calcination", "Solution", "Separation", "Conjunction", "Putrefaction", "Congelation",
@@ -726,6 +894,7 @@ C.salamander = {
     food = { "W:sulfur", "flowers_of_sulfur" },
     food_units = 9,
     ember = "salamander_ember",
+    forge = "magic.salamander_forge", -- whose ember it leaves: the Salamander's Forge
     appears = "Something stirs in the athanor's fire.",
     bound = "The salamander curls round your ankle. It is yours.",
     discovery = 30,
