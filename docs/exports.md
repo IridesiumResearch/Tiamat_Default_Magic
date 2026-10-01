@@ -39,8 +39,12 @@ All are namespaced `tiamat_default_magic:` by the engine.
   (light 12, 7, 2; Life's contact fire and heat source), `arbor_dianae`
   (the Tree of Diana: cutout, light 3, 3, 4; dug, it pays a silver ingot's
   units by the share of the block it fills).
-- **Models and entities:** the familiars `salamander`, `undine`, `gnome`
-  and `sylph`, each drawn from `models/<kind>.glb` with the picture beside
+- **Domain:** the instanced template `microcosm`, each adept's floating
+  island an instance keyed by the first 16 hex of their UUID.
+- **Containers:** `tiamat_default_magic:satchel:<uuid>`, a homunculus's
+  satchel (27 slots).
+- **Models and entities:** the familiars `salamander`, `undine`, `gnome`,
+  `sylph`, `homunculus` and `basilisk`, each drawn from `models/<kind>.glb` with the picture beside
   it, spawned by this mod and named for their kind.
 - **Items:** `mutus_liber`, `mortar`, `copper_still`; the simples
   `simple_chamomile`, `simple_mint`, `simple_bramble`, `simple_mantle`; the
@@ -73,7 +77,12 @@ All are namespaced `tiamat_default_magic:` by the engine.
   full well), `elixir_vitae` (food; quintessence flows twice as fast),
   `quintessence` (food: twenty to the well), `kerotakis`, `electrum`,
   `living_orichalcum`, the orichalcum `pick`, `axe`, `spade` and `chisel`
-  (`orichalcum_<tool>`: engine tools and Craft's tier 4), and `caduceus`.
+  (`orichalcum_<tool>`: engine tools and Craft's tier 4), and `caduceus`;
+  and tier 6's `ferment`, `red_stone`, `alkahest` (poured on rock, it
+  melts it to `prima_materia`), `prima_materia`, `panacea` (food; it
+  heals and cures everyone near), `wedding_crown`, `homunculus_vial` and
+  `basilisk_egg` (used, a familiar wakes), `basilisk_ash`, and
+  `beast_essence` (its detail `k=<kind>` names the creature).
 - **Into Progress:** the path `magic`, "The Hermetic Art", whose door is
   `emerald_tablet` (Progress registers its recipe as
   `tiamat_default_progress:door_magic`: the Keystone, 27 units of crystal,
@@ -92,14 +101,17 @@ All are namespaced `tiamat_default_magic:` by the engine.
   `gate_12` (25 insight times the number, group `gates`),
   `tiamat_default_magic.vitriol`, and the family
   `tiamat_default_magic.herb:*` (a species' first tincture, group
-  `herbs`); `tiamat_default_magic.familiar_<kind>` for each of the four (group
-  `familiars`); `tiamat_default_magic.peacock` and `tiamat_default_magic.tree_of_diana`
+  `herbs`); `tiamat_default_magic.familiar_<kind>` for each of the six (group
+  `familiars`); the family `tiamat_default_magic.essence:*` (a creature's
+  first essence, group `essences`); `tiamat_default_magic.microcosm` (a
+  first visit, group `milestones`); `tiamat_default_magic.chymical_wedding`; `tiamat_default_magic.peacock` and `tiamat_default_magic.tree_of_diana`
   (toybox); `tiamat_default_magic.transmutation` (a first transmutation,
   200, group `milestones`); the family `tiamat_default_magic.emblem:*`
   (Atalanta Fugiens' emblems, group `emblems`); the studies
   `study_calx`, `study_tincture`, `study_vitriol`, `study_quicksilver`,
   `study_aqua_regia`, `study_caput_corvi`, `study_peacock`,
-  `study_white_stone`, `study_solar_sulfur`, `study_aurum_potabile`.
+  `study_white_stone`, `study_solar_sulfur`, `study_aurum_potabile`,
+  `study_prima_materia`, `study_red_stone`.
 - **Into Craft:** the recipes `mutus_liber`, `mortar`, `grind_chamomile`,
   `grind_mint`, `grind_bramble`, `grind_mantle`, `flame_powder_blue`,
   `_green`, `_yellow`, `_white`, `poultice`, `hermetic_lamp` (by hand);
@@ -162,7 +174,13 @@ carving of the Art there; it replaced `sigil:x,y,z`),
 it) with `treefed:x,y,z` (the tick its watering ends), `weathered:x,y,z` (pyrite the rain has weathered),
 `familiar:<uuid>:<kind>` (`true` while it walks, `"resting"`, or
 `"dormant"` after a repath away), `undine_water:<uuid>` (blocks of water
-an undine carries), and per athanor `burned:<container>` (ticks it has burned
+an undine carries), `traits:<uuid>:<kind>` (the essences a familiar
+took), `kills:<uuid>:<creature>` (towards the next essence),
+`basilisk_ash:<uuid>` (when a basilisk next sheds), `phoenix:<uuid>` and
+`phoenix_ready:<uuid>` (the Phoenix armed, and when it may be again),
+`microreturn:<uuid>` (where a player stood before the Egg),
+`gatepair:x,y,z` and `gateowner:x,y,z` (a correspondence gate's twin and
+who linked it), `wedded:<container>` (an athanor whose Wedding has crowned), and per athanor `burned:<container>` (ticks it has burned
 without going out) and `called:<container>` (a salamander came). Who
 chose the path, and which nodes they
 hold, is Progress's; an athanor's fire and work are Craft's.

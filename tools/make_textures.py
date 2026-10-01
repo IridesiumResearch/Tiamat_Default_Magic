@@ -363,6 +363,19 @@ LAB.update({
     "caduceus": pipe,
     "orichalcum_pick": pipe, "orichalcum_axe": pipe, "orichalcum_spade": pipe, "orichalcum_chisel": pipe,
 })
+# Tier 6.
+LAB.update({
+    "ferment": lambda: heap((200, 150, 60), (240, 200, 110)),
+    "red_stone": lambda: crystal((200, 30, 40), (250, 120, 120)),
+    "alkahest": lambda: phial((200, 240, 200)),
+    "prima_materia": lambda: heap((120, 110, 130), (170, 160, 180)),
+    "panacea": lambda: phial((250, 210, 230)),
+    "wedding_crown": lambda: medal((230, 190, 60), (250, 230, 140)),
+    "homunculus_vial": lambda: flask(4, 8, (230, 190, 170)),
+    "basilisk_egg": lambda: heap((230, 220, 200), (250, 245, 235)),
+    "basilisk_ash": lambda: heap((150, 140, 120), (190, 180, 160)),
+    "beast_essence": lambda: phial((170, 110, 80)),
+})
 ITEMS.update(LAB)
 
 

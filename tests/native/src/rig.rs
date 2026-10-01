@@ -35,7 +35,8 @@ use tiamat_core::{
     modload::WorldOptionValue,
 
     script::{
-        ActionEvent, Brush, ChatEvent, DialogEvent, DigEvent, EngineVm, JoinEvent, LeaveEvent, PlaceEvent, RandomTickEvent,
+        ActionEvent, Brush, ChatEvent, DialogEvent, DigEvent, EngineVm, JoinEvent, LeaveEvent, MoveEvent, PlaceEvent,
+        RandomTickEvent,
         ScriptVm, UseAim, UseEntityEvent, UseEvent,
         VmLimits,
         WorldEdit,
@@ -621,8 +622,10 @@ impl ent::Access for Entities {
     fn shove_player(&self, _: [u8; 32], _: [f32; 3]) -> bool {
         true
     }
-    fn transfer(&self, _: EntityId, _: &str, _: [f64; 3]) -> bool {
-        false
+    /// Recorded, and accepted: the move itself is the server's.
+    fn transfer(&self, id: EntityId, domain: &str, to: [f64; 3]) -> bool {
+        TRANSFERS.lock().unwrap().push((id.0, domain.to_owned(), to));
+        true
     }
     fn set_abilities(&self, player: [u8; 32], abilities: Option<Abilities>) -> bool {
         ABILITIES.lock().unwrap().push((player, abilities));
@@ -633,6 +636,33 @@ impl ent::Access for Entities {
 /// Every `set_player_abilities` the mods made, in order: a speed from an
 /// elixir reaches the engine through Life, and this is where it lands.
 pub static ABILITIES: Mutex<Vec<([u8; 32], Option<Abilities>)>> = Mutex::new(Vec::new());
+
+/// Every `transfer_entity` the mods asked for: entity, domain, place.
+pub static TRANSFERS: Mutex<Vec<(u64, String, [f64; 3])>> = Mutex::new(Vec::new());
+
+/// The domains made at run time: `template/key`, as the server names them.
+#[derive(Default)]
+pub struct Places(pub Mutex<Vec<String>>);
+
+impl tiamat_core::domain::Access for Places {
+    fn create(&self, template: &str, key: &str) -> Option<String> {
+        let id = format!("{template}/{key}");
+        let mut all = self.0.lock().unwrap();
+        if !all.contains(&id) {
+            all.push(id.clone());
+        }
+        Some(id)
+    }
+    fn destroy(&self, id: &str) -> bool {
+        let mut all = self.0.lock().unwrap();
+        let before = all.len();
+        all.retain(|d| d != id);
+        all.len() != before
+    }
+    fn exists(&self, id: &str) -> bool {
+        self.0.lock().unwrap().iter().any(|d| d == id)
+    }
+}
 
 /// Every `move_player` the mods asked for, in order.
 pub static MOVES: Mutex<Vec<([u8; 32], [f64; 3])>> = Mutex::new(Vec::new());
@@ -693,6 +723,7 @@ pub struct Rig {
     pub sounds: Arc<Sounds>,
     pub particles: Arc<Particles>,
     pub world: Arc<World>,
+    pub places: Arc<Places>,
     pub entities: Entities,
     pub materials: HashMap<String, MaterialId>,
 }
@@ -716,6 +747,8 @@ impl Rig {
         let particles = Arc::new(Particles::default());
         let world = Arc::new(World::default());
         let entities = Entities::new();
+        let places = Arc::new(Places::default());
+        vm.set_domain_access(places.clone());
 
         vm.set_storage_access(storage.clone());
         vm.set_entity_access(Arc::new(entities.clone()));
@@ -770,7 +803,7 @@ impl Rig {
         let materials: HashMap<String, MaterialId> = vm.registered_blocks().into_iter().collect();
         *world.names.lock().unwrap() = materials.clone();
         *tools.known.lock().unwrap() = materials.keys().cloned().collect();
-        Rig { vm, storage, inventory, boxes, huds, dialogs, sounds, particles, world, entities, materials }
+        Rig { vm, storage, inventory, boxes, huds, dialogs, sounds, particles, world, places, entities, materials }
     }
 
     pub fn material(&self, id: &str) -> MaterialId {
@@ -879,6 +912,17 @@ impl Rig {
         !out.allowed
     }
 
+    /// The engine saying a player's feet crossed into the block at `to`.
+    pub fn moved(&mut self, player: [u8; 32], to: (i32, i32, i32)) {
+        let out = self.vm.player_move(&MoveEvent {
+            player,
+            domain: "overworld".into(),
+            block: BlockPos { x: to.0, y: to.1, z: to.2 },
+            from: None,
+        });
+        assert!(out.faults.is_empty(), "faulted in a move: {:?}", out.faults);
+    }
+
     /// A carved block of `id` at `(x, y, z)`: only `mask`'s cells filled.
     pub fn put_carved(&self, x: i32, y: i32, z: i32, id: &str, mask: u32) {
         self.world.blocks.lock().unwrap().insert((x, y, z), (self.material(id), mask));
@@ -929,6 +973,14 @@ impl Rig {
         });
         assert!(out.faults.is_empty(), "faulted in a dig start: {:?}", out.faults);
         (out.allowed, out.reason)
+    }
+
+    /// Gives a player a stack of `id` carrying a detail: a named thing.
+    pub fn give_detail(&self, player: [u8; 32], id: &str, units: u32, detail: &str) {
+        let material = self.material(id);
+        let stack = Stack { detail: Some(detail.to_owned()), ..Stack::new(material, units).unwrap() };
+        self.inventory.put(player, stack);
+        self.inventory.held.lock().unwrap().insert(player, (material, Some(detail.to_owned())));
     }
 
     /// Puts a stack of `id` into one of a player's views: `worn`, say.

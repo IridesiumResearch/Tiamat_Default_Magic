@@ -39,6 +39,12 @@ fn main() {
     the_white_stone();
     caduceus();
     the_gifts();
+    the_red_stone();
+    alkahest_and_panacea();
+    phoenix_and_wedding();
+    homunculus_and_basilisk();
+    microcosm_and_gates();
+    rose_garden();
     determinism();
     println!("magic native check: all passed");
 }
@@ -247,13 +253,13 @@ fn creative() {
     println!("creative: ok");
 }
 
-/// Every shipped path node — tiers 3 to `built_tier`, 68 while tier 5 is
+/// Every shipped path node — tiers 3 to `built_tier`, 85 while tier 6 is
 /// the last built — is in Progress, none disabled, and every one is
 /// beyond the Fork for a player without a path.
 fn the_tree() {
     let mut r = Rig::new(Setup::default());
     ready(&mut r, 5000);
-    assert_eq!(r.ask("t count"), "68", "Progress validated what ships: tiers 3 to 5");
+    assert_eq!(r.ask("t count"), "85", "Progress validated what ships: tiers 3 to 6");
     let answer = r.ask("t learn magic.athanor");
     assert!(answer.starts_with("nil") && answer.contains("lies beyond the Fork"), "{answer}");
     let answer = r.ask("t learn magic.hermes_trismegistus");
@@ -1020,6 +1026,213 @@ fn the_gifts() {
     r.tick(20);
     assert!(rig::ABILITIES.lock().unwrap().iter().any(|(p, a)| *p == PLAYER && a.as_ref().is_some_and(|a| a.fly)), "flying");
     println!("the gifts: ok");
+}
+
+/// The Rubedo: forty philosophical days in the Egg (hurried here by Craft's
+/// add_progress, as a sigil would) make the Red Stone; projected on nine
+/// base ingots it makes nine of gold, and eighteen once the Stone is exalted.
+fn the_red_stone() {
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.athanor", "magic.bain_marie", "magic.rubedo", "magic.gate_exaltation"]);
+    let at = (180, 64, 180);
+    let name = athanor(&mut r, at, &[(1, "tiamat_default_world:coal", 27 * 60), (2, "solar_sulfur", 27),
+        (3, "ferment", 27), (4, "white_stone", 27), (5, "bain_marie", 27), (6, "philosophers_egg", 27)]);
+    light(&mut r, at);
+    r.tick(40);
+    assert_eq!(r.ask(&format!("t hurry {name} 71900")), "true", "the athanor has the Rubedo in hand");
+    r.tick(200);
+    assert_eq!(slot(&r, &name, 7), Some((format!("{MOD}:red_stone"), 27)), "the Red Stone");
+
+    r.give(PLAYER, "red_stone", 27);
+    r.give(PLAYER, "tiamat_default_craft:copper_ingot", 27 * 9);
+    assert_eq!(r.ask(&format!("t make {MOD}:projection_red")), "made");
+    assert_eq!(r.units(PLAYER, "tiamat_default_craft:gold_ingot"), 27 * 18, "nine of gold, and nine more exalted");
+    println!("the red stone: ok");
+}
+
+/// The alkahest melts the world's rock round where it is poured into prima
+/// materia, a quintessence a block; coagula makes it stone again. The
+/// Panacea reaches the players near its drinker.
+fn alkahest_and_panacea() {
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.quintessence", "magic.alkahest", "magic.prima_materia", "magic.panacea"]);
+    r.join(OTHER);
+    r.give(PLAYER, "quintessence", 27);
+    r.hold(PLAYER, "quintessence");
+    assert!(r.use_at_nothing(PLAYER));
+    let centre = (200, 64, 200);
+    for (dx, dy, dz) in [(0, 0, 0), (1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, 0, 1)] {
+        r.put_block(centre.0 + dx, centre.1 + dy, centre.2 + dz, "tiamat_default_world:stone");
+    }
+    r.put_block(centre.0, centre.1 - 1, centre.2, "tiamat_default_craft:chest");
+    r.give(PLAYER, "alkahest", 27);
+    r.hold(PLAYER, "alkahest");
+    assert!(r.use_at(PLAYER, centre.0, centre.1, centre.2));
+    assert_eq!(r.units(PLAYER, "prima_materia"), 27 * 5, "five blocks of first matter");
+    assert_eq!(r.ask("t q"), "15/30", "a quintessence a block");
+    assert!(r.world.blocks.lock().unwrap().get(&(centre.0, centre.1 - 1, centre.2)).is_some_and(|b| b.1 != 0),
+        "the chest is not rock");
+    assert_eq!(r.ask(&format!("t make {MOD}:coagula_stone")), "made");
+    assert_eq!(r.units(PLAYER, "tiamat_default_world:stone"), 27, "unit for unit");
+
+    r.give(PLAYER, "panacea", 27);
+    r.hold(PLAYER, "panacea");
+    r.heard(OTHER);
+    r.tick(20);                                   // Life's cooldown between one use and the next
+    assert!(r.use_at_nothing(PLAYER), "drunk");
+    assert!(r.heard(OTHER).iter().any(|l| l == "The Panacea's warmth reaches you."));
+    println!("alkahest and panacea: ok");
+}
+
+/// The Phoenix keeps a player's things once in three sun-days; the
+/// Chymical Wedding crowns whoever completes it.
+fn phoenix_and_wedding() {
+    const SOL: u32 = 16612927;
+    const LUNA: u32 = 83853119;
+    const QUINTESSENCE: u32 = 4289552;
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.phoenix", "magic.chymical_wedding"]);
+    let armed = format!("phoenix:{}", rig::hex(PLAYER));
+    assert_eq!(r.stored(&armed).as_deref(), Some("Flag(true)"), "armed when learned");
+    r.heard(PLAYER);
+    r.say("die");
+    assert!(r.heard(PLAYER).iter().any(|l| l == "The phoenix rises: you keep what you carried."));
+    assert!(r.stored(&armed).is_none(), "spent");
+    r.tick(1300);
+    assert!(r.stored(&armed).is_none(), "not again for three sun-days");
+
+    let at = (210, 64, 210);
+    athanor(&mut r, at, &[]);
+    for (pos, id, mask) in [((211, 64, 210), "tiamat_default_world:gold_ore", SOL), ((209, 64, 210), "tiamat_default_world:silver_ore", LUNA),
+        ((210, 65, 210), "tiamat_default_world:crystal", QUINTESSENCE)] {
+        assert!(r.place_event(PLAYER, pos, id, mask));
+        r.put_carved(pos.0, pos.1, pos.2, id, mask);
+    }
+    r.tick(220);
+    assert_eq!(r.units(PLAYER, "wedding_crown"), 27, "the Red King and the White Queen joined");
+    r.tick(220);
+    assert_eq!(r.units(PLAYER, "wedding_crown"), 27, "once");
+    println!("phoenix and wedding: ok");
+}
+
+/// The homunculus, woken from its vial: it keeps an athanor near it in coal
+/// from a chest near it, a block a turn, and opens its satchel to its
+/// master; an essence given to it is a trait. The basilisk hatches from its
+/// egg and walks too, with the Greater Elementals' third place.
+fn homunculus_and_basilisk() {
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.homunculus", "magic.basilisk", "magic.essentia_animalium", "magic.elemental_circle",
+        "magic.greater_elementals"]);
+    r.give(PLAYER, "homunculus_vial", 27);
+    r.hold(PLAYER, "homunculus_vial");
+    assert!(r.use_at_nothing(PLAYER), "woken");
+    let model = format!("{MOD}:homunculus");
+    assert_eq!(r.with_model(&model).len(), 1, "it walks with its master");
+    let helper = r.with_model(&model)[0];
+
+    // A chest of coal and a cold athanor, both near it.
+    let chest = "tiamat_default_craft:chest:103,64,103".to_owned();
+    r.boxes.slots.lock().unwrap().insert(chest.clone(), vec![None; 27]);
+    r.boxes.set(&chest, 1, Some(tiamat_core::inventory::Stack::new(r.material("tiamat_default_world:coal"), 27 * 3).unwrap()));
+    let name = athanor(&mut r, (104, 64, 101), &[]);
+    r.tick(60);
+    assert_eq!(slot(&r, &name, 1), Some(("tiamat_default_world:coal".to_owned(), 27)), "a block of fuel");
+    r.tick(60);
+    assert_eq!(slot(&r, &name, 1), Some(("tiamat_default_world:coal".to_owned(), 81)), "a block every 40 ticks");
+    assert_eq!(r.boxes.get(&chest, 1), None, "until the chest is empty");
+
+    r.inventory.held.lock().unwrap().remove(&PLAYER);
+    assert!(r.use_entity(PLAYER, helper).0, "its satchel");
+    assert!(r.boxes.exists(&format!("{MOD}:satchel:{}", rig::hex(PLAYER))));
+
+    r.give_detail(PLAYER, "beast_essence", 27, "k=horse");
+    let (_, said) = r.use_entity(PLAYER, helper);
+    assert_eq!(said.as_deref(), Some("Your homunculus takes the horse's essence."));
+    assert_eq!(r.stored(&format!("traits:{}:homunculus", rig::hex(PLAYER))).as_deref(), Some("Text(\"horse\")"));
+    assert_eq!(r.with_model(&model).len(), 1, "made again, with its trait");
+
+    r.give(PLAYER, "basilisk_egg", 27);
+    r.hold(PLAYER, "basilisk_egg");
+    assert!(r.use_at_nothing(PLAYER), "hatched");
+    assert_eq!(r.with_model(&format!("{MOD}:basilisk")).len(), 1, "three may walk now");
+    println!("homunculus and basilisk: ok");
+}
+
+/// The microcosm: the Egg in hand makes its owner's island (an instance
+/// keyed by their UUID) and takes them there, and back to where they stood.
+/// Two correspondence gates, linked with a quintessence, carry a walker
+/// from one to the other for five more.
+fn microcosm_and_gates() {
+    const EMERALD: u32 = 50331327;
+    const SOL: u32 = 16612927;
+    const LUNA: u32 = 83853119;
+    rig::TRANSFERS.lock().unwrap().clear();
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.quintessence", "magic.prima_materia", "magic.microcosm", "magic.as_above_so_below"]);
+    let island = format!("{MOD}:microcosm/{}", &rig::hex(PLAYER)[..16]);
+    r.give(PLAYER, "philosophers_egg", 27);
+    r.hold(PLAYER, "philosophers_egg");
+    assert!(r.use_at_nothing(PLAYER), "into the Egg");
+    assert!(r.places.0.lock().unwrap().contains(&island), "their island, made");
+    let went = rig::TRANSFERS.lock().unwrap().last().cloned().expect("a transfer");
+    assert_eq!((went.0, went.1.as_str()), (1, island.as_str()), "the player, to their island");
+    let out = tiamat_core::script::ScriptVm::use_block(&mut r.vm, &tiamat_core::script::UseEvent { player: PLAYER, domain: island.clone(), aim: None,
+        held: tiamat_core::inventory::Access::held(&*r.inventory, PLAYER) });
+    assert!(!out.allowed, "and the Egg, used there");
+    let back = rig::TRANSFERS.lock().unwrap().last().cloned().expect("a transfer back");
+    assert_eq!(back.1, "overworld", "back where they came from");
+    assert!((back.2[0] - 100.5).abs() < 0.01 && (back.2[2] - 100.5).abs() < 0.01, "to where they stood: {back:?}");
+
+    // Two gates: an emerald, Sol on one diagonal, Luna on the other.
+    for (cx, cz) in [(220, 220), (240, 240)] {
+        r.put_carved(cx, 64, cz, "tiamat_default_world:crystal", EMERALD);
+        for (dx, dz, mask, id) in [(1, 1, SOL, "tiamat_default_world:gold_ore"), (-1, -1, SOL, "tiamat_default_world:gold_ore"),
+            (1, -1, LUNA, "tiamat_default_world:silver_ore"), (-1, 1, LUNA, "tiamat_default_world:silver_ore")] {
+            r.put_carved(cx + dx, 64, cz + dz, id, mask);
+        }
+    }
+    r.give(PLAYER, "quintessence", 27 * 3);
+    r.hold(PLAYER, "quintessence");
+    assert!(r.use_at_nothing(PLAYER), "a drink, for the well");
+    r.tick(20);
+    assert!(r.use_at(PLAYER, 220, 64, 220), "the first gate hums");
+    assert!(r.use_at(PLAYER, 240, 64, 240));
+    assert_eq!(r.units(PLAYER, "quintessence"), 27, "one spent on the link");
+    rig::MOVES.lock().unwrap().clear();
+    r.moved(PLAYER, (220, 65, 220));
+    let carried = rig::MOVES.lock().unwrap().last().cloned().expect("carried");
+    assert_eq!(carried.1, [240.5, 65.0, 240.5], "set down on the twin");
+    println!("microcosm and gates: ok");
+}
+
+/// A Tree of Diana grown whole, with a Venus sigil three blocks off on each
+/// side set by a gardener who knows the Rosarium: flowers bloom on its grass.
+fn rose_garden() {
+    const VENUS: u32 = 100433791;
+    let mut r = Rig::new(Setup::default());
+    let tree = (230, 65, 230);
+    // A grown tree, as storage keeps one, before the world first looks.
+    r.storage.0.lock().unwrap().insert((MOD.to_owned(), format!("tree:{},{},{}", tree.0, tree.1, tree.2)),
+        tiamat_core::storage::Value::Text(format!("27;{}", rig::hex(PLAYER))));
+    adept(&mut r, &["magic.rosarium"]);
+    r.put_block(tree.0, tree.1, tree.2, "arbor_dianae");
+    for dx in -3..=3 {
+        for dz in -3..=3 {
+            r.put_block(tree.0 + dx, tree.1 - 1, tree.2 + dz, "tiamat_default_world:grass");
+        }
+    }
+    for (dx, dz) in [(3, 0), (-3, 0), (0, 3), (0, -3)] {
+        let at = (tree.0 + dx, tree.1, tree.2 + dz);
+        assert!(r.place_event(PLAYER, at, "tiamat_default_world:stone", VENUS));
+        r.put_carved(at.0, at.1, at.2, "tiamat_default_world:stone", VENUS);
+    }
+    r.tick(1300);
+    let flowers: Vec<_> = r.world.edits.lock().unwrap().iter()
+        .filter(|(p, id)| p.y == tree.1 && (id.ends_with("chamomile") || id.ends_with("poppy") || id.ends_with("bluebell")
+            || id.ends_with("peony") || id.ends_with("allium")))
+        .cloned().collect();
+    assert!(!flowers.is_empty(), "flowers bloom in the Rose Garden");
+    println!("rose garden: ok");
 }
 
 /// The same play twice leaves the same storage.

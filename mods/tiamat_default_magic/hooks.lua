@@ -29,6 +29,7 @@ local entity_uses = {}
 local dig_starts = {}
 local punches = {}
 local actions = {}
+local moves = {}
 
 --- Runs `fn(player, rest)` when a player says `word` (case-insensitive),
 --- alone or followed by more words. A string `fn` answers is its reply, said
@@ -60,6 +61,12 @@ end
 function tdm.on_action(id, fn)
     actions[id] = actions[id] or {}
     table.insert(actions[id], fn)
+end
+
+--- Runs `fn(event)` when a player's feet cross into another block:
+--- `{ player, x, y, z, domain, from? }`.
+function tdm.on_move(fn)
+    moves[#moves + 1] = fn
 end
 
 --- Runs `fn(event)` for events from the dialog this mod showed as `form`.
@@ -144,6 +151,12 @@ function H.install()
     game.register_on_action(function(event)
         for _, fn in ipairs(actions[event.id] or {}) do fn(event) end
     end)
+
+    if #moves > 0 then
+        game.register_on_player_move(function(event)
+            for _, fn in ipairs(moves) do fn(event) end
+        end)
+    end
 
     game.register_on_dialog_event(function(event)
         local fn = dialogs[event.form]

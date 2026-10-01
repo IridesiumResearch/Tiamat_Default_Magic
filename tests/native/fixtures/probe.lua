@@ -19,6 +19,7 @@
 --   t glyph <mask>       Craft's glyph_of a mask
 --   t band <x> <y> <z>   the world's depth band there
 --   t q                  the speaker's quintessence, "amount/ceiling"
+--   t hurry <box> <n>    Craft's add_progress: n ticks more on a station's job
 
 local p = game.exports("tiamat_default_progress")
 local c = game.exports("tiamat_default_craft")
@@ -69,6 +70,9 @@ game.register_on_chat(function(e)
         local w = game.exports("tiamat_default_world")
         local x, y, z = string.match(rest, "^(%-?%d+) (%-?%d+) (%-?%d+)$")
         say = tostring(w and w.depth_band(tonumber(x), tonumber(y), tonumber(z)))
+    elseif word == "hurry" then
+        local name, ticks = string.match(rest, "^(%S+) (%d+)$")
+        say = tostring(c.add_progress(name, math.tointeger(tonumber(ticks))))
     elseif word == "q" then
         local amount, ceiling = m.quintessence(e.player)
         say = tostring(amount) .. "/" .. tostring(ceiling)

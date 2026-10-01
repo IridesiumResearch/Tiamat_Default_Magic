@@ -173,7 +173,40 @@ def face(c, skin):
     c.rect(10, 10, 13, 10, (120, 60, 60))
 
 
-MODELS = {"salamander": salamander, "undine": undine, "gnome": gnome, "sylph": sylph}
+def homunculus():
+    """Paracelsus' little helper: a small, round, cheerful figure."""
+    boxes = [
+        ((-0.3, 0.0, -0.25), (0.3, 0.8, 0.25), HIDE),       # body
+        ((-0.28, 0.8, -0.28), (0.28, 1.3, 0.28), FACE),     # head
+        ((0.3, 0.3, -0.1), (0.42, 0.7, 0.1), HIDE),         # arms
+        ((-0.42, 0.3, -0.1), (-0.3, 0.7, 0.1), HIDE),
+    ]
+    c = Canvas((190, 120, 90))
+    c.rect(0, 0, 7, 4, (90, 60, 120))                      # a little cloak
+    face(c, (240, 200, 180))
+    return boxes, c
+
+
+def basilisk():
+    """Theophilus' basilisk: a grumpy rooster-lizard, not a monster."""
+    boxes = [
+        ((-0.35, 0.3, -0.6), (0.35, 0.8, 0.5), HIDE),       # body
+        ((-0.25, 0.6, 0.5), (0.25, 1.1, 0.95), FACE),       # head
+        ((-0.05, 1.1, 0.6), (0.05, 1.25, 0.85), HIDE),      # comb
+        ((-0.15, 0.4, -1.2), (0.15, 0.6, -0.6), HIDE),      # tail
+        ((0.15, 0.0, -0.1), (0.3, 0.3, 0.1), HIDE),         # legs
+        ((-0.3, 0.0, -0.1), (-0.15, 0.3, 0.1), HIDE),
+    ]
+    c = Canvas((90, 140, 70))
+    for x, y in [(1, 2), (5, 5), (2, 10), (6, 12)]:
+        c.dot(x, y, (200, 60, 40))                          # red scales here and there
+    face(c, (120, 160, 90))
+    c.rect(10, 11, 13, 11, (60, 40, 30))                    # a frown
+    return boxes, c
+
+
+MODELS = {"salamander": salamander, "undine": undine, "gnome": gnome, "sylph": sylph,
+          "homunculus": homunculus, "basilisk": basilisk}
 
 
 def main():

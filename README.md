@@ -53,7 +53,7 @@ the Hermetic Seal wards ground; the Ouroboros hurries an athanor. And
 three more elementals: the undine in still water at night, the gnome in
 the deep caves, the sylph on peaks and in storms.
 
-**What ships** is gated: `built_tier` in `config.lua` (5 today) is the last
+**What ships** is gated: `built_tier` in `config.lua` (6 today) is the last
 tier whose Art is built, and nodes above it are not registered, so nobody
 meets a node that does nothing.
 
@@ -64,7 +64,17 @@ Life and the quintessence; the Quintessence bar, drawn only for magic
 players; Maria's kerotakis, electrum and orichalcum tools; the Caduceus;
 the Circle of Four, so two familiars walk; the undine's water-breathing,
 the gnome's tunnels, the sylph's wings; the Assay and Atalanta Fugiens's
-emblems. The gate is at 5. Tiers 6 and 7 are next.
+emblems.
+
+Step 8: **tier 6, the Red Work.** Gates IX to XI and the Red Stone —
+forty philosophical days in the Egg — which makes gold, twice over once
+exalted; the alkahest and prima materia; the Panacea; the Phoenix, which
+keeps a player's things through a death once in three sun-days; the
+Chymical Wedding; the homunculus, which tends athanors from a chest; the
+basilisk; essences of the beasts as familiars' traits; the Greater
+Elementals; the microcosm, each adept's own floating island; the
+correspondence gates; and the Rose Garden. The gate is at 6. Tier 7 is
+next.
 
 ## What is here
 

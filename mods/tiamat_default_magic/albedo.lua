@@ -74,13 +74,19 @@ end
 
 -- The Assay, and the first transmutation ----------------------------------------------------
 
-local studies = {}          -- qualified recipe id -> insight
-for _, study in ipairs(C.studies) do studies[U.id(study.id)] = study.insight end
+local studies = nil         -- qualified recipe id -> insight, built on first use: every tier has added its own by then
+local function study_insight(id)
+    if not studies then
+        studies = {}
+        for _, study in ipairs(C.studies) do studies[U.id(study.id)] = study.insight end
+    end
+    return studies[id]
+end
 local PROJECTION = U.id("projection_white")
 
 if craft and progress then
     craft.on_crafted(function(uuid, recipe_id)
-        local insight = studies[recipe_id]
+        local insight = study_insight(recipe_id)
         if insight then
             local bonus = progress.effects_of(uuid, "magic.")["magic.study_bonus_percent"] or 0
             if bonus > 0 then progress.award(uuid, insight * bonus // 100, "the assay") end

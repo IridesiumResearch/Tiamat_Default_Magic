@@ -46,16 +46,14 @@ if progress then
     end
 end
 
--- Which recipe opens which gate, from the recipes as registered.
-local gate_of = {}
-for id, r in pairs(tdm.recipes.by_id) do
-    if r.gate then gate_of[id] = r.gate end
-end
+-- Which recipe opens which gate: read from the recipe as registered, when it
+-- is made, so a tier loaded after this file is heard too.
 local GREEN_VITRIOL = U.id("green_vitriol")
 
 if craft and progress then
     craft.on_crafted(function(uuid, recipe_id)
-        local n = gate_of[recipe_id]
+        local r = tdm.recipes.by_id[recipe_id]
+        local n = r and r.gate
         if n then progress.discover(uuid, G.id(n)) end
         if recipe_id == GREEN_VITRIOL then progress.discover(uuid, VITRIOL) end
     end)

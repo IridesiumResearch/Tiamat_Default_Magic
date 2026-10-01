@@ -191,7 +191,7 @@ C.long_works = {                    -- in philosophical days
 -- The release gate: the highest tier whose Art is built. Nodes above it are
 -- not registered with Progress, so nobody meets a node that does nothing;
 -- raised a tier at a time as each lands (docs/brief.md §17).
-C.built_tier = 5
+C.built_tier = 6
 
 C.path = {
     id = "magic",
@@ -825,6 +825,157 @@ C.gifts = {
             "W:gravel", "W:white_sand", "W:dry_clay", "W:wet_clay", "W:cobble", "W:coal", "W:copper_ore", "W:tin_ore",
             "W:iron_ore", "W:lead_ore", "W:silver_ore", "W:gold_ore", "W:cinnabar", "W:pyrite", "W:salt", "W:sulfur" } },
     sylph_flight = { node = "magic.sylph_flight", cost = 10, ticks = 200 },
+}
+
+-- Tier 6 (brief §5.4): the Red Work -------------------------------------------------
+
+C.tier6_items = {
+    { id = "ferment", name = "The Ferment", description = "The Stone leavened with gold: Gate IX, Fermentation." },
+    { id = "red_stone", name = "The Red Stone", description = "The Philosophers' Stone: forty days in the Egg. Projected on base metal, it makes gold." },
+    { id = "alkahest", name = "Alkahest", description = "The universal solvent. Poured on rock, it melts it back into first matter." },
+    { id = "prima_materia", name = "Prima materia", description = "First matter: what every common stone is made of, before it is any of them." },
+    { id = "panacea", name = "The Panacea", description = "The cure for all ills, for you and everyone near you.",
+        food = { heal = 27, cures = { "poison", "wither", "radiation", "burning" }, sound = "drink" } },
+    { id = "wedding_crown", name = "The Wedding Crown", description = "Given when the Red King and the White Queen are joined at an athanor. The Rebis needs it." },
+}
+
+C.tier6_recipes = {
+    -- Gate IX, Fermentation; the Rubedo; Gates X and XI.
+    { id = "fermentation", station = "athanor", node = "magic.gate_fermentation", degree = 1, days = 3, gate = 9,
+        inputs = { { "solar_sulfur", count = 1 }, { "C:gold_ingot", count = 1 }, { "vinum", count = 1 } },
+        tools = { { "philosophers_egg", wear = 0 } }, outputs = { { "ferment", count = 1 } } },
+    { id = "rubedo", station = "athanor", node = "magic.rubedo", degree = 1, days = 40,
+        inputs = { { "solar_sulfur", count = 1 }, { "ferment", count = 1 }, { "white_stone", count = 1 } },
+        tools = { { "philosophers_egg", wear = 0 } }, outputs = { { "red_stone", count = 1 } } },
+    { id = "exaltation", station = "athanor", node = "magic.gate_exaltation", degree = 1, days = 1, gate = 10,
+        inputs = { { "red_stone", count = 1 }, { "quintessence", count = 1 } }, tools = { { "philosophers_egg", wear = 0 } },
+        outputs = { { "red_stone", count = 1 } } },
+    { id = "multiplication", station = "athanor", node = "magic.gate_multiplication", degree = 1, days = 7, gate = 11,
+        inputs = { { "red_stone", count = 1 }, { "C:gold_ingot", count = 1 }, { "#quicksilver", count = 1 } },
+        tools = { { "philosophers_egg", wear = 0 } }, outputs = { { "red_stone", count = 2 } } },
+    -- The universal solvent, and first matter made into common stone.
+    { id = "alkahest", station = "athanor", node = "magic.alkahest", degree = 1, days = 7,
+        inputs = { { "aqua_regia", count = 1 }, { "spirit_of_wine", count = 1 }, { "sal_alembroth", count = 1 } },
+        tools = { { "philosophers_egg", wear = 0 } }, outputs = { { "alkahest", count = 3 } } },
+    -- The Panacea.
+    { id = "panacea", station = "athanor", node = "magic.panacea", degree = 1, days = 1,
+        inputs = { { "aurum_potabile", count = 1 }, { "elixir_vitae", count = 1 }, { "quintessence", count = 1 } },
+        tools = { { "pelican", wear = 0 } }, outputs = { { "panacea", count = 3 } } },
+}
+
+-- Projection of the Red Stone, while the world allows transmutation; both
+-- Stones' projections yield `magic.projection_percent` more (Exaltation).
+C.red_projection = {
+    node = "magic.rubedo",
+    base = "#magic_red_base",
+    base_members = { "C:copper_ingot", "C:tin_ingot", "C:lead_ingot", "C:iron_bar", "C:silver_ingot" },
+    makes = "C:gold_ingot", count = 9,
+}
+
+-- The alkahest poured (brief §5.4): the blocks round the one it is poured
+-- on melt into prima materia, unit for unit, a quintessence each; only the
+-- world's own rock and earth (the gnome's list), never anything built.
+C.alkahest = { node = "magic.alkahest", radius = 1, cost = 1, item = "alkahest", becomes = "prima_materia" }
+-- Coagula: prima materia, unit for unit, into any common stone, earth or sand.
+C.coagula = { node = "magic.prima_materia", into = { "W:stone", "W:granite", "W:slate", "W:calcite", "W:dark_basalt",
+    "W:dirt", "W:sand", "W:white_sand", "W:gravel" } }
+
+-- The Panacea heals and cures everyone within `radius` of its drinker.
+C.panacea = { radius = 6, heal = 27, cures = { "poison", "wither", "radiation", "burning" } }
+
+-- The Phoenix (brief §6.9): once in `every` ticks (three sun-days), a
+-- death drops nothing (Life's keep_inventory, its answer to L-M7).
+C.phoenix = { node = "magic.phoenix", every = 72000, rises = "The phoenix rises: you keep what you carried." }
+
+-- The Chymical Wedding (brief §7.3): an athanor with a Sol sigil on one
+-- side, Luna's opposite and a quintessence glyph on top; a player who
+-- knows the Wedding and completes it is given the Wedding Crown.
+C.wedding = { node = "magic.chymical_wedding", crown = "wedding_crown", discovery = 50 }
+
+-- The living works of tier 6 (brief §6.9): two familiars made, not found.
+C.homunculus = {
+    node = "magic.homunculus", made = true,
+    model = { id = "homunculus", file = "models/homunculus.glb", texture = "models/homunculus.png" },
+    name = "Homunculus", collider = { width = 0.8, height = 1.4 }, health = 12, speed = 1.0,
+    vial = "homunculus_vial", food = {}, food_units = 0, discovery = 50,
+    satchel = 27,                   -- slots in the satchel it carries
+    reach = 8,                      -- blocks: the chests and athanors it tends
+    every = 40,                     -- ticks between one block of fuel and the next
+    keep = 27 * 9,                  -- units of fuel it keeps in an athanor
+    fuels = { "W:coal", "C:charcoal" },
+}
+C.basilisk = {
+    node = "magic.basilisk", made = true,
+    model = { id = "basilisk", file = "models/basilisk.glb", texture = "models/basilisk.png" },
+    name = "Basilisk", collider = { width = 1.0, height = 1.2 }, health = 14, speed = 0.9,
+    egg = "basilisk_egg", food = {}, food_units = 0, discovery = 50,
+    stare = 6,                      -- blocks: hostile creatures it sees are frozen
+    freeze = 100,                   -- ticks they stay frozen
+    every = 100,
+    ash_every = 24000,              -- a sun-day: it sheds an ash
+    ash = "basilisk_ash",
+}
+-- Life's creatures a guard turns on: the ones that turn on players.
+C.hostile = { "spider", "cave_troll", "swamp_hag", "scurrier", "cave_rat", "ghost" }
+
+C.tier6_living_items = {
+    { id = "homunculus_vial", name = "Homunculus", description = "Paracelsus' little helper, in its vial. Use it to let it out." },
+    { id = "basilisk_egg", name = "Basilisk egg", description = "A hen's egg kept under vermilion. Use it to hatch it." },
+    { id = "basilisk_ash", name = "Basilisk ash", description = "What a basilisk sheds. On copper, it is Spanish gold." },
+    { id = "beast_essence", name = "Beast essence", description = "A creature's essence, distilled. Give it to a familiar." },
+}
+C.tier6_living_recipes = {
+    { id = "homunculus_vial", station = "athanor", node = "magic.homunculus", degree = 1, days = 40,
+        inputs = { { "conjoined_matter", count = 1 }, { "elixir_vitae", count = 1 }, { "caput_corvi", count = 1 } },
+        tools = { { "philosophers_egg", wear = 0 } }, outputs = { { "homunculus_vial", count = 1 } } },
+    { id = "basilisk_egg", station = "athanor", node = "magic.basilisk", degree = 1, days = 7,
+        inputs = { { "L:egg", count = 1 }, { "vermilion", count = 1 } }, outputs = { { "basilisk_egg", count = 1 } } },
+}
+-- Theophilus' Spanish gold, while the world allows transmutation.
+C.spanish_gold = { node = "magic.basilisk", inputs = { { "basilisk_ash", count = 1 }, { "C:copper_ingot", count = 1 } },
+    outputs = { { "C:gold_ingot", count = 1 } } }
+
+-- Essences of the beasts: every `every`th creature of a kind a player kills,
+-- with a phial on them, gives its essence; fed to a familiar it is a trait
+-- (three, the oldest given way). A kind's first essence is a discovery.
+C.essences = {
+    node = "magic.essentia_animalium", every = 3, insight = 10, slots = 3,
+    traits = { horse = { speed = 1.5 }, mammoth = { health = 2 }, bat = { sense = 2 } },
+}
+
+-- The Greater Elementals: each familiar's third gift.
+C.greater = { node = "magic.greater_elementals", every = 100, alight = 60, heal = 1, scout = 200 }
+
+-- The Microcosm (brief §6.11): a world in the Egg — each adept's own
+-- floating island, an instance of one template keyed by the first 16 hex
+-- of their UUID, entered and left by using the Philosophers' Egg in hand.
+C.microcosm = {
+    node = "magic.microcosm",
+    template = "microcosm",         -- qualified: tiamat_default_magic:microcosm
+    egg = "philosophers_egg",
+    radius = 24, depth = 12, top = 64, -- blocks: the island's half-width, its depth, and where its turf lies
+    arrive = { x = 0.5, y = 66, z = 0.5 },
+    ground = { grass = "W:grass", dirt = "W:dirt", stone = "W:stone" },
+    flowers = { "W:roman_chamomile", "W:poppy", "W:bluebell" },
+    discovery = 100,
+}
+
+-- As Above, So Below (brief §6.11): a correspondence gate is an emerald
+-- glyph with Sol and Luna sigils on the alternate corners of the 3x3 round
+-- it. Two are linked by using each in turn with a quintessence in hand;
+-- stepping onto one sets its walker on the other, for quintessence.
+C.correspondence = { node = "magic.as_above_so_below", cost = 5, link_with = "quintessence", per_player = 8,
+    rest = 40 }                     -- ticks before a traveller can be carried again
+
+-- The Rose Garden (brief §7.3): a Tree of Diana grown whole, with a Venus
+-- sigil three blocks off on each of its four sides, set by an adept who
+-- knows the Rosarium: wild flowers bloom on the grass round it.
+C.rosarium = { node = "magic.rosarium", reach = 3, every = 600,
+    flowers = { "W:roman_chamomile", "W:poppy", "W:bluebell", "W:peony", "W:allium" }, cells = { 10, 13 } }
+
+C.tier6_studies = {
+    { id = "study_prima_materia", name = "Study prima materia", inputs = { { "prima_materia", count = 1 } }, ticks = 6000, insight = 200 },
+    { id = "study_red_stone", name = "Study the Red Stone", inputs = { { "red_stone", count = 1 } }, ticks = 12000, insight = 1500 },
 }
 
 -- Ripley's Twelve Gates, as discoveries: the first time a player completes

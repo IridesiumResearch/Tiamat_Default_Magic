@@ -37,8 +37,9 @@ local life = U.exports("tiamat_default_life")
 local world = U.exports("tiamat_default_world")
 local weather = U.exports("tiamat_weather")
 
-F.KINDS = { salamander = C.salamander, undine = C.undine, gnome = C.gnome, sylph = C.sylph }
-F.ORDER = { "salamander", "undine", "gnome", "sylph" }
+F.KINDS = { salamander = C.salamander, undine = C.undine, gnome = C.gnome, sylph = C.sylph,
+    homunculus = C.homunculus, basilisk = C.basilisk }
+F.ORDER = { "salamander", "undine", "gnome", "sylph", "homunculus", "basilisk" }
 
 local MODELS = {}           -- qualified model id -> kind
 local FOOD = {}             -- kind -> { numeric material = true }
@@ -55,7 +56,7 @@ for _, kind in ipairs(F.ORDER) do
     end
     if progress then
         progress.register_discovery{ id = game.mod_id .. ".familiar_" .. kind, insight = K.discovery,
-            label = "A " .. string.lower(K.name) .. ", bound", group = "familiars" }
+            label = "A " .. string.lower(K.name) .. (K.made and ", made" or ", bound"), group = "familiars" }
     end
 end
 
@@ -102,12 +103,20 @@ local function where(uuid)
     return e and e.pos or nil, e
 end
 
-local function spawn(kind, pos)
+local function spawn(kind, pos, uuid)
     if count() >= C.familiars.per_server then return nil end
     local K = F.KINDS[kind]
-    return game.spawn_entity{ pos = pos, model = U.id(K.model.id), health = K.health, speed = K.speed,
+    -- A familiar's traits, from the essences it was given (essences.lua).
+    local speed, health = K.speed, K.health
+    if uuid and tdm.essences then
+        local t = tdm.essences.traits(uuid, kind)
+        speed = speed * (t.speed or 1)
+        health = math.tointeger(health * (t.health or 1)) or health
+    end
+    return game.spawn_entity{ pos = pos, model = U.id(K.model.id), health = health, speed = speed,
         nametag = K.name, collider = K.collider }
 end
+
 
 local function body_of(uuid, kind)
     return bodies[uuid] and bodies[uuid][kind] or nil
@@ -118,11 +127,21 @@ local function come(uuid, kind)
     if body_of(uuid, kind) or record(uuid, kind) ~= true then return end
     local pos = where(uuid)
     if not pos then return end
-    local id = spawn(kind, { x = pos.x + 1, y = pos.y, z = pos.z + 1 })
+    local id = spawn(kind, { x = pos.x + 1, y = pos.y, z = pos.z + 1 }, uuid)
     if not id then return end
     bodies[uuid] = bodies[uuid] or {}
     bodies[uuid][kind] = id
     owner_of[id] = { uuid = uuid, kind = kind }
+end
+
+--- Lets a player's familiar's body be made again, with what it is now:
+--- after it is given a trait.
+function F.renew(uuid, kind)
+    local id = bodies[uuid] and bodies[uuid][kind]
+    if not id then return end
+    game.despawn_entity(id)
+    bodies[uuid][kind], owner_of[id] = nil, nil
+    come(uuid, kind)
 end
 
 local function go(uuid, kind)
@@ -334,8 +353,14 @@ tdm.on_use_entity(function(e)
         if mine.kind == "sylph" and gifted(e.player, "sylph_flight") then
             if not tdm.quintessence.spend(e.player, GIFTS.sylph_flight.cost) then return C.caduceus.dry end
             tdm.effects.start(e.player, "flight", GIFTS.sylph_flight.ticks)
-            return "The sylph lifts you."
+            local scouted = F.scout(e.player)
+            return "The sylph lifts you." .. (scouted and (" Far ahead: " .. scouted .. ".") or "")
         end
+        if mine.kind == "homunculus" then return F.satchel(e.player) end
+    end
+    -- An essence given to your own familiar is one of its traits.
+    if mine and mine.uuid == e.player and e.held and tdm.essences and tdm.essences.is_essence(e.held) then
+        return tdm.essences.give(e.player, mine.kind, e.held)
     end
     -- Your own undine gives you a bucket of the water it carries.
     if mine and mine.uuid == e.player and mine.kind == "undine" and e.held and e.held.material == BUCKET then
@@ -388,7 +413,7 @@ end
 function WORK.gnome(uuid, id, me)
     local pos = where(uuid)
     if not pos then return end
-    local r = C.gnome.sense
+    local r = C.gnome.sense + (tdm.essences and tdm.essences.traits(uuid, "gnome").sense or 0)
     local l = layer[uuid] or -r
     layer[uuid] = l >= r and -r or l + 1
     local cx, cy, cz = math.floor(pos.x), math.floor(pos.y) + l, math.floor(pos.z)
@@ -485,6 +510,152 @@ tdm.on_tick(function()
         end
     end
 end)
+
+-- The made ones: a homunculus from its vial, a basilisk from its egg ----------------------------
+
+local MADE = {}             -- numeric material of a vial or egg -> kind
+for _, kind in ipairs({ "homunculus", "basilisk" }) do
+    local K = F.KINDS[kind]
+    local m = U.material(U.id(K.vial or K.egg))
+    if m then MADE[m] = kind end
+end
+
+tdm.on_use(function(e)
+    local kind = e.held and MADE[e.held.material]
+    if not kind then return nil end
+    local K = F.KINDS[kind]
+    if not has_node(e.player, kind) then return "You do not know how to wake it." end
+    if record(e.player, kind) ~= nil then return "You have a " .. string.lower(K.name) .. " already." end
+    if game.take(e.player, { material = e.held.material, count = 1 }) < U.UNITS then return "" end
+    F.walk(e.player, kind)
+    if progress then progress.discover(e.player, game.mod_id .. ".familiar_" .. kind) end
+    game.chat_to(e.player, "The " .. string.lower(K.name) .. " stirs, and is yours.")
+    return ""
+end)
+
+-- The homunculus: a satchel, and athanors kept in fuel from a chest.
+local H = C.homunculus
+local FUELS = {}
+for _, id in ipairs(H.fuels) do
+    local m = U.material(U.id(id))
+    if m then FUELS[#FUELS + 1] = { id = U.id(id), material = m } end
+end
+local CHESTS = "tiamat_default_craft:chest:"
+local ATHANORS = "tiamat_default_craft:" .. U.id(C.athanor.station) .. ":"
+
+function F.satchel(uuid)
+    local name = game.mod_id .. ":satchel:" .. uuid
+    game.make_container(name, H.satchel)
+    if not game.open_container(name, uuid) then return "Somebody is in the satchel." end
+    return ""
+end
+
+local function near(name, station, pos)
+    local at = U.station_pos(name, station)
+    if not at then return nil end
+    local dx, dy, dz = at.x + 0.5 - pos.x, at.y + 0.5 - pos.y, at.z + 0.5 - pos.z
+    return dx * dx + dy * dy + dz * dz <= H.reach * H.reach
+end
+
+local tended = {}           -- uuid -> ticks since its last block of fuel
+function WORK.homunculus(uuid, id, me)
+    tended[uuid] = (tended[uuid] or 0) + C.familiars.think_every
+    if tended[uuid] < H.every then return end
+    tended[uuid] = 0
+    local chests = {}
+    for _, name in ipairs(game.containers(CHESTS)) do
+        if near(name, "chest", me.pos) then chests[#chests + 1] = name end
+    end
+    if #chests == 0 then return end
+    for _, name in ipairs(game.containers(ATHANORS)) do
+        if near(name, U.id(C.athanor.station), me.pos) then
+            local held = 0
+            for _, stack in ipairs(game.container(name)) do
+                if stack.slot == C.athanor.slots.fuel then held = stack.units end
+            end
+            if held < H.keep then
+                for _, chest in ipairs(chests) do
+                    for _, fuel in ipairs(FUELS) do
+                        local got = game.container_take(chest, { material = fuel.id, units = U.UNITS })
+                        if got > 0 then
+                            local put = game.container_give(name, { material = fuel.id, units = got, slot = C.athanor.slots.fuel })
+                            if put < got then game.container_give(chest, { material = fuel.id, units = got - put }) end
+                            return                     -- a block a turn
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+-- The basilisk: a guard whose stare freezes hostile creatures, and an ash.
+local B = C.basilisk
+local HOSTILE = {}
+for _, kind in ipairs(C.hostile) do HOSTILE["tiamat_default_life:" .. kind] = true end
+local stared = {}
+function WORK.basilisk(uuid, id, me)
+    stared[uuid] = (stared[uuid] or 0) + C.familiars.think_every
+    if stared[uuid] >= B.every and life and life.freeze then
+        stared[uuid] = 0
+        local eye = { x = me.pos.x, y = me.pos.y + 1, z = me.pos.z }
+        for _, other in ipairs(game.entities_in_radius(me.pos, B.stare, "tiamat_default_life")) do
+            local e = game.entity(other)
+            if e and e.model and HOSTILE[e.model] then
+                local sees = not game.line_of_sight or game.line_of_sight(eye, { x = e.pos.x, y = e.pos.y + 1, z = e.pos.z }) ~= false
+                if sees then life.freeze(other, B.freeze) end
+            end
+        end
+    end
+    local key = "basilisk_ash:" .. uuid
+    local next_ash = game.storage.get(key)
+    if type(next_ash) ~= "number" then
+        game.storage.set(key, tdm.effects.now() + B.ash_every)
+    elseif tdm.effects.now() >= next_ash then
+        game.give(uuid, { material = U.id(B.ash), count = 1 })
+        game.storage.set(key, tdm.effects.now() + B.ash_every)
+    end
+end
+
+-- The Greater Elementals: each one's third gift.
+local GR = C.greater
+local function greater(uuid) return progress ~= nil and progress.has(uuid, GR.node) == true end
+local spent = {}            -- uuid -> ticks since the last greater gift
+local plain_salamander, plain_undine = WORK.salamander, WORK.undine
+
+function WORK.salamander(uuid, id, me)
+    if plain_salamander then plain_salamander(uuid, id, me) end
+    if not (greater(uuid) and life and life.set_alight) then return end
+    spent[uuid] = (spent[uuid] or 0) + C.familiars.think_every
+    if spent[uuid] < GR.every then return end
+    spent[uuid] = 0
+    for _, other in ipairs(game.entities_in_radius(me.pos, B.stare, "tiamat_default_life")) do
+        local e = game.entity(other)
+        if e and e.model and HOSTILE[e.model] then life.set_alight(other, GR.alight) end
+    end
+end
+
+function WORK.undine(uuid, id, me)
+    plain_undine(uuid, id, me)
+    if not (greater(uuid) and life and life.heal) then return end
+    spent[uuid] = (spent[uuid] or 0) + C.familiars.think_every
+    if spent[uuid] < GR.every then return end
+    spent[uuid] = 0
+    life.heal(uuid, GR.heal)
+end
+
+--- The sylph scouts, for a master who knows the Greater Elementals: the
+--- biome `scout` blocks ahead, or nil.
+function F.scout(uuid)
+    if not (greater(uuid) and world and world.biome_under) then return nil end
+    local _, me = where(uuid)
+    if not me then return nil end
+    -- The way the player faces, as far as the scout flies: a place to name.
+    local x = math.floor(me.pos.x + me.facing.x * GR.scout)
+    local z = math.floor(me.pos.z + me.facing.z * GR.scout)
+    local biome = world.biome_under(x, math.floor(me.pos.y), z)
+    return biome and (string.gsub(biome, "_", " ")) or nil
+end
 
 -- Coming and going -------------------------------------------------------------------------------
 

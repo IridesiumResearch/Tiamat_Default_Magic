@@ -155,6 +155,68 @@ tdm.on_dig(function(e)
     return nil
 end)
 
+-- The Rose Garden ------------------------------------------------------------------------------
+--
+-- A tree grown whole, with a Venus sigil `reach` blocks off on each of its
+-- four sides, set by an adept who knows the Rosarium: every `every` ticks a
+-- wild flower blooms on an empty patch of grass round it (brief §7.3).
+
+local RS = C.rosarium
+local GRASS = U.material(U.id("W:grass"))
+local FLOWERS = {}
+for _, id in ipairs(RS.flowers) do
+    if U.material(U.id(id)) then FLOWERS[#FLOWERS + 1] = U.id(id) end
+end
+local BLOOM = 0
+for _, cell in ipairs(RS.cells) do BLOOM = BLOOM | (1 << cell) end
+
+local function venus_at(x, y, z)
+    local b = game.get_block{ x = x, y = y, z = z }
+    local g = b and b.occupancy and tdm.glyphs.of(b.occupancy)
+    return g and g.id == "venus", b
+end
+
+--- Whether the grown tree `t` stands in a Rose Garden: answers its gardener.
+local function garden(t)
+    local r = RS.reach
+    local gardener = nil
+    for _, d in ipairs({ { r, 0 }, { -r, 0 }, { 0, r }, { 0, -r } }) do
+        local x, z = t.x + d[1], t.z + d[2]
+        if not venus_at(x, t.y, z) then return nil end
+        gardener = gardener or tdm.sigils.setter(x, t.y, z)
+    end
+    if gardener and progress and progress.has(gardener, RS.node) then return gardener end
+    return nil
+end
+
+local bloomed = 0
+local function bloom(t, now)
+    if #FLOWERS == 0 or not GRASS or not garden(t) then return end
+    local rng = game.rng_stream({ x = t.x, y = t.y, z = t.z, seed = game.world_seed or 0 }, "rosarium" .. now)
+    local r = RS.reach - 1
+    for _ = 1, 4 do
+        local x, z = t.x - r + rng:below(2 * r + 1), t.z - r + rng:below(2 * r + 1)
+        local ground = game.get_block{ x = x, y = t.y - 1, z = z }
+        local above = game.get_block{ x = x, y = t.y, z = z }
+        if ground and ground.material == GRASS and above and above.occupancy == 0 then
+            game.set_block({ x = x, y = t.y, z = z }, FLOWERS[rng:below(#FLOWERS) + 1], BLOOM)
+            return
+        end
+    end
+end
+
+tdm.on_tick(function(dt)
+    bloomed = bloomed + (math.tointeger(dt) or 1)
+    if bloomed < RS.every then return end
+    bloomed = 0
+    local now = E.now()
+    all()
+    for _, k in ipairs(order) do
+        local t = trees[k]
+        if t and t.cells == #A.order then bloom(t, now) end
+    end
+end)
+
 -- Growing ---------------------------------------------------------------------------------------
 
 local MATERIAL = U.material(TREE)
