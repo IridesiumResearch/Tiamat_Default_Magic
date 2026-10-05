@@ -12,6 +12,16 @@ finds every mod's open asks in one place.
 
 Nothing open as of 2026-09-30: E-M1 and E-M2 landed and E-M3 was answered.
 
+## Model and whole blocks — landed on main 2026-10-05
+
+Not an ask; a dependency. The athanor (cold and lit) and the Emerald Tablet
+are drawn as models and so are `whole`, and the Hermetic Lamp is `whole`
+(brief §8), through `register_block`'s `whole`, `model` and `shape`. Those
+came in on the engine's `feat/model-blocks` (8870b780), merged to main;
+`register_block` refuses a field it does not know, so this mod needs an
+engine at or after that commit. `--check-mods` is clean, and all 34 native
+checks pass (`the blocks` reads the engine's rules for each of the five).
+
 ## E-M3, actions that fire — answered 2026-09-30
 
 *Wanted:* `register_on_action` delivering presses. *Why:* the stubs say

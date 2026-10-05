@@ -667,11 +667,11 @@ The Technic-style layer: late items are **assembled** from carved blocks plus re
 
 | Block | Why it must be a block | Notes |
 |---|---|---|
-| `emerald_tablet` | Progress's door must be a block | light {2,9,4}; hardness 2.6; tags `crystal`, `glowing` |
-| `athanor` | a Craft station in the world | hardness 2.0; tags `stone`, `hard` |
-| `athanor_lit` | Craft's `lit_block` | light {12,7,2}; contact fire |
-| `hermetic_lamp` | light needs a block (the engine has no item light) | light {6,12,8}; hardness 0.5; transparent; the Apothecary's Bench's gift |
-| `arbor_dianae` | grows in the world, cell by cell | transparent (cutout), light {3,3,4}; drops silver units |
+| `emerald_tablet` | Progress's door must be a block | light {2,9,4}; hardness 2.6; tags `crystal`, `glowing`; a model (the tablet on its plinth), so whole |
+| `athanor` | a Craft station in the world | hardness 2.0; tags `stone`, `hard`; a model (the tower, its mouth dark), so whole |
+| `athanor_lit` | Craft's `lit_block` | light {12,7,2}; contact fire; a model (the mouth burning), so whole |
+| `hermetic_lamp` | light needs a block (the engine has no item light) | light {6,12,8}; hardness 0.5; transparent; whole (a glass cube, so no model); the Apothecary's Bench's gift |
+| `arbor_dianae` | grows in the world, cell by cell | transparent (cutout), light {3,3,4}; drops silver units; never whole: it grows and is paid by the cell |
 
 Everything else — vessels, reagents, stones, talismans, familiars' food, relics — is an item; every in-world structure is carved from World's own blocks. The Loom, the Circle, the gates and the seals add **no** blocks.
 

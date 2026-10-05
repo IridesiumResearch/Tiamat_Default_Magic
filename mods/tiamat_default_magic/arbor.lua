@@ -39,6 +39,8 @@ T.block = game.register_block{
     tags = A.block.tags,
     light_emit = A.block.light,
     cutout = true,
+    -- Never `whole`: it grows a cell at a time and is paid by the share of
+    -- the block it fills, which is exactly what a whole block refuses.
     drops = drops,
     textures = { all = "textures/" .. A.block.id .. ".png" },
 }

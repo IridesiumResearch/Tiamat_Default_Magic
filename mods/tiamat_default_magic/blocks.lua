@@ -6,13 +6,16 @@
 -- item, and everything it builds is carved from the world's own blocks. So
 -- far there are two: the Bench's lamp (light needs a block, because the
 -- engine has no light an item gives) and the door (Progress's door must be
--- a block a player uses).
+-- a block a player uses). Both come up in one piece (`whole`), and the door
+-- is drawn as a model: a standing tablet on its plinth.
 
 local C = tdm.config
+local U = tdm.util
 
 local B = {}
 
 local tablet = C.emerald_tablet
+local whole, model, shape = U.block_look(tablet)
 B.emerald_tablet = game.register_block{
     id = tablet.id,
     name = tablet.name,
@@ -20,6 +23,7 @@ B.emerald_tablet = game.register_block{
     hardness = tablet.hardness,
     tags = tablet.tags,
     light_emit = tablet.light,
+    whole = whole, model = model, shape = shape,
     textures = { all = "textures/" .. tablet.id .. ".png" },
 }
 
@@ -32,6 +36,7 @@ B.hermetic_lamp = game.register_block{
     tags = lamp.tags,
     -- Glass: seen through, and light passes a whole block of it.
     transparent = true,
+    whole = lamp.whole,
     light_emit = lamp.light,
     textures = { all = "textures/" .. lamp.id .. ".png" },
 }

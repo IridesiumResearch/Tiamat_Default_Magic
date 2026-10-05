@@ -34,9 +34,11 @@ the parts of the Art they read are built.
 
 All are namespaced `tiamat_default_magic:` by the engine.
 
-- **Blocks:** `emerald_tablet` (the door; light 2, 9, 4), `hermetic_lamp`
-  (light 6, 12, 8; transparent; never goes out), `athanor` and `athanor_lit`
-  (light 12, 7, 2; Life's contact fire and heat source), `arbor_dianae`
+- **Blocks:** `emerald_tablet` (the door; light 2, 9, 4; drawn as the
+  model `emerald_tablet`, so whole), `hermetic_lamp`
+  (light 6, 12, 8; transparent; never goes out; whole), `athanor` and `athanor_lit`
+  (light 12, 7, 2; Life's contact fire and heat source; drawn as the models
+  `athanor` and `athanor_lit`, so whole), `arbor_dianae`
   (the Tree of Diana: cutout, light 3, 3, 4; dug, it pays a silver ingot's
   units by the share of the block it fills).
 - **Domain:** the instanced template `microcosm`, each adept's floating

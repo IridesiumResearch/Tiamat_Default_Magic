@@ -82,6 +82,10 @@ C.hermetic_lamp = {
     id = "hermetic_lamp", name = "Hermetic Lamp",
     description = "Glow caps sealed in glass. It never goes out.",
     hardness = 0.5, light = { r = 6, g = 12, b = 8 }, tags = { "glowing", "glass" },
+    -- One piece: a jar is lifted whole, never chipped away a cell at a time,
+    -- and nothing is carved into it. Still a glass cube, so no model: a
+    -- model has no faces for glass to be.
+    whole = true,
 }
 
 -- The Bench's recipes, into Craft. `node` is the shared node that opens
@@ -211,6 +215,11 @@ C.emerald_tablet = {
     id = "emerald_tablet", name = "The Emerald Tablet",
     description = "As above, so below. Use it, holding the Keystone's knowledge, to take the Hermetic path.",
     hardness = 2.6, light = { r = 2, g = 9, b = 4 }, tags = { "crystal", "glowing" },
+    -- Drawn as a standing tablet on its plinth, and so whole: it comes up in
+    -- one piece. The world knows the plinth and the slab (a wall across the
+    -- middle row), which is what a player walks against and aims at.
+    model = { id = "emerald_tablet", file = "models/emerald_tablet.glb", texture = "models/emerald_tablet.png" },
+    shape = { "### ### ###", "... ### ...", "... ### ..." },
 }
 
 -- Toybox discoveries (brief §6.12): insight for play itself.
@@ -228,10 +237,17 @@ C.toybox = {
 C.athanor = {
     station = "athanor",                                -- qualified: tiamat_default_magic:athanor
     name = "Athanor",
+    -- Both are drawn as the tower (its mouth dark, or burning) and so are
+    -- whole: the furnace is lifted in one piece, and a chisel cannot take
+    -- a corner off it. The world knows the tower and the dome over it.
     block = { id = "athanor", name = "Athanor", description = "The philosophers' furnace: a slow tower fire. Light it with a striker.",
-        hardness = 2.0, tags = { "stone", "hard" } },
+        hardness = 2.0, tags = { "stone", "hard" },
+        model = { id = "athanor", file = "models/athanor.glb", texture = "models/athanor.png" },
+        shape = { "### ### ###", "### ### ###", ".#. ### .#." } },
     lit = { id = "athanor_lit", name = "Athanor (burning)", description = "A slow fire, held even for days.",
-        hardness = 2.0, tags = { "stone", "hard", "glowing" }, light = { r = 12, g = 7, b = 2 } },
+        hardness = 2.0, tags = { "stone", "hard", "glowing" }, light = { r = 12, g = 7, b = 2 },
+        model = { id = "athanor_lit", file = "models/athanor_lit.glb", texture = "models/athanor_lit.png" },
+        shape = { "### ### ###", "### ### ###", ".#. ### .#." } },
     slots = { fuel = 1, input = { from = 2, to = 4 }, tool = { from = 5, to = 6 }, output = { from = 7, to = 9 } },
     blast = "#magic_blast",                             -- what blows the 4th degree: Craft's bellows (and, one day, a salamander's ember)
     blast_members = { "C:bellows", "salamander_ember" },

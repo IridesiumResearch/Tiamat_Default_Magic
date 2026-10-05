@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: Iridesium
 # SPDX-License-Identifier: GPL-3.0-only
-"""Generates the placeholder models for mods/tiamat_default_magic/models.
+"""Generates the placeholder models for mods/tiamat_default_magic/models:
+the familiars, and the blocks drawn as models (the athanor, the Tablet).
 
 A familiar is a few boxes: rigid (no clips, so the engine draws it still),
 self-contained .glb with no image inside it (the engine refuses one that
@@ -205,8 +206,52 @@ def basilisk():
     return boxes, c
 
 
+# Blocks drawn as models (Sub-Node Contract §8.6): the same units, so a block
+# is -1.5..1.5 across, 0..3 tall, its front +Z. Their texture is split as a
+# familiar's is: the left half the body, the right half the face that shows.
+def athanor_of(mouth, glow):
+    """The philosophers' oven: a plinth, a brick tower, a dome, and its mouth."""
+    boxes = [
+        ((-1.5, 0.0, -1.5), (1.5, 0.5, 1.5), HIDE),         # the plinth
+        ((-1.25, 0.5, -1.25), (1.25, 2.3, 1.25), HIDE),     # the tower
+        ((-0.9, 2.3, -0.9), (0.9, 2.75, 0.9), HIDE),        # the dome
+        ((-0.3, 2.75, -0.3), (0.3, 3.0, 0.3), HIDE),        # the chimney's lip
+        ((-0.55, 0.65, 1.25), (0.55, 1.45, 1.32), FACE),    # the fire mouth, in front
+    ]
+    c = Canvas((150, 82, 58))
+    for y in range(0, 16, 3):                                # courses of brick
+        c.rect(0, y, 7, y, (110, 60, 44))
+        for x in ((1, 5) if (y // 3) % 2 else (3, 7)):
+            c.rect(x, y, x, y + 2, (110, 60, 44))
+    c.rect(8, 0, 15, 15, (70, 44, 34))                       # the mouth's iron frame
+    c.rect(9, 2, 14, 13, mouth)
+    if glow:
+        c.rect(10, 8, 13, 12, glow)
+        c.rect(11, 5, 12, 7, glow)
+    return boxes, c
+
+
+def emerald_tablet():
+    """Hermes' tablet: a green slab standing on a stone plinth."""
+    boxes = [
+        ((-1.5, 0.0, -1.5), (1.5, 0.6, 1.5), HIDE),         # the plinth
+        ((-1.2, 0.6, -0.35), (1.2, 2.95, 0.35), FACE),      # the tablet
+    ]
+    c = Canvas((128, 128, 120))
+    for x, y in [(1, 2), (5, 6), (2, 11), (6, 13)]:
+        c.dot(x, y, (100, 100, 96))
+    c.rect(8, 0, 15, 15, (30, 150, 80))                      # emerald
+    c.rect(8, 0, 15, 0, (20, 110, 60))
+    for y in (3, 6, 9, 12):                                  # its lines of writing
+        c.rect(10, y, 13, y, (180, 240, 200))
+    return boxes, c
+
+
 MODELS = {"salamander": salamander, "undine": undine, "gnome": gnome, "sylph": sylph,
-          "homunculus": homunculus, "basilisk": basilisk}
+          "homunculus": homunculus, "basilisk": basilisk,
+          "athanor": lambda: athanor_of((24, 16, 14), None),
+          "athanor_lit": lambda: athanor_of((90, 30, 10), (250, 170, 40)),
+          "emerald_tablet": emerald_tablet}
 
 
 def main():

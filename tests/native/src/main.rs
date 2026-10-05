@@ -20,6 +20,7 @@ fn main() {
     creative();
     the_tree();
     the_door();
+    the_blocks();
     the_athanor();
     spagyrics();
     glyphs();
@@ -311,6 +312,49 @@ fn the_door() {
 }
 
 /// A player on the magic path, holding `nodes` (granted by an operator).
+/// The five blocks' looks (Sub-Node Contract §7.5, §8.6): the athanor, lit
+/// and cold, and the Tablet drawn as models and so whole, each with the shape
+/// the world knows; the lamp a whole glass cube; the Tree of Diana neither,
+/// since it grows a cell at a time and is paid by the share it fills.
+fn the_blocks() {
+    use tiamat_core::script::ScriptVm;
+    let r = Rig::new(Setup::default());
+    let rules = r.vm.registered_block_rules();
+    let of = |id: &str| {
+        let id = format!("{MOD}:{id}");
+        rules.iter().find(|b| b.block == id).unwrap_or_else(|| panic!("{id} registered"))
+    };
+    // A layer string to its 9 bits, in the engine's cell order (x + 3y + 9z).
+    let mask = |layers: [&str; 3]| -> u32 {
+        let mut m = 0;
+        for (y, layer) in layers.iter().enumerate() {
+            for (i, c) in layer.chars().filter(|c| !c.is_whitespace()).enumerate() {
+                if c == '#' {
+                    m |= 1 << ((i % 3) + 3 * y + 9 * (i / 3));
+                }
+            }
+        }
+        m
+    };
+    let tower = mask(["### ### ###", "### ### ###", ".#. ### .#."]);
+    for (id, model, shape) in [
+        ("athanor", "athanor", tower),
+        ("athanor_lit", "athanor_lit", tower),
+        ("emerald_tablet", "emerald_tablet", mask(["### ### ###", "... ### ...", "... ### ..."])),
+    ] {
+        let b = of(id);
+        assert!(b.whole, "{id} is whole");
+        assert_eq!(b.model.as_deref(), Some(format!("{MOD}:{model}").as_str()), "{id}'s model");
+        assert_eq!(b.shape, shape, "{id}'s shape");
+    }
+    let lamp = of("hermetic_lamp");
+    assert!(lamp.whole && lamp.model.is_none() && lamp.transparent, "the lamp: a whole glass cube");
+    assert_eq!(lamp.shape, 0x7FF_FFFF);
+    let tree = of("arbor_dianae");
+    assert!(!tree.whole && tree.model.is_none(), "the Tree of Diana grows by the cell");
+    println!("the blocks: ok");
+}
+
 fn adept(r: &mut Rig, nodes: &[&str]) {
     ready(r, 0);
     assert_eq!(r.ask("progress grant shared.keystone"), "Learned: The Keystone");

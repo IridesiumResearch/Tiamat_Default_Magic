@@ -95,4 +95,19 @@ function U.sorted_keys(t)
     return keys
 end
 
+--- A block spec's look, as `register_block` takes it: `whole`, `model` and
+--- `shape` (Sub-Node Contract §7.5, §8.6). A model is registered here first,
+--- once; one the engine refuses is logged, and the block keeps its cells'
+--- look rather than naming a model nobody has.
+function U.block_look(spec)
+    local model = nil
+    if spec.model then
+        local ok, why = pcall(game.register_model, { id = spec.model.id, file = spec.model.file, texture = spec.model.texture })
+        if ok then model = spec.model.id
+        else game.log("tiamat_default_magic: the " .. spec.model.id .. " model was refused: " .. tostring(why)) end
+    end
+    local whole = spec.whole or (spec.model ~= nil) or nil
+    return whole, model, whole and spec.shape or nil
+end
+
 return U

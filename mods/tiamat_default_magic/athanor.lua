@@ -7,7 +7,9 @@
 -- It is a Craft station and nothing more: Craft places its container, opens
 -- its screen, lights it with the fire striker, burns its fuel and makes, on
 -- its own, the most particular recipe its slots, vessels and heat allow.
--- This file registers the station, its two blocks, and what Life should
+-- This file registers the station, its two blocks (each a model of the
+-- tower, whole: lifted in one piece, and Craft's lighting swaps one for the
+-- other with a plain write, which a whole block takes), and what Life should
 -- know of a lit one (it burns to stand in, and warms to stand beside).
 --
 -- The vessels in its two tool slots are what make one furnace every
@@ -24,6 +26,7 @@ local craft = U.exports("tiamat_default_craft")
 local life = U.exports("tiamat_default_life")
 
 local function block(spec)
+    local whole, model, shape = U.block_look(spec)
     return game.register_block{
         id = spec.id,
         name = spec.name,
@@ -31,6 +34,7 @@ local function block(spec)
         hardness = spec.hardness,
         tags = spec.tags,
         light_emit = spec.light,
+        whole = whole, model = model, shape = shape,
         textures = { all = "textures/" .. spec.id .. ".png" },
     }
 end
