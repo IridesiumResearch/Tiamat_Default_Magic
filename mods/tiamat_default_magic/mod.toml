@@ -31,5 +31,12 @@ name = "Transmutation"
 description = "May the Stones make silver and gold? Off: they still heal and still open the Great Arcanum, but projection makes nothing."
 default = 1
 
+[[world_option]]
+id = "woven_worlds"
+name = "Woven worlds per player"
+description = "How many worlds each Adept may weave and keep at once (the Opus Mundi)."
+options = ["1", "2", "4"]
+default = 1
+
 # NO `[theme]` HERE, ON PURPOSE. The engine wears the LAST theme in load
 # order, and the interface mod owns the look.

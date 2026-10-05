@@ -46,6 +46,11 @@ fn main() {
     homunculus_and_basilisk();
     microcosm_and_gates();
     rose_garden();
+    world_projection();
+    lapis_infinitus();
+    quintessences_of_the_four();
+    woven_worlds();
+    thrice_greatest();
     determinism();
     println!("magic native check: all passed");
 }
@@ -260,7 +265,7 @@ fn creative() {
 fn the_tree() {
     let mut r = Rig::new(Setup::default());
     ready(&mut r, 5000);
-    assert_eq!(r.ask("t count"), "85", "Progress validated what ships: tiers 3 to 6");
+    assert_eq!(r.ask("t count"), "97", "Progress validated what ships: tiers 3 to 7");
     let answer = r.ask("t learn magic.athanor");
     assert!(answer.starts_with("nil") && answer.contains("lies beyond the Fork"), "{answer}");
     let answer = r.ask("t learn magic.hermes_trismegistus");
@@ -311,7 +316,6 @@ fn the_door() {
     println!("the door: ok");
 }
 
-/// A player on the magic path, holding `nodes` (granted by an operator).
 /// The five blocks' looks (Sub-Node Contract §7.5, §8.6): the athanor, lit
 /// and cold, and the Tablet drawn as models and so whole, each with the shape
 /// the world knows; the lamp a whole glass cube; the Tree of Diana neither,
@@ -355,6 +359,7 @@ fn the_blocks() {
     println!("the blocks: ok");
 }
 
+/// A player on the magic path, holding `nodes` (granted by an operator).
 fn adept(r: &mut Rig, nodes: &[&str]) {
     ready(r, 0);
     assert_eq!(r.ask("progress grant shared.keystone"), "Learned: The Keystone");
@@ -1277,6 +1282,239 @@ fn rose_garden() {
         .cloned().collect();
     assert!(!flowers.is_empty(), "flowers bloom in the Rose Garden");
     println!("rose garden: ok");
+}
+
+/// Gate XII: a Red Stone and twenty quintessence used on the ground turn the
+/// base-metal ore round it into gold ore, a block a tick, and leave common
+/// stone alone; the Gate is a discovery worth 300.
+fn world_projection() {
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.quintessence", "magic.gate_projection"]);
+    r.give(PLAYER, "quintessence", 27);
+    r.hold(PLAYER, "quintessence");
+    assert!(r.use_at_nothing(PLAYER), "a drink, for the well");
+    r.tick(20);
+    let centre = (250, 64, 250);
+    r.put_block(centre.0, centre.1, centre.2, "tiamat_default_world:stone");
+    for (dx, dz) in [(1, 0), (-1, 1), (2, 2)] {
+        r.put_block(centre.0 + dx, centre.1, centre.2 + dz, "tiamat_default_world:copper_ore");
+    }
+    r.put_block(centre.0 + 3, centre.1, centre.2, "tiamat_default_world:copper_ore");
+    let before: i64 = r.ask("t insight").parse().unwrap();
+    r.give(PLAYER, "red_stone", 27);
+    r.hold(PLAYER, "red_stone");
+    assert!(r.use_at(PLAYER, centre.0, centre.1, centre.2), "the Stone, thrown");
+    assert_eq!(r.units(PLAYER, "red_stone"), 0, "the Stone is spent");
+    assert_eq!(r.ask("t q"), "0/30", "and twenty quintessence");
+    r.tick(5);
+    let gold = r.material("tiamat_default_world:gold_ore");
+    let copper = r.material("tiamat_default_world:copper_ore");
+    let blocks = r.world.blocks.lock().unwrap().clone();
+    for (dx, dz) in [(1, 0), (-1, 1), (2, 2)] {
+        assert_eq!(blocks.get(&(centre.0 + dx, centre.1, centre.2 + dz)).map(|b| b.0), Some(gold), "gold ore at {dx},{dz}");
+    }
+    assert_eq!(blocks.get(&(centre.0 + 3, centre.1, centre.2)).map(|b| b.0), Some(copper), "beyond the radius");
+    assert_ne!(blocks.get(&centre).map(|b| b.0), Some(gold), "stone is not base metal");
+    let after: i64 = r.ask("t insight").parse().unwrap();
+    assert_eq!(after - before, 300, "Gate XII, discovered");
+    println!("world projection: ok");
+}
+
+/// Lapis Infinitus: the Stone multiplies in one day, fed a quintessence.
+fn lapis_infinitus() {
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.athanor", "magic.bain_marie", "magic.rubedo", "magic.gate_multiplication", "magic.lapis_infinitus"]);
+    let at = (190, 64, 190);
+    let name = athanor(&mut r, at, &[(1, "tiamat_default_world:coal", 27 * 10), (2, "red_stone", 27),
+        (3, "tiamat_default_craft:gold_ingot", 27), (4, "quintessence", 27), (5, "bain_marie", 27), (6, "philosophers_egg", 27)]);
+    light(&mut r, at);
+    r.tick(40);
+    assert_eq!(r.ask(&format!("t hurry {name} 1800")), "true", "the athanor has the work in hand");
+    r.tick(200);
+    assert_eq!(slot(&r, &name, 7), Some((format!("{MOD}:red_stone"), 54)), "two Stones, in a day");
+    println!("lapis infinitus: ok");
+}
+
+/// Quintessences of the Four: a gnome walking with an adept who stands at
+/// the centre of a Circle of Four gives up the quintessence of earth after
+/// a philosophical day there.
+fn quintessences_of_the_four() {
+    const QUINTESSENCE: u32 = 4289552;
+    const FIRE: u32 = 6127127;
+    const WATER: u32 = 134143999;
+    const AIR: u32 = 129928175;
+    const EARTH: u32 = 49020602;
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.athanor", "magic.degrees_of_fire", "magic.gate_calcination", "magic.salamander",
+        "magic.cupellation", "magic.gnome", "magic.elemental_quintessences"]);
+    let deep = (0..400).map(|i| 40_000 - 100 * i).find(|y| r.ask(&format!("t band 100 {y} 100")) == "dark_caves")
+        .expect("the world has a Gloam");
+    let feet = deep - 50;
+    r.stand(PLAYER, 100.5, feet as f64, 100.5);
+    r.tick(700);
+    let gnomes = r.with_model(&format!("{MOD}:gnome"));
+    assert_eq!(gnomes.len(), 1, "a gnome in the deep");
+    r.give(PLAYER, "silver_grain", 27);
+    r.hold(PLAYER, "silver_grain");
+    assert!(r.use_entity(PLAYER, gnomes[0]).0, "bound");
+    let y = feet - 1;
+    r.put_carved(100, y, 100, "tiamat_default_world:crystal", QUINTESSENCE);
+    for (dx, dz, id, mask) in [(2, 0, "tiamat_default_world:lava_rock", FIRE), (-2, 0, "tiamat_default_world:ice", WATER),
+        (0, 2, "tiamat_default_world:pumice", AIR), (0, -2, "tiamat_default_world:granite", EARTH)] {
+        r.put_carved(100 + dx, y, 100 + dz, id, mask);
+    }
+    r.tick(1000);
+    assert_eq!(r.units(PLAYER, "quintessence_earth"), 0, "not yet: half a day");
+    r.tick(900);
+    assert_eq!(r.units(PLAYER, "quintessence_earth"), 27, "the quintessence of earth");
+    println!("quintessences of the four: ok");
+}
+
+/// The Loom: a world woven with the Rebis, its sky and vein and sea chosen;
+/// the Egg back out, the Loom back in; a World-Gate for the weaver and,
+/// once allowed, a friend; the world generated; and Solve et Coagula ends
+/// it, with half the first matter back.
+fn woven_worlds() {
+    const MASKS: [(&str, u32, &str); 13] = [
+        ("quintessence", 4289552, "crystal"),
+        ("sol", 16612927, "gold_ore"), ("luna", 83853119, "silver_ore"), ("venus", 100433791, "copper_ore"),
+        ("mars", 117374719, "iron_ore"), ("jupiter", 100433855, "tin_ore"), ("saturn", 50233279, "lead_ore"),
+        ("mercury", 100597439, "cinnabar"), ("emerald", 50331327, "crystal"),
+        ("fire", 6127127, "lava_rock"), ("water", 134143999, "ice"), ("air", 129928175, "pumice"), ("earth", 49020602, "granite"),
+    ];
+    let ring = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)];
+    let edges = [(2, 0), (-2, 0), (0, 2), (0, -2)];
+    rig::TRANSFERS.lock().unwrap().clear();
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.quintessence", "magic.microcosm", "magic.as_above_so_below", "magic.opus_mundi",
+        "magic.planetary_skies", "magic.planetary_veins", "magic.worldgate", "magic.solve_et_coagula"]);
+    let (lx, ly, lz) = (300, 64, 300);
+    let carve = |r: &Rig, x: i32, z: i32, glyph: &str| {
+        let (_, mask, ore) = MASKS.iter().find(|m| m.0 == glyph).unwrap();
+        r.put_carved(x, ly, z, &format!("tiamat_default_world:{ore}"), *mask);
+    };
+    carve(&r, lx, lz, "quintessence");
+    for (d, glyph) in ring.iter().zip(["sol", "luna", "venus", "mars", "jupiter", "saturn", "mercury", "emerald"]) {
+        carve(&r, lx + d.0, lz + d.1, glyph);
+    }
+    for (d, glyph) in edges.iter().zip(["fire", "water", "air", "earth"]) {
+        carve(&r, lx + d.0, lz + d.1, glyph);
+    }
+
+    // Weave: water, under Sol, rich in Mars's iron, a high sea.
+    for id in ["rebis", "quintessence_fire", "quintessence_water", "quintessence_air", "quintessence_earth", "red_stone"] {
+        r.give(PLAYER, id, 27);
+    }
+    r.give(PLAYER, "prima_materia", 27 * 27);
+    r.hold(PLAYER, "rebis");
+    let before: i64 = r.ask("t insight").parse().unwrap();
+    assert!(r.use_at(PLAYER, lx, ly, lz));
+    let (form, tree) = r.last_dialog().expect("the Loom asks");
+    assert_eq!(form, format!("{MOD}:loom"));
+    assert!(tree.contains("Weave a world of"), "{tree}");
+    for button in ["arch:water", "sky:sol", "vein:mars", "sea:high", "weave"] {
+        r.press(PLAYER, MOD, "loom", button);
+    }
+    let key = format!("{}_1_mars_high", &rig::hex(PLAYER)[..16]);
+    let world = format!("{MOD}:world_water/{key}");
+    assert!(r.places.0.lock().unwrap().contains(&world), "the world, made: {:?}", r.places.0.lock().unwrap());
+    let went = rig::TRANSFERS.lock().unwrap().last().cloned().expect("a transfer");
+    assert_eq!((went.0, went.1.as_str()), (1, world.as_str()), "the weaver, into it");
+    for id in ["rebis", "quintessence_fire", "quintessence_water", "quintessence_air", "quintessence_earth", "red_stone", "prima_materia"] {
+        assert_eq!(r.units(PLAYER, id), 0, "{id} taken");
+    }
+    let after: i64 = r.ask("t insight").parse().unwrap();
+    assert_eq!(after - before, 1000, "the first world woven");
+
+    // Its ground: the landing under the arrival, and a high sea far out.
+    use tiamat_core::script::ScriptVm;
+    let air = tiamat_core::MaterialId::AIR;
+    let (chunk, _) = r.vm.generate_chunk(&world, rig::SEED, tiamat_core::BlockPos { x: 0, y: 64, z: 0 }.chunk(), air)
+        .expect("the landing generates");
+    assert!(chunk.blocks().any(|(_, b)| !b.is_air()), "there is ground under the arrival");
+    let mut wet = false;
+    for x in [2000, 3000, 4000, 5000] {
+        let (_, fluid) = r.vm.generate_chunk(&world, rig::SEED, tiamat_core::BlockPos { x, y: 66, z: x }.chunk(), air)
+            .expect("the sea generates");
+        wet |= fluid.blocks().any(|f| f.0 != 0);
+    }
+    assert!(wet, "a world-wide sea");
+
+    // The Egg, inside, goes back to where the weaver stood.
+    r.give(PLAYER, "philosophers_egg", 27);
+    r.hold(PLAYER, "philosophers_egg");
+    let out = r.vm.use_block(&tiamat_core::script::UseEvent { player: PLAYER, domain: world.clone(), aim: None,
+        held: tiamat_core::inventory::Access::held(&*r.inventory, PLAYER) });
+    assert!(!out.allowed, "the Egg, used inside");
+    let back = rig::TRANSFERS.lock().unwrap().last().cloned().expect("a transfer back");
+    assert_eq!(back.1, "overworld");
+    assert!((back.2[0] - 300.5).abs() < 0.01 && (back.2[2] - 303.5).abs() < 0.01, "beside the Loom: {back:?}");
+
+    // The Loom, with anything else in hand, lists the world to enter.
+    r.hold(PLAYER, "quintessence_air");
+    assert!(r.use_at(PLAYER, lx, ly, lz));
+    let (_, tree) = r.last_dialog().expect("the list");
+    assert!(tree.contains("A world of Water"), "{tree}");
+    r.press(PLAYER, MOD, "loom", &format!("enter:{key}"));
+    assert_eq!(rig::TRANSFERS.lock().unwrap().last().map(|t| t.1.clone()), Some(world.clone()), "in again");
+
+    // A World-Gate: a correspondence gate bound with the Egg.
+    const EMERALD: u32 = 50331327;
+    const SOL: u32 = 16612927;
+    const LUNA: u32 = 83853119;
+    let (gx, gz) = (330, 330);
+    r.put_carved(gx, 64, gz, "tiamat_default_world:crystal", EMERALD);
+    for (dx, dz, mask, id) in [(1, 1, SOL, "tiamat_default_world:gold_ore"), (-1, -1, SOL, "tiamat_default_world:gold_ore"),
+        (1, -1, LUNA, "tiamat_default_world:silver_ore"), (-1, 1, LUNA, "tiamat_default_world:silver_ore")] {
+        r.put_carved(gx + dx, 64, gz + dz, id, mask);
+    }
+    r.hold(PLAYER, "philosophers_egg");
+    assert!(r.use_at(PLAYER, gx, 64, gz));
+    assert_eq!(r.stored(&format!("worldgate:{gx},64,{gz}")).as_deref(), Some(format!("Text({key:?})").as_str()), "bound");
+    rig::TRANSFERS.lock().unwrap().clear();
+    r.moved(PLAYER, (gx, 65, gz));
+    assert_eq!(rig::TRANSFERS.lock().unwrap().last().map(|t| t.1.clone()), Some(world.clone()), "the weaver, through the gate");
+    r.join(OTHER);
+    rig::TRANSFERS.lock().unwrap().clear();
+    r.heard(OTHER);
+    r.moved(OTHER, (gx, 65, gz));
+    assert!(rig::TRANSFERS.lock().unwrap().is_empty(), "a stranger is not carried");
+    assert!(r.heard(OTHER).iter().any(|l| l == "That world is not open to you."));
+    assert_eq!(r.ask("magic world allow someone"), "someone may walk in your worlds.");
+    r.tick(50);
+    r.moved(OTHER, (gx, 65, gz));
+    assert_eq!(rig::TRANSFERS.lock().unwrap().last().map(|t| t.1.clone()), Some(world.clone()), "a friend, allowed");
+
+    // Solve et coagula.
+    r.hold(PLAYER, "quintessence_air");
+    assert!(r.use_at(PLAYER, lx, ly, lz));
+    r.press(PLAYER, MOD, "loom", &format!("solve:{key}"));
+    assert!(!r.places.0.lock().unwrap().contains(&world), "the world, ended");
+    assert_eq!(r.units(PLAYER, "prima_materia"), 27 * 27 / 2, "half its first matter back");
+    assert!(r.stored(&format!("woven:{key}")).is_none(), "and forgotten");
+    println!("woven worlds: ok");
+}
+
+/// The Universal Medicine runs among friends without fault; Thrice-Greatest
+/// shows the Tablet's whole text when it is learned, and on `magic tablet`,
+/// and wears a golden aura.
+fn thrice_greatest() {
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.universal_medicine"]);
+    r.join(OTHER);
+    r.stand(OTHER, 100.5, 64.0, 102.5);
+    r.tick(220);
+    r.heard(OTHER);
+    assert_eq!(r.ask("progress grant magic.hermes_trismegistus"), "Learned: Thrice-Greatest");
+    let (form, tree) = r.last_dialog().expect("the Tablet speaks");
+    assert_eq!(form, format!("{MOD}:tablet"));
+    assert!(tree.contains("Tis true without lying") && tree.contains("Hermes Trismegist"), "{tree}");
+    assert!(r.heard(OTHER).iter().any(|l| l.ends_with("is Trismegistus: Thrice-Greatest.")));
+    assert_eq!(r.ask("magic tablet"), "", "again, on asking");
+    r.bursts();
+    r.tick(50);
+    assert!(!r.bursts().is_empty(), "a golden aura");
+    println!("thrice-greatest: ok");
 }
 
 /// The same play twice leaves the same storage.

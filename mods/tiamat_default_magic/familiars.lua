@@ -663,7 +663,8 @@ end
 local function clear_orphans(pos)
     for _, id in ipairs(game.entities_in_radius(pos, C.familiars.orphans, game.mod_id)) do
         local e = game.entity(id)
-        if e and e.model and MODELS[e.model] and not wild[id] and not owner_of[id] then game.despawn_entity(id) end
+        if e and e.model and MODELS[e.model] and not wild[id] and not owner_of[id]
+            and not (tdm.worlds and tdm.worlds.spirit[id]) then game.despawn_entity(id) end
     end
 end
 

@@ -18,7 +18,8 @@
 -- Sol and Luna sigils on the alternate corners round it. Two gates are
 -- linked by using each in turn with a quintessence in hand; stepping onto
 -- one sets the walker down on the other, for quintessence. Same domain
--- only: crossing between worlds is the World-Gate's (tier 7).
+-- only: crossing between worlds is the World-Gate's (tier 7, worlds.lua),
+-- and a gate bound to a world is a World-Gate and carries nobody here.
 
 local C = tdm.config
 local U = tdm.util
@@ -100,6 +101,8 @@ end
 
 tdm.on_use(function(e)
     if not (e.held and e.held.material == EGG) then return nil end
+    local out = tdm.worlds and tdm.worlds.egg_use(e)    -- inside a woven world, the Egg goes back
+    if out then return out end
     if not (progress and progress.has(e.player, M.node)) then return nil end   -- an egg is a vessel to everybody else
     return travel(e.player, e.domain)
 end)
@@ -161,6 +164,7 @@ end)
 tdm.on_move(function(e)
     if e.domain ~= "overworld" then return end
     local x, y, z = e.x, e.y - 1, e.z
+    if tdm.worlds and tdm.worlds.gate_of(x, y, z) then return end   -- a World-Gate's, now
     local twin = game.storage.get(pair_key(x, y, z))
     if type(twin) ~= "string" then return end
     if (carried[e.player] or 0) > tdm.effects.now() then return end

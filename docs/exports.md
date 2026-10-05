@@ -41,8 +41,13 @@ All are namespaced `tiamat_default_magic:` by the engine.
   `athanor` and `athanor_lit`, so whole), `arbor_dianae`
   (the Tree of Diana: cutout, light 3, 3, 4; dug, it pays a silver ingot's
   units by the share of the block it fills).
-- **Domain:** the instanced template `microcosm`, each adept's floating
-  island an instance keyed by the first 16 hex of their UUID.
+- **Domains:** the instanced template `microcosm`, each adept's floating
+  island an instance keyed by the first 16 hex of their UUID; and the
+  five woven-world templates `world_earth`, `world_water`, `world_air`,
+  `world_fire` and `world_quintessence`, each world an instance keyed
+  `<weaver's first 16 hex>_<n>_<vein>_<sea>` (a planet or `none`; `low`,
+  `mid` or `high`), which its generator reads back from `pos.domain`; its
+  sky is set on the instance when it is woven.
 - **Containers:** `tiamat_default_magic:satchel:<uuid>`, a homunculus's
   satchel (27 slots).
 - **Models and entities:** the familiars `salamander`, `undine`, `gnome`,
@@ -84,7 +89,9 @@ All are namespaced `tiamat_default_magic:` by the engine.
   melts it to `prima_materia`), `prima_materia`, `panacea` (food; it
   heals and cures everyone near), `wedding_crown`, `homunculus_vial` and
   `basilisk_egg` (used, a familiar wakes), `basilisk_ash`, and
-  `beast_essence` (its detail `k=<kind>` names the creature).
+  `beast_essence` (its detail `k=<kind>` names the creature); and tier
+  7's `rebis` and the four `quintessence_<element>` (`fire`, `water`,
+  `air`, `earth`), in the group `#magic_elemental_quintessence`.
 - **Into Progress:** the path `magic`, "The Hermetic Art", whose door is
   `emerald_tablet` (Progress registers its recipe as
   `tiamat_default_progress:door_magic`: the Keystone, 27 units of crystal,
@@ -113,7 +120,9 @@ All are namespaced `tiamat_default_magic:` by the engine.
   `study_calx`, `study_tincture`, `study_vitriol`, `study_quicksilver`,
   `study_aqua_regia`, `study_caput_corvi`, `study_peacock`,
   `study_white_stone`, `study_solar_sulfur`, `study_aurum_potabile`,
-  `study_prima_materia`, `study_red_stone`.
+  `study_prima_materia`, `study_red_stone`, `study_elemental_quintessence`;
+  and `tiamat_default_magic.woven` (the first world woven, 1,000, group
+  `milestones`).
 - **Into Craft:** the recipes `mutus_liber`, `mortar`, `grind_chamomile`,
   `grind_mint`, `grind_bramble`, `grind_mantle`, `flame_powder_blue`,
   `_green`, `_yellow`, `_white`, `poultice`, `hermetic_lamp` (by hand);
@@ -150,10 +159,12 @@ All are namespaced `tiamat_default_magic:` by the engine.
 - **Actions:** `mutus_liber` (default key J): the Mute Book, for a player
   who carries one; `familiar` (default key K): the next bound familiar
   walks.
-- **Dialog:** `liber`, the Mute Book.
+- **Dialogs:** `liber`, the Mute Book; `loom`, the Loom of the Four;
+  `tablet`, the Emerald Tablet's whole text.
 
-**World option:** `transmutation` (on by default): whether the Stones make
-silver and gold by projection.
+**World options:** `transmutation` (on by default): whether the Stones make
+silver and gold by projection; `woven_worlds` (`1`, `2` or `4`; 1 by
+default): how many worlds each adept may hold at once.
 
 ## Commands it accepts
 
@@ -162,7 +173,11 @@ along the Apothecary's Bench the speaker is), `magic book` (opens the Mute
 Book for a player who carries one), and `magic seal allow <name>` and
 `magic seal deny <name>` (who, of the players here, may build within the
 speaker's seals), and `magic familiar [kind]` (which familiars walk and
-rest, or call one to walk). A sentence that only begins with the word is chat.
+rest, or call one to walk), `magic world allow <name>` and `magic world
+deny <name>` (who may walk in the speaker's woven worlds), `magic leave`
+(out of a woven world, back to where the speaker stood), and `magic
+tablet` (the Emerald Tablet's whole text, for the Thrice-Greatest). A
+sentence that only begins with the word is chat.
 
 ## Data it stores or sends
 
@@ -182,7 +197,14 @@ took), `kills:<uuid>:<creature>` (towards the next essence),
 `phoenix_ready:<uuid>` (the Phoenix armed, and when it may be again),
 `microreturn:<uuid>` (where a player stood before the Egg),
 `gatepair:x,y,z` and `gateowner:x,y,z` (a correspondence gate's twin and
-who linked it), `wedded:<container>` (an athanor whose Wedding has crowned), and per athanor `burned:<container>` (ticks it has burned
+who linked it), `wedded:<container>` (an athanor whose Wedding has crowned),
+`eqdrawn:<uuid>:<kind>` (ticks an elemental has spent in the Circle
+towards its next quintessence), `woven:<key>` (a woven world: its
+archetype, weaver, sky and the Loom it was woven at), `wovencount:<uuid>`
+(the number of a weaver's next world), `wovenreturn:<uuid>` (where a
+traveller stood before a woven world), `worldgate:x,y,z` (the world a
+World-Gate opens on), `worldallow:<weaver>:<uuid>` (who may walk in a
+weaver's worlds), and per athanor `burned:<container>` (ticks it has burned
 without going out) and `called:<container>` (a salamander came). Who
 chose the path, and which nodes they
 hold, is Progress's; an athanor's fire and work are Craft's.

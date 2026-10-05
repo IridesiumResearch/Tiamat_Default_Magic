@@ -53,7 +53,7 @@ the Hermetic Seal wards ground; the Ouroboros hurries an athanor. And
 three more elementals: the undine in still water at night, the gnome in
 the deep caves, the sylph on peaks and in storms.
 
-**What ships** is gated: `built_tier` in `config.lua` (6 today) is the last
+**What ships** is gated: `built_tier` in `config.lua` (7 today: the whole tree) is the last
 tier whose Art is built, and nodes above it are not registered, so nobody
 meets a node that does nothing.
 
@@ -73,8 +73,17 @@ keeps a player's things through a death once in three sun-days; the
 Chymical Wedding; the homunculus, which tends athanors from a chest; the
 basilisk; essences of the beasts as familiars' traits; the Greater
 Elementals; the microcosm, each adept's own floating island; the
-correspondence gates; and the Rose Garden. The gate is at 6. Tier 7 is
-next.
+correspondence gates; and the Rose Garden.
+
+Step 9: **tier 7, the Great Arcanum.** Gate XII, the Stone projected on
+the world, base ore turned to gold ore round it; the Rebis; the Four's
+quintessences, drawn from elementals in the Circle; the Loom of the Four
+and woven worlds — Earth, Water, Air, Fire and Quintessence, each its
+own instance, under the sky and with the veins and sea its weaver chose,
+with wild spirits of its element; the World-Gate, for friends; Solve et
+Coagula, which ends a world; the Universal Medicine; Lapis Infinitus;
+and Thrice-Greatest, the Emerald Tablet's whole text. The gate is at 7:
+all 97 nodes ship.
 
 ## What is here
 

@@ -376,6 +376,14 @@ LAB.update({
     "basilisk_ash": lambda: heap((150, 140, 120), (190, 180, 160)),
     "beast_essence": lambda: phial((170, 110, 80)),
 })
+# Tier 7.
+LAB.update({
+    "rebis": lambda: crystal((170, 60, 160), (240, 170, 230)),
+    "quintessence_fire": lambda: phial((240, 100, 40)),
+    "quintessence_water": lambda: phial((60, 130, 230)),
+    "quintessence_air": lambda: phial((210, 230, 250)),
+    "quintessence_earth": lambda: phial((120, 90, 50)),
+})
 ITEMS.update(LAB)
 
 

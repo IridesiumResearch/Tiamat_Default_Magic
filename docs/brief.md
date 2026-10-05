@@ -842,7 +842,9 @@ Craft's and Progress's code rules apply verbatim (fan-out, lazy id resolution, s
 
 ## 17. Build order
 
-**The release gate (2026-09-30).** `config.lua`'s `built_tier` is the highest tier whose Art is built; only nodes up to it are registered with Progress and shown in the Mute Book, so a release never shows a node that does nothing. `tools/check_tree.py` proves what ships stands alone. It is 6 today, and each tier below raises it when it lands, tests and all. The engine's 0.4.0 wants Magic with tiers 5–7 or with them held back: the gate makes either true.
+**The release gate (2026-09-30).** `config.lua`'s `built_tier` is the highest tier whose Art is built; only nodes up to it are registered with Progress and shown in the Mute Book, so a release never shows a node that does nothing. `tools/check_tree.py` proves what ships stands alone. It is 7 today: every tier is built and all 97 nodes ship.
+
+**Tier 7 as built (2026-10-05).** Where the build settled what this brief left open: a woven world's key joins its parts with `_`, not `-` (the engine takes letters, digits and `_`); the Rebis is an athanor recipe whose tool slot holds the Wedding Crown, kept, standing for the Wedding that athanor has seen; an elemental's quintessence comes from an adept standing on the Circle of Four's centre with it walking near, a philosophical day a quintessence; Lapis Infinitus multiplies in a day with a quintessence in place of the quicksilver (the athanor has three input slots); a World-Gate is a correspondence gate bound with the Egg to the weaver's newest world; the Egg, used in a woven world, goes back, and `magic leave` does for a guest; *Trismegistus* is a golden crown over the head and a golden aura, since a player's own nametag is the engine's. The engine's 0.4.0 wants Magic with tiers 5–7 or with them held back: the gate makes either true.
 
 1. Scaffold, manifest, `config.lua`, `hooks.lua`, `store.lua`, items, blocks. **Tests: load.**
 2. **Apothecary's Bench** (§4) end to end: the child's half hour. Tag `0.1.0` — shippable before the Fork has a door.

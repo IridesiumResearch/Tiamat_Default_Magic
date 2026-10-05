@@ -30,6 +30,7 @@ local dig_starts = {}
 local punches = {}
 local actions = {}
 local moves = {}
+local enters = {}
 
 --- Runs `fn(player, rest)` when a player says `word` (case-insensitive),
 --- alone or followed by more words. A string `fn` answers is its reply, said
@@ -67,6 +68,12 @@ end
 --- `{ player, x, y, z, domain, from? }`.
 function tdm.on_move(fn)
     moves[#moves + 1] = fn
+end
+
+--- Runs `fn(event)` before a body enters a simulation space:
+--- `{ entity, from, to }`. To watch, not to refuse: the answer is ignored.
+function tdm.on_domain_enter(fn)
+    enters[#enters + 1] = fn
 end
 
 --- Runs `fn(event)` for events from the dialog this mod showed as `form`.
@@ -155,6 +162,12 @@ function H.install()
     if #moves > 0 then
         game.register_on_player_move(function(event)
             for _, fn in ipairs(moves) do fn(event) end
+        end)
+    end
+
+    if #enters > 0 then
+        game.register_on_domain_enter(function(event)
+            for _, fn in ipairs(enters) do fn(event) end
         end)
     end
 

@@ -195,7 +195,7 @@ C.long_works = {                    -- in philosophical days
 -- The release gate: the highest tier whose Art is built. Nodes above it are
 -- not registered with Progress, so nobody meets a node that does nothing;
 -- raised a tier at a time as each lands (docs/brief.md §17).
-C.built_tier = 6
+C.built_tier = 7
 
 C.path = {
     id = "magic",
@@ -1129,5 +1129,148 @@ C.book_notes = {
     ["magic.spagyric_tincture"] = "a handful of any herb + spirit of wine  ->  its planet's tincture, in the athanor, in Maria's bath (1st degree), a day",
     ["magic.simple_elixirs"] = "a tincture + a phial  ->  that planet's elixir, by hand",
 }
+
+-- Tier 7 (brief §5.5): the Great Arcanum ----------------------------------------------
+
+C.tier7_items = {
+    { id = "rebis", name = "The Rebis", description = "The two-thing: the Red King and the White Queen made one. The key of worlds." },
+    { id = "quintessence_fire", name = "Quintessence of Fire", description = "The pure essence of fire, drawn from a salamander in the Circle." },
+    { id = "quintessence_water", name = "Quintessence of Water", description = "The pure essence of water, drawn from an undine in the Circle." },
+    { id = "quintessence_air", name = "Quintessence of Air", description = "The pure essence of air, drawn from a sylph in the Circle." },
+    { id = "quintessence_earth", name = "Quintessence of Earth", description = "The pure essence of earth, drawn from a gnome in the Circle." },
+}
+
+C.tier7_recipes = {
+    -- The Rebis (brief §7.5): the two Stones and the green lion, Sol carved
+    -- in gold ore and Luna in silver, joined in the Egg; the Wedding Crown
+    -- stands for the Wedding the athanor has seen, and is kept.
+    { id = "rebis", station = "athanor", node = "magic.rebis", degree = 1, days = 7,
+        inputs = { { "red_stone", count = 1 }, { "white_stone", count = 1 }, { "green_lion", count = 1 },
+            { glyph = "sol", material = "W:gold_ore", count = 1 }, { glyph = "luna", material = "W:silver_ore", count = 1 } },
+        tools = { { "philosophers_egg", wear = 0 }, { "wedding_crown", wear = 0 } }, outputs = { { "rebis", count = 1 } } },
+}
+
+-- Lapis Infinitus (brief §5.5): the Stone multiplies in one day, fed a
+-- quintessence in place of Gate XI's quicksilver.
+C.lapis = { node = "magic.lapis_infinitus", days = 1 }
+
+-- Gate XII, projection on the world (brief §6.10): a Red Stone and `cost`
+-- quintessence used on the ground turn base-metal ore within `radius` to
+-- gold ore, `per_tick` blocks a tick, and heal every creature and player
+-- within `heal_radius`. With transmutation off, it only heals.
+C.world_projection = {
+    node = "magic.gate_projection", stone = "red_stone", cost = 20, radius = 2, per_tick = 1,
+    ores = { "W:copper_ore", "W:tin_ore", "W:lead_ore", "W:iron_ore" }, becomes = "W:gold_ore",
+    heal = 10, heal_radius = 8, gate = 12,
+}
+
+-- Quintessences of the Four (brief §5.5): an elemental walking with an
+-- adept who stands on the Circle of Four's centre gives its element's
+-- quintessence for every `days` philosophical days spent there.
+C.elemental_quintessences = {
+    node = "magic.elemental_quintessences", days = 1, every = 100, reach = 8,
+    kinds = { salamander = "fire", undine = "water", sylph = "air", gnome = "earth" },
+}
+
+-- The Universal Medicine: every `every` ticks, other players within
+-- `radius` of an adept who knows it heal `heal`.
+C.universal_medicine = { node = "magic.universal_medicine", radius = 8, every = 100, heal = 1 }
+
+-- Thrice-Greatest: the Tablet speaks its whole text (Newton's translation,
+-- c. 1680) to whoever has it; a golden aura about them; the title on
+-- their tongue in chat.
+C.trismegistus = {
+    node = "magic.hermes_trismegistus", title = "Trismegistus", aura_every = 40,
+    tablet = {
+        "Tis true without lying, certain & most true.",
+        "That which is below is like that which is above & that which is above is like that which is below to do the miracles of one only thing.",
+        "And as all things have been & arose from one by the mediation of one: so all things have their birth from this one thing by adaptation.",
+        "The Sun is its father, the moon its mother, the wind hath carried it in its belly, the earth its nurse.",
+        "The father of all perfection in the whole world is here.",
+        "Its force or power is entire if it be converted into earth.",
+        "Separate thou the earth from the fire, the subtle from the gross sweetly with great industry.",
+        "It ascends from the earth to the heaven & again it descends to the earth and receives the force of things superior & inferior.",
+        "By this means you shall have the glory of the whole world & thereby all obscurity shall fly from you.",
+        "Its force is above all force. For it vanquishes every subtle thing & penetrates every solid thing.",
+        "So was the world created.",
+        "From this are & do come admirable adaptations whereof the means is here in this.",
+        "Hence I am called Hermes Trismegist, having the three parts of the philosophy of the whole world.",
+        "That which I have said of the operation of the Sun is accomplished & ended.",
+    },
+}
+
+C.tier7_studies = {
+    { id = "study_elemental_quintessence", name = "Study an elemental quintessence",
+        inputs = { { "#magic_elemental_quintessence", count = 1 } }, ticks = 9000, insight = 400 },
+}
+
+-- Woven worlds (brief §6.11) ---------------------------------------------------------
+--
+-- Five templates, one an archetype; each world an instance whose KEY holds
+-- its parameters: `<weaver's first 16 hex>_<n>_<vein>_<sea>` (letters,
+-- digits and `_`, the engine's rule). The generator reads them back from
+-- `pos.domain`, so nothing is stored for it and every worker agrees.
+C.worlds = {
+    node = "magic.opus_mundi",
+    skies_node = "magic.planetary_skies",
+    veins_node = "magic.planetary_veins",
+    spirits_node = "magic.native_spirits",
+    gate_node = "magic.worldgate",
+    solve_node = "magic.solve_et_coagula",
+    discovery = 1000,               -- the first world woven (brief §6.12)
+    -- What a weaving consumes (brief §6.11).
+    costs = { { "rebis", count = 1 }, { "quintessence_fire", count = 1 }, { "quintessence_water", count = 1 },
+        { "quintessence_air", count = 1 }, { "quintessence_earth", count = 1 }, { "prima_materia", units = 27 * 27 },
+        { "red_stone", count = 1 } },
+    returned = 27 * 27 // 2,        -- prima materia units Solve et Coagula gives back
+    arrive = { x = 0.5, y = 68, z = 0.5 },
+    landing = { radius = 7, top = 66, depth = 5 },  -- the ground every world has under its arrival
+    seas = { low = 56, mid = 62, high = 68 },
+    archetypes = {
+        { id = "earth", name = "Earth", spirit = "gnome", blurb = "Caverns and crystal, and the ores lie deep." },
+        { id = "water", name = "Water", spirit = "undine", blurb = "An archipelago on a world-wide sea." },
+        { id = "air", name = "Air", spirit = "sylph", blurb = "Floating islands over nothing at all." },
+        { id = "fire", name = "Fire", spirit = "salamander", blurb = "Basalt and ash on a sea of lava." },
+        { id = "quintessence", name = "Quintessence", blurb = "Calcite and crystal, and light." },
+    },
+    veins = {                       -- planet -> the ore that runs rich (planetary_veins)
+        sol = "W:gold_ore", luna = "W:silver_ore", venus = "W:copper_ore", mars = "W:iron_ore",
+        jupiter = "W:tin_ore", saturn = "W:lead_ore", mercury = "W:cinnabar",
+    },
+    common_ores = { "W:copper_ore", "W:iron_ore", "W:coal", "W:tin_ore" },
+    ores_per_chunk = 6, rich_per_chunk = 18,
+    -- Skies, by name: the archetypes' own, and the seven planets'
+    -- (planetary_skies). `day` and `night` are the sky, `sun` the light.
+    skies = {
+        earth = { day = { 0.55, 0.62, 0.55 }, night = { 0.03, 0.04, 0.03 }, sun = { 1.0, 0.92, 0.8 } },
+        water = { day = { 0.45, 0.65, 0.85 }, night = { 0.02, 0.03, 0.07 }, sun = { 0.95, 0.98, 1.0 } },
+        air = { day = { 0.7, 0.82, 0.95 }, night = { 0.05, 0.06, 0.12 }, sun = { 1.0, 1.0, 1.0 } },
+        fire = { day = { 0.6, 0.3, 0.15 }, night = { 0.15, 0.04, 0.02 }, sun = { 1.0, 0.6, 0.35 } },
+        quintessence = { day = { 0.85, 0.85, 0.75 }, night = { 0.08, 0.07, 0.1 }, sun = { 1.0, 0.98, 0.9 } },
+        saturn = { day = { 0.42, 0.42, 0.45 }, night = { 0.03, 0.03, 0.04 }, sun = { 0.75, 0.75, 0.78 } },
+        sol = { day = { 0.9, 0.75, 0.35 }, night = { 0.08, 0.05, 0.02 }, sun = { 1.0, 0.85, 0.5 } },
+        luna = { day = { 0.75, 0.78, 0.85 }, night = { 0.06, 0.07, 0.12 }, sun = { 0.85, 0.9, 1.0 } },
+        venus = { day = { 0.85, 0.6, 0.65 }, night = { 0.08, 0.03, 0.06 }, sun = { 1.0, 0.8, 0.8 } },
+        mars = { day = { 0.75, 0.35, 0.25 }, night = { 0.1, 0.02, 0.02 }, sun = { 1.0, 0.65, 0.5 } },
+        jupiter = { day = { 0.45, 0.5, 0.85 }, night = { 0.03, 0.03, 0.1 }, sun = { 0.9, 0.9, 1.0 } },
+        mercury = { day = { 0.55, 0.78, 0.75 }, night = { 0.03, 0.07, 0.07 }, sun = { 0.9, 1.0, 0.95 } },
+    },
+    spirits = 4,                    -- wild elementals a world keeps near an arrival (native_spirits)
+    spirit_every = 400,             -- ticks between one spirit's birth and the next
+    spirit_reach = 32,              -- blocks: the wild ones near an arrival that count towards those
+    gate_rest = 40,                 -- ticks before a World-Gate carries the same traveller again
+}
+
+-- The Mute Book's lines for tier 7's works that are not recipes.
+C.book_notes["magic.gate_projection"] = "a Red Stone + 20 quintessence, used on the ground  ->  copper, tin, lead and iron ore near it become gold ore, and all near are healed"
+C.book_notes["magic.elemental_quintessences"] = "stand at the centre of a Circle of Four with an elemental walking with you: a day there, and it gives its element's quintessence"
+C.book_notes["magic.opus_mundi"] = "the Loom: a quintessence glyph in crystal, the seven sigils and the emerald round it, fire, water, air and earth at the edges. Use it with the Rebis to weave; with anything else, to enter your worlds. The Egg, used inside, brings you back"
+C.book_notes["magic.planetary_skies"] = "at the Loom, choose the sky your world wears"
+C.book_notes["magic.planetary_veins"] = "at the Loom, choose the metal that runs rich in your world"
+C.book_notes["magic.native_spirits"] = "your worlds keep wild spirits of their element near whoever walks in them"
+C.book_notes["magic.worldgate"] = "use a correspondence gate's emerald with the Egg: it opens on your newest world. magic world allow <name> lets a friend through"
+C.book_notes["magic.solve_et_coagula"] = "at the Loom, dissolve a world: everyone in it comes home, and half its prima materia returns"
+C.book_notes["magic.universal_medicine"] = "friends within eight blocks of you slowly heal"
+C.book_notes["magic.hermes_trismegistus"] = "magic tablet: the Emerald Tablet's whole text"
 
 return C
