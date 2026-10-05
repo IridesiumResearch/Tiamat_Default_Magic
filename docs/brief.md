@@ -359,7 +359,7 @@ Solvents in their historical order of discovery, the Egg, the first three elemen
 | `wise_mind` | `magic.quintessence_max` 40, `magic.quintessence_regen_percent` 100 |
 | `ouroboros` | `magic.long_work_percent` −20 |
 | `gate_cibation` | `magic.long_work_percent` −15 |
-| `assay` | `magic.study_bonus_percent` 25 |
+| `assay` | `progress.study_percent` 25 (read by Progress when it pays any study, P-M2) |
 | `gate_exaltation` | `magic.projection_percent` 100 |
 | `lapis_infinitus` | `magic.projection_percent` 800 (with Exaltation's 100: ×10), `magic.multiplication_days` −6 |
 | `greater_talismans` | `magic.talisman_grade` 1, `magic.talisman_slots` 1 |
@@ -799,7 +799,7 @@ What a player waits on, per tier, besides insight — the gates that make it *ta
 - **U-M1, shape-crafter presets from siblings.** `add_preset{ id, label, mask, visible = fn(player) → bool }`: buttons beside Slab / Stairs / Pillar, shown when `visible` answers true (a node held). The biggest single thing for children.
 
 **Progress**
-- **P-M1, a branch label and a reveal rule.** A node field `branch = "Menstrua"` the Research tab groups by, and an option to show a path node only when all but one of its requirements are held. A hundred nodes shown at once overwhelms a child and an adult alike.
+- **P-M1, a branch label and a reveal rule.** A node field `branch = "Menstrua"` the Research tab groups by, and an option to show a path node only when all but one of its requirements are held. A hundred nodes shown at once overwhelms a child and an adult alike. *Answered (Progress `ef6014b`) and adopted:* nine named branches, the path revealed `near`. And **P-M2**, a study bonus any node may carry: Progress reads `progress.study_percent`, which the Assay now carries.
 
 **Weather**
 - **Wx-M1, a layered sky overlay.** Weather writes `set_sky_modifier` for every player continuously, and a second writer would fight it. Ask: `add_overlay(uuid, source, { intensity, sky, sky_mix, saturation, grade } | nil)`, blended by Weather into what it writes. For night-sight and the Luna talisman; a woven world's sky is the engine's `set_domain_sky` now (E-M2). Shared with science (the Core's darkening, the atmosphere processor).

@@ -65,6 +65,8 @@ if progress then
         sentence = C.path.sentence,
         refusal = C.path.refusal,
         on_choose = function(uuid) T.on_choose(uuid) end,
+        branches = C.path.branches,
+        reveal = C.path.reveal,
     }
     if not ok then game.log("tiamat_default_magic: Progress refused the path: " .. tostring(why)) end
 
@@ -78,7 +80,7 @@ if progress then
         end
         local added, refused = progress.register_node{
             id = node_id(node.id), tier = node.tier, cost = node.cost, requires = requires,
-            label = node.label, text = node.text, effects = effects,
+            label = node.label, text = node.text, effects = effects, branch = node.branch,
         }
         if not added then
             game.log("tiamat_default_magic: Progress refused " .. node.id .. ": " .. tostring(refused))

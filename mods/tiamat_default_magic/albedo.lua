@@ -14,7 +14,7 @@
 --   allows transmutation (its world option; off, the Stone is only an
 --   ingredient and a study);
 -- - orichalcum tools, Craft's tier 4, engine tools that dig;
--- - the Assay: this mod's studies pay the assayer more;
+-- - the Assay: every study pays the assayer more (Progress pays it);
 -- - Atalanta Fugiens: an emblem for each first, once the book is known.
 
 local C = tdm.config
@@ -72,27 +72,16 @@ if life and life.add_weapon then
     for _, tool in ipairs(C.orichalcum_tools) do life.add_weapon(U.id(tool.id), O.weapon) end
 end
 
--- The Assay, and the first transmutation ----------------------------------------------------
+-- The first transmutation ------------------------------------------------------------------
+--
+-- (The Assay is a node and nothing more: its `progress.study_percent` is
+-- read by Progress when it pays any study, its answer to P-M2.)
 
-local studies = nil         -- qualified recipe id -> insight, built on first use: every tier has added its own by then
-local function study_insight(id)
-    if not studies then
-        studies = {}
-        for _, study in ipairs(C.studies) do studies[U.id(study.id)] = study.insight end
-    end
-    return studies[id]
-end
 local PROJECTION = U.id("projection_white")
 
 if craft and progress then
     craft.on_crafted(function(uuid, recipe_id)
-        local insight = study_insight(recipe_id)
-        if insight then
-            local bonus = progress.effects_of(uuid, "magic.")["magic.study_bonus_percent"] or 0
-            if bonus > 0 then progress.award(uuid, insight * bonus // 100, "the assay") end
-        elseif recipe_id == PROJECTION then
-            progress.discover(uuid, MILESTONE)
-        end
+        if recipe_id == PROJECTION then progress.discover(uuid, MILESTONE) end
     end)
 end
 

@@ -89,7 +89,7 @@ return {
     { id = "kerotakis", tier = 5, cost = 400, requires = { "amalgams", "degrees_of_fire" }, branch = "FIRE", label = "Maria's Kerotakis", text = "Maria's palette tints metals: gold and silver make electrum." },
     { id = "greater_talismans", tier = 5, cost = 500, requires = { "talismans", "kerotakis" }, branch = "SIGN", label = "Greater Talismans", text = "Talismans grow stronger, and two worn together both work.", effects = { { "magic.talisman_grade", 1 }, { "magic.talisman_slots", 1 } } },
     { id = "atalanta_fugiens", tier = 5, cost = 350, requires = { "cauda_pavonis" }, branch = "OPUS", star = true, label = "Atalanta Fugiens", text = "Maier's book of fifty emblems, each with music. Collect them all." },
-    { id = "assay", tier = 5, cost = 400, requires = { "aqua_fortis", "cupellation" }, branch = "PLAN", label = "The Assay", text = "The assayer's art: every study at the research table teaches more.", effects = { { "magic.study_bonus_percent", 25 } } },
+    { id = "assay", tier = 5, cost = 400, requires = { "aqua_fortis", "cupellation" }, branch = "PLAN", label = "The Assay", text = "The assayer's art: every study at the research table teaches more.", effects = { { "progress.study_percent", 25 } } },
     { id = "greater_seal", tier = 5, cost = 450, requires = { "hermetic_seal", "gate_congelation" }, branch = "SIGN", label = "The Greater Seal", text = "A wider Seal, and doors that open only for your friends." },
 
     -- Tier 6 — Rubedo: the Red Work

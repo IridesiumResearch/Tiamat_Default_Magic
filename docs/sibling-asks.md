@@ -31,8 +31,8 @@ and what came of it. The design reasons are in `docs/brief.md` §14.
 | W-M3 pyrite's random tick | World | answered: it is ours | **adopted**: pyrite weathers in the rain |
 | U-M1 shape-crafter presets | Interface | answered (ae8954a) | **adopted**: the seven sigils |
 | U-M2 widgets are views | Interface | answered (ae8954a) | the book copies them |
-| P-M1 a branch label and a reveal rule | Progress | **open** | the Research tab shows the path flat |
-| P-M2 a study bonus any node may carry | Progress | **open** | the Assay pays more for this mod's studies only |
+| P-M1 a branch label and a reveal rule | Progress | answered (Progress `ef6014b`) | **adopted**: nine branches, path-wide `reveal = "near"` |
+| P-M2 a study bonus any node may carry | Progress | answered (Progress `ef6014b`) | **adopted**: the Assay carries `progress.study_percent` 25 |
 | Wx-M1 a layered sky overlay | Weather | **open** | night-sight glows instead of brightening |
 
 Life's answers landed in Life `87a95f6`. This mod still calls each only
@@ -112,20 +112,22 @@ Block, Slab, Stairs and Pillar; at most eight added presets show at once.
 
 ### Tiamat Default Progress
 
-**P-M1, a branch label and a reveal rule** — *open.* A node field
-`branch = "Menstrua"` the Research tab groups by, and an option to show a
-path node only when all but one of its requirements are held. This path has
-97 nodes; the Research tab shows them flat. `tree.lua` already carries each
-node's `branch`, ready.
+**P-M1, a branch label and a reveal rule** — *answered 2026-09-30
+(Progress `ef6014b`), adopted 2026-10-05.* A node field `branch` the
+Research tab groups by, and an option to show a path node only when all but
+one of its requirements are held. *Answered:* `register_node{ branch }`,
+`register_path{ branches = { CODE = "Name" }, reveal = "near" }`, `reveal`
+per node as well. *Adopted:* every node passes its `tree.lua` branch, the
+path names the nine (`config.lua`, `C.path.branches`) and reveals its nodes
+`near`.
 
-**P-M2, a study bonus any node may carry** — *open, 2026-10-01.* Progress
-pays a study's insight and keeps what each pays to itself, so the Assay
-("every study at the research table pays 25 % more") can only add to
-this mod's own studies, whose insight it knows. *Wanted:* Progress reads an
-effect key — `progress.study_percent`, or this mod's
-`magic.study_bonus_percent` — from `effects_of` when it pays a study, as
-Craft reads `craft.*`. *Stands in:* this mod awards the bonus on its own
-studies through `award`.
+**P-M2, a study bonus any node may carry** — *answered 2026-09-30
+(Progress `ef6014b`), adopted 2026-10-05.* The Assay ("every study at the
+research table pays 25 % more") could only add to this mod's own studies.
+*Answered:* Progress reads `progress.study_percent`, summed over the nodes a
+player holds, whenever it pays a study. *Adopted:* the Assay carries
+`progress.study_percent` 25, and this mod's own award of the bonus is gone
+(it would have paid twice).
 
 ### Tiamat Weather
 

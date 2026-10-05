@@ -99,7 +99,7 @@ All are namespaced `tiamat_default_magic:` by the engine.
   `magic.hermetic_oath` to `magic.hermes_trismegistus`, carrying the effect
   keys `craft.fuel_percent` and `magic.sigil_percent`,
   `elixir_duration_percent`, `quintessence_max`,
-  `quintessence_regen_percent`, `long_work_percent`, `study_bonus_percent`,
+  `quintessence_regen_percent`, `long_work_percent`, (Progress's) `progress.study_percent`,
   `projection_percent`, `multiplication_days`, `talisman_grade`,
   `talisman_slots` and `familiars`; the shared nodes `shared.mutus_liber`,
   `shared.apothecary`, `shared.herb_lore` (tier 1) and `shared.foxfire`,

@@ -46,7 +46,7 @@ fn main() {
     homunculus_and_basilisk();
     microcosm_and_gates();
     rose_garden();
-    world_projection();
+    world_projection_and_the_assay();
     lapis_infinitus();
     quintessences_of_the_four();
     woven_worlds();
@@ -271,6 +271,10 @@ fn the_tree() {
     let answer = r.ask("t learn magic.hermes_trismegistus");
     assert!(answer.starts_with("nil"), "{answer}");
     assert_eq!(r.ask("t insight"), "5000", "nothing was spent");
+    // Grouped by branch (Progress's P-M1); each node's reveal is left to the
+    // path's, `near`, which the Research tab applies.
+    assert_eq!(r.ask("t node magic.rubedo"), "OPUS/nil");
+    assert_eq!(r.ask("t node magic.gate_calcination"), "GATE/nil");
     println!("the tree: ok");
 }
 
@@ -1287,7 +1291,7 @@ fn rose_garden() {
 /// Gate XII: a Red Stone and twenty quintessence used on the ground turn the
 /// base-metal ore round it into gold ore, a block a tick, and leave common
 /// stone alone; the Gate is a discovery worth 300.
-fn world_projection() {
+fn world_projection_and_the_assay() {
     let mut r = Rig::new(Setup::default());
     adept(&mut r, &["magic.quintessence", "magic.gate_projection"]);
     r.give(PLAYER, "quintessence", 27);
@@ -1317,7 +1321,10 @@ fn world_projection() {
     assert_ne!(blocks.get(&centre).map(|b| b.0), Some(gold), "stone is not base metal");
     let after: i64 = r.ask("t insight").parse().unwrap();
     assert_eq!(after - before, 300, "Gate XII, discovered");
-    println!("world projection: ok");
+    // The Assay: Progress pays every study more, read from its key (P-M2).
+    assert_eq!(r.ask("progress grant magic.assay"), "Learned: The Assay");
+    assert_eq!(r.ask("t effects progress."), "progress.study_percent=25");
+    println!("world projection and the assay: ok");
 }
 
 /// Lapis Infinitus: the Stone multiplies in one day, fed a quintessence.

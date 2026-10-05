@@ -137,7 +137,7 @@ def check(nodes):
         if len(n["text"]) > 90:
             problems.append(f"{nid}: text over 90 ({len(n['text'])})")
         effects = n.get("effects", [])
-        if len(effects) > 8 or any(not isinstance(e[1], int) or not re.match(r"^(magic|craft)\.", e[0]) for e in effects):
+        if len(effects) > 8 or any(not isinstance(e[1], int) or not re.match(r"^(magic|craft|progress)\.", e[0]) for e in effects):
             problems.append(f"{nid}: effects {effects}")
 
     for nid, n in by_id.items():

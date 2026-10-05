@@ -6,6 +6,7 @@
 --
 --   t nodes              the Bench's nodes Progress knows, in its order
 --   t has <node>         whether the speaker holds it
+--   t node <node>        a node's branch and reveal, as Progress keeps them
 --   t award <n>          insight, as another mod's milestone
 --   t learn <node>       Progress's unlock, paid in insight
 --   t insight            the speaker's insight
@@ -41,6 +42,10 @@ game.register_on_chat(function(e)
             end
         end
         say = table.concat(ids, " ")
+    elseif word == "node" then
+        for _, n in ipairs(p.nodes()) do
+            if n.id == rest then say = tostring(n.branch) .. "/" .. tostring(n.reveal) end
+        end
     elseif word == "has" then
         say = tostring(p.has(e.player, rest))
     elseif word == "award" then

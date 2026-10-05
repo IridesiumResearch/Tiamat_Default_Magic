@@ -209,6 +209,15 @@ C.path = {
     },
     oath = "magic.hermetic_oath",       -- cost 0, given the moment the door is chosen
     welcome = "You have taken the Oath. Seek the Athanor.",
+    -- The Research tab groups each tier by branch under these names, and
+    -- shows a node only once all but one of its requirements are held: the
+    -- frontier and the step past it, not ninety-seven tiles (Progress's
+    -- answer to P-M1).
+    branches = {
+        GATE = "The Twelve Gates", FIRE = "Vessels and Fire", MENS = "Menstrua", PLAN = "The Seven Metals",
+        SPAG = "Spagyrics", ELEM = "Elementals", SIGN = "Sigils and Seals", OPUS = "The Stones", COSM = "Worlds",
+    },
+    reveal = "near",
 }
 
 C.emerald_tablet = {
@@ -778,8 +787,8 @@ C.quintessence = {
     flow = { "quintessence_flow", 12000 }, -- the own effect the Elixir of Life starts, and its ticks
 }
 
--- The Assay: this mod's studies pay `magic.study_bonus_percent` more (and
--- every study would, if Progress read the key: sibling ask P-M2).
+-- The Assay: every study at the research table pays its node's
+-- `progress.study_percent` more, which Progress reads when it pays (P-M2).
 C.assay = { node = "magic.assay" }
 
 -- Atalanta Fugiens (Maier, 1617): an emblem for a first, once the book is
