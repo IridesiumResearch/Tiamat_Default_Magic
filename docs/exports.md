@@ -24,7 +24,7 @@ one in `depends` or `optional_depends`. Source:
 | `glyphs` | `{ [id] = { mask, variants } }` | Every glyph of the Art by its short id (`"sol"`): the canonical 27-bit mask and every orientation Craft knows it by. Read-only data. |
 | `quintessence(uuid)` | a player's UUID in hex | Their quintessence and its ceiling, two numbers; the ceiling is 0 off the magic path. |
 | `spend_quintessence(uuid, n)` | a UUID; a whole number | Takes `n` if they have it: `true`, else `false` and nothing taken. |
-| `is_warded(pos, uuid)` | `{ x, y, z }` in whole blocks (the overworld); a UUID | Whether a Hermetic Seal forbids that player to dig or build there. `nil` and why for a malformed question. |
+| `is_warded(pos, uuid)` | `{ x, y, z, domain? }` in whole blocks (the overworld when no domain); a UUID | Whether a Hermetic Seal forbids that player to dig or build there. `nil` and why for a malformed question. |
 | `familiars(uuid)` | a player's UUID in hex | Their familiars whose bodies are in the world, as `{ { kind, entity } }`; `nil` and why for a malformed UUID. |
 
 The brief's other fields (§12: herbs, the Opus's subscribers) are added as
@@ -183,9 +183,9 @@ sentence that only begins with the word is chat.
 
 `game.storage`, private to this mod: `clock` (ticks the world has run, as
 this mod counts them) and `fx:<uuid>:<effect>` (the tick a player's own
-effect ends: `night_sight`, `swiftness`), `carved:x,y,z` (who set a
+effect ends: `night_sight`, `swiftness`), `carved:x,y,z` (`carved:<domain>@x,y,z` off the overworld; who set a
 carving of the Art there; it replaced `sigil:x,y,z`),
-`seal:x,y,z` (a Hermetic Seal: its setter and radius),
+`seal:x,y,z` (`seal:<domain>@x,y,z` off the overworld; a Hermetic Seal: its setter and radius, warding the domain it was set in),
 `sealallow:<setter>:<uuid>` (who a setter lets build in their wards),
 `tree:x,y,z` (a Tree of Diana: its cells and who planted
 it) with `treefed:x,y,z` (the tick its watering ends), `weathered:x,y,z` (pyrite the rain has weathered),

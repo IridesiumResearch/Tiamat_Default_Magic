@@ -512,7 +512,7 @@ Every drink is registered with Life's `add_food` (`sound = "drink"`), so Life's 
 | Vigour | `effects = {{"regeneration", 300}}` | — |
 | Fortitude | `{{"resistance", 600}}` | — |
 | Warming / Cooling draught | `temperature = "warm"/"cool"`, `{{"warmth"/"cooling", 1200}}` | — |
-| Night-sight | — | sky brightened, 2,400 ticks (Wx-M1; until then `rested` and a faint glow of particles round the drinker) |
+| Night-sight | — | a light floor of 0.35 through Weather's overlay (Wx-M1, adopted 2026-10-07), and a faint glow of particles round the drinker; 2,400 ticks |
 | Swiftness | — | speed ×1.3, 1,200 ticks (L-M3) |
 | Rosewater, teas | small heal, `rested` | — |
 | Theriac | makes Life's own `antidote` | — |
@@ -802,7 +802,7 @@ What a player waits on, per tier, besides insight — the gates that make it *ta
 - **P-M1, a branch label and a reveal rule.** A node field `branch = "Menstrua"` the Research tab groups by, and an option to show a path node only when all but one of its requirements are held. A hundred nodes shown at once overwhelms a child and an adult alike. *Answered (Progress `ef6014b`) and adopted:* nine named branches, the path revealed `near`. And **P-M2**, a study bonus any node may carry: Progress reads `progress.study_percent`, which the Assay now carries.
 
 **Weather**
-- **Wx-M1, a layered sky overlay.** Weather writes `set_sky_modifier` for every player continuously, and a second writer would fight it. Ask: `add_overlay(uuid, source, { intensity, sky, sky_mix, saturation, grade } | nil)`, blended by Weather into what it writes. For night-sight and the Luna talisman; a woven world's sky is the engine's `set_domain_sky` now (E-M2). Shared with science (the Core's darkening, the atmosphere processor).
+- **Wx-M1, a layered sky overlay.** Weather writes `set_sky_modifier` for every player continuously, and a second writer would fight it. Ask: `add_overlay(uuid, source, { intensity, sky, sky_mix, saturation, grade } | nil)`, blended by Weather into what it writes. For night-sight and the Luna talisman; a woven world's sky is the engine's `set_domain_sky` now (E-M2). Shared with science (the Core's darkening, the atmosphere processor). *Answered (Weather `2f437fe`, the floor `8275c89`) and adopted:* `add_overlay` with the engine's `light_floor`.
 
 ### `docs/engine-asks.md`
 

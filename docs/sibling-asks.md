@@ -33,7 +33,7 @@ and what came of it. The design reasons are in `docs/brief.md` §14.
 | U-M2 widgets are views | Interface | answered (ae8954a) | the book copies them |
 | P-M1 a branch label and a reveal rule | Progress | answered (Progress `ef6014b`) | **adopted**: nine branches, path-wide `reveal = "near"` |
 | P-M2 a study bonus any node may carry | Progress | answered (Progress `ef6014b`) | **adopted**: the Assay carries `progress.study_percent` 25 |
-| Wx-M1 a layered sky overlay | Weather | **open** | night-sight glows instead of brightening |
+| Wx-M1 a layered sky overlay | Weather | answered (Weather `2f437fe`, `8275c89`) | **adopted**: night-sight's light floor |
 
 Life's answers landed in Life `87a95f6`. This mod still calls each only
 when Life's exports have it, so an older Life loses that effect and
@@ -131,10 +131,14 @@ player holds, whenever it pays a study. *Adopted:* the Assay carries
 
 ### Tiamat Weather
 
-**Wx-M1, a layered sky overlay** — *open.*
-`add_overlay(uuid, source, { intensity, sky, sky_mix, saturation } | nil)`,
-blended by Weather into what it writes, since `set_sky_modifier` is one
-modifier a player and the last writer wins. For night-sight and the Luna
-talisman (a woven world's sky no longer needs it: the engine's
-`set_domain_sky` gives an instance its own, E-M2). Shared with science (Wx-S2). Until then
-this mod never calls `set_sky_modifier`.
+**Wx-M1, a layered sky overlay** — *answered (Weather `2f437fe`; its light floor `8275c89`), adopted
+2026-10-07.* `set_sky_modifier` is one modifier a player and the last
+writer wins, so night-sight could not brighten without fighting Weather.
+*Answered:* `add_overlay(player, source, spec | nil)`, with the engine's
+`light_floor` (W32): Weather lays it over its own sky, sends the highest
+floor any overlay asks, keeps it underground and off the overworld, and
+drops it when the player leaves. *Adopted:* night-sight — the elixir and
+the Luna talisman — lays a light floor of 0.35 under
+`tiamat_default_magic:night_sight` while it lasts and takes it off when
+it ends (`config.lua`, `own_effects.night_sight.overlay`); the motes stay.
+Without Weather it is the motes alone.

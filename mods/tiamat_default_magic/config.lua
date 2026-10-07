@@ -390,7 +390,11 @@ C.elixirs = {
 -- This mod's own effects (brief §6.7): what Life does not have, each a
 -- timer in storage and a look every `every` ticks.
 C.own_effects = {
-    night_sight = { every = 40, particles = 6, colour = { r = 0.7, g = 0.9, b = 1.0, a = 0.35 } },
+    -- Night-sight: the frame never darker than `light_floor`, caves too,
+    -- through Weather's overlay (its answer to Wx-M1); and a faint glow of
+    -- motes round the drinker.
+    night_sight = { every = 40, particles = 6, colour = { r = 0.7, g = 0.9, b = 1.0, a = 0.35 },
+        overlay = { light_floor = 0.35, ease_ticks = 40 } },
     -- Through Life's composed abilities (its answer to L-M3): a speed that
     -- multiplies in with Life's own cold and hunger, under this mod's name.
     swiftness = { speed_mul = 1.3 },

@@ -69,6 +69,15 @@ function U.station_pos(name, station)
         domain = domain or "overworld" }
 end
 
+--- A key for something placed at `x, y, z` in `domain`: `prefix:x,y,z` in
+--- the overworld (as every key was before place and dig events named their
+--- domain), `prefix:<domain>@x,y,z` anywhere else — a woven world's block
+--- is not the overworld's at the same coordinates.
+function U.place_key(prefix, x, y, z, domain)
+    if domain == nil or domain == "overworld" then return string.format("%s:%d,%d,%d", prefix, x, y, z) end
+    return string.format("%s:%s@%d,%d,%d", prefix, domain, x, y, z)
+end
+
 --- The middle of a block's top face, in world blocks: where a flame is seen.
 function U.above(pos)
     return { x = pos.x + 0.5, y = pos.y + 0.9, z = pos.z + 0.5, domain = pos.domain }

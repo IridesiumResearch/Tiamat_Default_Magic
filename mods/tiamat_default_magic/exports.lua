@@ -36,12 +36,12 @@ function E.spend_quintessence(uuid, n)
 end
 
 --- Whether a Hermetic Seal forbids `uuid` to dig or build at `pos`
---- (`{ x, y, z }`, whole blocks, the overworld).
+--- (`{ x, y, z, domain? }`, whole blocks; the overworld when no domain).
 function E.is_warded(pos, uuid)
     if type(pos) ~= "table" or type(uuid) ~= "string" then return nil, "is_warded takes a position and a UUID" end
     local x, y, z = math.tointeger(pos.x), math.tointeger(pos.y), math.tointeger(pos.z)
     if not (x and y and z) then return nil, "a position is whole blocks" end
-    return tdm.seal.warding(x, y, z, uuid) ~= nil
+    return tdm.seal.warding(x, y, z, uuid, pos.domain) ~= nil
 end
 
 --- A player's bound familiars: `{ { kind, entity } }`, entity nil for one

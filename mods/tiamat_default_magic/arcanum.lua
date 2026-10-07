@@ -96,7 +96,7 @@ tdm.on_use(function(e)
                 for dz = -r, r do
                     local x, y, z = at.x + dx, at.y + dy, at.z + dz
                     local b = game.get_block{ x = x, y = y, z = z, domain = e.domain }
-                    if b and BASE[b.material] and not (tdm.seal and tdm.seal.warding(x, y, z, e.player)) then
+                    if b and BASE[b.material] and not (tdm.seal and tdm.seal.warding(x, y, z, e.player, e.domain)) then
                         queue[#queue + 1] = { x = x, y = y, z = z, domain = e.domain }
                         turned = turned + 1
                     end

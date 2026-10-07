@@ -48,24 +48,25 @@ for _, glyph in ipairs(G.table) do
     if glyph.planet and glyph.ore then ore_of[glyph.planet] = U.material(U.id(glyph.ore)) end
 end
 
-local function key(x, y, z)
-    return string.format("carved:%d,%d,%d", x, y, z)
+local function key(x, y, z, domain)
+    return U.place_key("carved", x, y, z, domain)
 end
 
---- Who set the carved glyph at `x, y, z`, or nil.
-function S.setter(x, y, z)
-    local who = game.storage.get(key(x, y, z))
+--- Who set the carved glyph at `x, y, z` (in `domain`, the overworld when
+--- nil), or nil.
+function S.setter(x, y, z, domain)
+    local who = game.storage.get(key(x, y, z, domain))
     return type(who) == "string" and who or nil
 end
 
 -- Who set it: remembered when a glyph of the Art is placed, forgotten when dug.
 tdm.on_place(function(e)
-    if G.of(e.occupancy) then game.storage.set(key(e.x, e.y, e.z), e.player) end
+    if G.of(e.occupancy) then game.storage.set(key(e.x, e.y, e.z, e.domain), e.player) end
     return nil
 end)
 
 tdm.on_dig(function(e)
-    local k = key(e.x // 3, e.y // 3, e.z // 3)
+    local k = key(e.x // 3, e.y // 3, e.z // 3, e.domain)
     if game.storage.get(k) ~= nil then game.storage.set(k, nil) end
 end)
 
@@ -95,7 +96,7 @@ function S.percent(name, pos)
         local at = game.get_block{ x = x, y = y, z = z, domain = pos.domain }
         local glyph = at and at.occupancy and G.of(at.occupancy)
         if glyph and glyph.planet and wanted[glyph.planet] then
-            local setter = game.storage.get(key(x, y, z))
+            local setter = game.storage.get(key(x, y, z, pos.domain))
             local known = 0
             if type(setter) == "string" and progress then
                 known = progress.effects_of(setter, "magic.")["magic.sigil_percent"] or 0
@@ -119,7 +120,7 @@ function S.ring_percent(pos)
         local at = game.get_block{ x = x, y = pos.y, z = z, domain = pos.domain }
         local glyph = at and at.occupancy and G.of(at.occupancy)
         if glyph ~= OUROBOROS then return 0 end
-        setter = setter or S.setter(x, pos.y, z)
+        setter = setter or S.setter(x, pos.y, z, pos.domain)
     end
     if not (setter and progress) then return 0 end
     local less = -(progress.effects_of(setter, "magic.")["magic.long_work_percent"] or 0)

@@ -87,11 +87,11 @@ local function soluble_round(pos, uuid)
     for dx = -r, r do
         for dy = -r, r do
             for dz = -r, r do
-                local at = { x = pos.x + dx, y = pos.y + dy, z = pos.z + dz }
+                local at = { x = pos.x + dx, y = pos.y + dy, z = pos.z + dz, domain = pos.domain }
                 local b = game.get_block(at)
                 local fluid = b and game.get_fluid(at)
                 if b and SOLUBLE[b.material] and b.occupancy == game.OCCUPANCY_FULL and not (fluid and fluid.volume > 0)
-                    and not (tdm.seal and tdm.seal.warding(at.x, at.y, at.z, uuid)) then
+                    and not (tdm.seal and tdm.seal.warding(at.x, at.y, at.z, uuid, at.domain)) then
                     out[#out + 1] = at
                 end
             end
@@ -190,8 +190,8 @@ if progress then
     progress.register_discovery{ id = WEDDING, insight = W.discovery, label = "The Chymical Wedding", group = "opus" }
 end
 
-local function glyph_at(x, y, z)
-    local b = game.get_block{ x = x, y = y, z = z }
+local function glyph_at(x, y, z, domain)
+    local b = game.get_block{ x = x, y = y, z = z, domain = domain }
     local g = b and b.occupancy and G.of(b.occupancy)
     return g and g.id or nil
 end
@@ -199,12 +199,12 @@ end
 --- Whether the athanor at `pos` is wed: Sol and Luna on opposite sides,
 --- a quintessence on top. Answers the top's position.
 function M.wed(pos)
-    if glyph_at(pos.x, pos.y + 1, pos.z) ~= "quintessence" then return nil end
+    if glyph_at(pos.x, pos.y + 1, pos.z, pos.domain) ~= "quintessence" then return nil end
     for _, d in ipairs({ { 1, 0 }, { 0, 1 } }) do
-        local a = glyph_at(pos.x + d[1], pos.y, pos.z + d[2])
-        local b = glyph_at(pos.x - d[1], pos.y, pos.z - d[2])
+        local a = glyph_at(pos.x + d[1], pos.y, pos.z + d[2], pos.domain)
+        local b = glyph_at(pos.x - d[1], pos.y, pos.z - d[2], pos.domain)
         if (a == "sol" and b == "luna") or (a == "luna" and b == "sol") then
-            return { x = pos.x, y = pos.y + 1, z = pos.z }
+            return { x = pos.x, y = pos.y + 1, z = pos.z, domain = pos.domain }
         end
     end
     return nil
@@ -220,7 +220,7 @@ tdm.on_tick(function(dt)
             local pos = U.station_pos(name, STATION)
             local b = pos and game.get_block(pos)
             local top = b and LIT_OR_NOT[b.material] and M.wed(pos)
-            local who = top and tdm.sigils.setter(top.x, top.y, top.z)
+            local who = top and tdm.sigils.setter(top.x, top.y, top.z, top.domain)
             if who and progress and progress.has(who, W.node) then
                 game.storage.set("wedded:" .. name, true)
                 game.give(who, { material = CROWN, count = 1 })

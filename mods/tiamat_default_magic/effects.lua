@@ -11,9 +11,10 @@
 -- keep running out while they are away, since the clock does.
 --
 -- Each effect is a look, repeated every `every` ticks while it lasts, to
--- that player alone. Night-sight is the one tier 3 needs: until Weather
--- blends a sky overlay (sibling ask Wx-M1) it brightens nothing, so it is a
--- faint glow of motes round the drinker, and Life's own rested sleep.
+-- that player alone. Night-sight is the one tier 3 needs: a light floor laid
+-- over the sky through Weather's overlay (its answer to Wx-M1), so the dark
+-- is lit, caves too; and a faint glow of motes round the drinker. Without
+-- Weather it is the motes alone.
 
 local C = tdm.config
 local U = tdm.util
@@ -21,6 +22,7 @@ local U = tdm.util
 local E = {}
 
 local life = U.exports("tiamat_default_life")
+local weather = U.exports("tiamat_weather")
 
 local live = {}             -- uuid -> { effect id -> the tick it ends }
 
@@ -105,12 +107,18 @@ function E.begin(uuid, id)
     if spec and (spec.speed_mul or spec.fly) and life and life.set_ability then
         life.set_ability(uuid, ability_source(id), { speed_mul = spec.speed_mul or 1, fly = spec.fly == true })
     end
+    if spec and spec.overlay and weather and weather.add_overlay then
+        weather.add_overlay(uuid, ability_source(id), spec.overlay)
+    end
 end
 
 local function finish(uuid, id)
     local spec = C.own_effects[id]
     if spec and (spec.speed_mul or spec.fly) and life and life.set_ability then
         life.set_ability(uuid, ability_source(id), nil)
+    end
+    if spec and spec.overlay and weather and weather.add_overlay then
+        weather.add_overlay(uuid, ability_source(id), nil)
     end
 end
 

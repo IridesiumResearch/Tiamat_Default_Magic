@@ -933,6 +933,7 @@ impl Rig {
     pub fn place_event(&mut self, player: [u8; 32], (x, y, z): (i32, i32, i32), id: &str, mask: u32) -> bool {
         let out = self.vm.place(&PlaceEvent {
             player,
+            domain: "overworld".into(),
             block: BlockPos { x, y, z },
             material: self.material(id),
             occupancy: mask,
@@ -951,6 +952,7 @@ impl Rig {
         };
         let out = self.vm.dig_complete(&DigEvent {
             player,
+            domain: "overworld".into(),
             target: tiamat_core::SubNodePos { x: x * 3 + 1, y: y * 3 + 1, z: z * 3 + 1 },
             material,
             brush: Brush::Block,
@@ -967,6 +969,7 @@ impl Rig {
         };
         let out = self.vm.dig_start(&DigEvent {
             player,
+            domain: "overworld".into(),
             target: tiamat_core::SubNodePos { x: x * 3 + 1, y: y * 3 + 1, z: z * 3 + 1 },
             material,
             brush: Brush::Block,

@@ -15,8 +15,9 @@
 --
 -- The seals are keys (`seal:x,y,z`, holding the setter and the radius),
 -- read once into a list, and every dig and build is checked against the
--- list — a few seals a player, not a world scan. The engine's place and dig
--- events name no domain, so seals ward the overworld.
+-- list — a few seals a player, not a world scan. A seal wards the domain it
+-- was set in (the place and dig events name it); off the overworld its key
+-- is `seal:<domain>@x,y,z`.
 
 local C = tdm.config
 local U = tdm.util
@@ -31,17 +32,20 @@ local MARBLE = U.material(U.id(S.marble))
 
 local seals = nil           -- key -> { x, y, z, by, radius }
 
-local function key(x, y, z) return string.format("seal:%d,%d,%d", x, y, z) end
+local function key(x, y, z, domain) return U.place_key("seal", x, y, z, domain) end
 
 local function all()
     if seals then return seals end
     seals = {}
     for _, k in ipairs(game.storage.keys("seal:")) do
-        local x, y, z = string.match(k, "^seal:(%-?%d+),(%-?%d+),(%-?%d+)$")
+        local rest = string.sub(k, 6)
+        local domain, where = string.match(rest, "^(.*)@([^@]+)$")
+        local x, y, z = string.match(where or rest, "^(%-?%d+),(%-?%d+),(%-?%d+)$")
         local by, radius = string.match(tostring(game.storage.get(k)), "^(%x+);(%d+)$")
         if x and by then
             seals[k] = { x = math.tointeger(tonumber(x)), y = math.tointeger(tonumber(y)),
-                z = math.tointeger(tonumber(z)), by = by, radius = math.tointeger(tonumber(radius)) }
+                z = math.tointeger(tonumber(z)), by = by, radius = math.tointeger(tonumber(radius)),
+                domain = domain or "overworld" }
         end
     end
     return seals
@@ -61,11 +65,13 @@ local function active(seal)
     return progress ~= nil and progress.has(seal.by, S.node) == true
 end
 
---- Whether a seal forbids `uuid` the block at `x, y, z`: the seal, or nil.
-function W.warding(x, y, z, uuid)
+--- Whether a seal forbids `uuid` the block at `x, y, z` in `domain` (the
+--- overworld when nil): the seal, or nil.
+function W.warding(x, y, z, uuid, domain)
+    domain = domain or "overworld"
     for _, seal in pairs(all()) do
         local r = seal.radius
-        if math.abs(x - seal.x) <= r and math.abs(y - seal.y) <= r and math.abs(z - seal.z) <= r
+        if seal.domain == domain and math.abs(x - seal.x) <= r and math.abs(y - seal.y) <= r and math.abs(z - seal.z) <= r
             and not allowed(seal.by, uuid) and active(seal) then
             return seal
         end
@@ -84,25 +90,25 @@ end
 -- Setting one, and building or digging under one ------------------------------------------
 
 tdm.on_place(function(e)
-    if W.warding(e.x, e.y, e.z, e.player) then return S.refused end
+    if W.warding(e.x, e.y, e.z, e.player, e.domain) then return S.refused end
     if G.of(e.occupancy) ~= SEAL or not (progress and progress.has(e.player, S.node)) then return nil end
     local r = radius_for(e.player, e.material)
     for _, seal in pairs(all()) do
         local reach = r + seal.radius
-        if seal.by ~= e.player and math.abs(e.x - seal.x) <= reach and math.abs(e.y - seal.y) <= reach
+        if seal.by ~= e.player and seal.domain == (e.domain or "overworld") and math.abs(e.x - seal.x) <= reach and math.abs(e.y - seal.y) <= reach
             and math.abs(e.z - seal.z) <= reach then
             return S.overlaps
         end
     end
-    local k = key(e.x, e.y, e.z)
-    all()[k] = { x = e.x, y = e.y, z = e.z, by = e.player, radius = r }
+    local k = key(e.x, e.y, e.z, e.domain)
+    all()[k] = { x = e.x, y = e.y, z = e.z, by = e.player, radius = r, domain = e.domain or "overworld" }
     game.storage.set(k, string.format("%s;%d", e.player, r))
     return nil
 end)
 
 local function refuse_dig(e)
     local x, y, z = e.x // 3, e.y // 3, e.z // 3
-    if W.warding(x, y, z, e.player) then return S.refused end
+    if W.warding(x, y, z, e.player, e.domain) then return S.refused end
     return nil
 end
 
@@ -111,7 +117,7 @@ tdm.on_dig_start(refuse_dig)
 tdm.on_dig(function(e)
     local refused = refuse_dig(e)
     if refused then return refused end
-    local k = key(e.x // 3, e.y // 3, e.z // 3)
+    local k = key(e.x // 3, e.y // 3, e.z // 3, e.domain)
     if all()[k] then
         seals[k] = nil
         game.storage.set(k, nil)
