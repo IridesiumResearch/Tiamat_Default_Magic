@@ -850,8 +850,8 @@ C.gifts = {
     gnome_delving = { node = "magic.gnome_delving", reach = 16, height = 2,
         -- What a gnome may tunnel: the world's own ground and ore, nothing
         -- anybody built, so a tunnel never opens a chest or a station.
-        digs = { "W:stone", "W:granite", "W:slate", "W:calcite", "W:dark_basalt", "W:basalt", "W:dirt", "W:sand",
-            "W:gravel", "W:white_sand", "W:dry_clay", "W:wet_clay", "W:cobble", "W:coal", "W:copper_ore", "W:tin_ore",
+        digs = { "W:stone", "W:granite", "W:slate", "W:calcite", "W:dark_basalt", "W:dirt", "W:sand",
+            "W:gravel", "W:white_sand", "W:dry_clay", "W:wet_clay", "W:cobbles", "W:coal", "W:copper_ore", "W:tin_ore",
             "W:iron_ore", "W:lead_ore", "W:silver_ore", "W:gold_ore", "W:cinnabar", "W:pyrite", "W:salt", "W:sulfur" } },
     sylph_flight = { node = "magic.sylph_flight", cost = 10, ticks = 200 },
 }
