@@ -939,6 +939,7 @@ impl Rig {
             occupancy: mask,
             units: mask.count_ones(),
             cells: None,
+            swept: false,
         });
         assert!(out.faults.is_empty(), "faulted in a place: {:?}", out.faults);
         out.allowed
