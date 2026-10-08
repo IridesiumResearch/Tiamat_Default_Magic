@@ -1324,6 +1324,11 @@ fn world_projection_and_the_assay() {
     // The Assay: Progress pays every study more, read from its key (P-M2).
     assert_eq!(r.ask("progress grant magic.assay"), "Learned: The Assay");
     assert_eq!(r.ask("t effects progress."), "progress.study_percent=25");
+    // Salamander's wool, from the hot shell (W-M2).
+    assert_eq!(r.ask("progress grant magic.salamander"), "Learned: The Salamander");
+    r.give(PLAYER, "tiamat_default_world:hot_fiber_stone", 27);
+    assert_eq!(r.ask(&format!("t make {MOD}:salamander_wool")), "made");
+    assert_eq!(r.units(PLAYER, "salamander_wool"), 27);
     println!("world projection and the assay: ok");
 }
 
@@ -1499,6 +1504,20 @@ fn woven_worlds() {
     assert!(!r.places.0.lock().unwrap().contains(&world), "the world, ended");
     assert_eq!(r.units(PLAYER, "prima_materia"), 27 * 27 / 2, "half its first matter back");
     assert!(r.stored(&format!("woven:{key}")).is_none(), "and forgotten");
+
+    // A block of caul, the world-egg's membrane, for the prima materia (W-M2).
+    for id in ["rebis", "quintessence_fire", "quintessence_water", "quintessence_air", "quintessence_earth", "red_stone"] {
+        r.give(PLAYER, id, 27);
+    }
+    r.give(PLAYER, "tiamat_default_world:caul", 27);
+    let materia = r.units(PLAYER, "prima_materia");
+    r.hold(PLAYER, "rebis");
+    assert!(r.use_at(PLAYER, lx, ly, lz));
+    r.press(PLAYER, MOD, "loom", "weave");
+    let second = format!("{MOD}:world_earth/{}_2_none_mid", &rig::hex(PLAYER)[..16]);
+    assert!(r.places.0.lock().unwrap().contains(&second), "woven on the caul");
+    assert_eq!(r.units(PLAYER, "tiamat_default_world:caul"), 0, "the caul taken");
+    assert_eq!(r.units(PLAYER, "prima_materia"), materia, "and the first matter kept");
     println!("woven worlds: ok");
 }
 

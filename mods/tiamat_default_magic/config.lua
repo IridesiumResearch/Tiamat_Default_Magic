@@ -1212,6 +1212,20 @@ C.trismegistus = {
     },
 }
 
+-- The magical shells (World's answer to W-M2): what the core's hot and
+-- cold shells give the Art. `hot_fiber_stone`, teased apart by hand, is
+-- salamander's wool (the old name for asbestos, the cloth fire cleans):
+-- in an athanor's vessel slot it blows the 4th degree, as bellows do. And
+-- a block of `caul`, the membrane of the world-egg, may stand at the Loom
+-- for the block of prima materia a weaving takes.
+C.shells = {
+    wool = { id = "salamander_wool", name = "Salamander's wool",
+        description = "Fibre from the core's hot shell. Fire cleans it and cannot burn it; in an athanor's vessel slot it blows the 4th degree." },
+    wool_recipe = { id = "salamander_wool", station = "hand", node = "magic.salamander",
+        inputs = { { "W:hot_fiber_stone", units = 27 } }, outputs = { { "salamander_wool", count = 1 } } },
+    caul = "W:caul", caul_units = 27,
+}
+
 C.tier7_studies = {
     { id = "study_elemental_quintessence", name = "Study an elemental quintessence",
         inputs = { { "#magic_elemental_quintessence", count = 1 } }, ticks = 9000, insight = 400 },
@@ -1236,6 +1250,9 @@ C.worlds = {
         { "quintessence_air", count = 1 }, { "quintessence_earth", count = 1 }, { "prima_materia", units = 27 * 27 },
         { "red_stone", count = 1 } },
     returned = 27 * 27 // 2,        -- prima materia units Solve et Coagula gives back
+    -- A block of caul (the world-egg's membrane, W-M2) for the prima materia,
+    -- when the weaver carries too little first matter.
+    instead = { prima_materia = { "W:caul", units = 27 } },
     arrive = { x = 0.5, y = 68, z = 0.5 },
     landing = { radius = 7, top = 66, depth = 5 },  -- the ground every world has under its arrival
     seas = { low = 56, mid = 62, high = 68 },
@@ -1277,7 +1294,7 @@ C.worlds = {
 -- The Mute Book's lines for tier 7's works that are not recipes.
 C.book_notes["magic.gate_projection"] = "a Red Stone + 20 quintessence, used on the ground  ->  copper, tin, lead and iron ore near it become gold ore, and all near are healed"
 C.book_notes["magic.elemental_quintessences"] = "stand at the centre of a Circle of Four with an elemental walking with you: a day there, and it gives its element's quintessence"
-C.book_notes["magic.opus_mundi"] = "the Loom: a quintessence glyph in crystal, the seven sigils and the emerald round it, fire, water, air and earth at the edges. Use it with the Rebis to weave; with anything else, to enter your worlds. The Egg, used inside, brings you back"
+C.book_notes["magic.opus_mundi"] = "the Loom: a quintessence glyph in crystal, the seven sigils and the emerald round it, fire, water, air and earth at the edges. Use it with the Rebis to weave; with anything else, to enter your worlds. The Egg, used inside, brings you back. A block of caul from the core may stand for the prima materia"
 C.book_notes["magic.planetary_skies"] = "at the Loom, choose the sky your world wears"
 C.book_notes["magic.planetary_veins"] = "at the Loom, choose the metal that runs rich in your world"
 C.book_notes["magic.native_spirits"] = "your worlds keep wild spirits of their element near whoever walks in them"

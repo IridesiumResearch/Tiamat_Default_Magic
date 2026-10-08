@@ -793,7 +793,7 @@ What a player waits on, per tier, besides insight — the gates that make it *ta
 **World**
 - **W-M1, cinnabar.** A `cinnabar` block (tags `ore`, `mineral`; hardness 1.8; drops itself) as crust round Volcanic Foothills fumaroles and Geyser Basin throats, and seams in Mineral Vein Tunnels. Science needs it too (barometer, daguerreotype). Fallback §6.4.
 - **W-M3, pyrite's random tick.** The engine allows one random-tick handler a material, and World does not tick pyrite today. Ask: leave pyrite to this mod (weathering to vitriol under rain), or tick it in World and call an export of this mod. Fallback: the list of placed pyrite blocks in §6.4.
-- **W-M2 (optional), the magical shells.** If World builds `hot_magical` / `cold_magical` / `slime_border`, this mod reads `hot_fiber_stone` as *salamander's wool* (asbestos was so called) and `caul` as the membrane of the world-egg — both would join the T6–T7 recipes. Nothing waits on it.
+- **W-M2 (optional), the magical shells.** If World builds `hot_magical` / `cold_magical` / `slime_border`, this mod reads `hot_fiber_stone` as *salamander's wool* (asbestos was so called) and `caul` as the membrane of the world-egg — both would join the T6–T7 recipes. Nothing waits on it. *Answered and adopted (2026-10-08):* salamander's wool, a 4th-degree blast; a block of caul for the prima materia at the Loom.
 
 **UI**
 - **U-M1, shape-crafter presets from siblings.** `add_preset{ id, label, mask, visible = fn(player) → bool }`: buttons beside Slab / Stairs / Pillar, shown when `visible` answers true (a node held). The biggest single thing for children.

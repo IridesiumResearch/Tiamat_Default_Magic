@@ -36,6 +36,11 @@ R.group("#magic_elemental_quintessence",
     { "quintessence_fire", "quintessence_water", "quintessence_air", "quintessence_earth" })
 for _, study in ipairs(C.tier7_studies) do C.studies[#C.studies + 1] = study end
 
+-- Salamander's wool (W-M2): teased from the hot shell's fibre, and a
+-- blast in an athanor's vessel slot, beside bellows and the ember.
+R.register(C.shells.wool_recipe)
+R.group(C.athanor.blast, { C.shells.wool.id })
+
 -- Lapis Infinitus: Gate XI in a day, a quintessence for the quicksilver.
 R.register{ id = "multiplication_lapis", station = "athanor", node = C.lapis.node, degree = 1, days = C.lapis.days, gate = 11,
     inputs = { { "red_stone", count = 1 }, { "C:gold_ingot", count = 1 }, { "quintessence", count = 1 } },

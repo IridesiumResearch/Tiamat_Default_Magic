@@ -45,6 +45,7 @@ add({ C.caduceus.item })
 add(C.tier6_items)
 add(C.tier6_living_items)
 add(C.tier7_items)
+add({ C.shells.wool })
 add({ C.arbor.seed })
 for _, kind in ipairs(C.talismans.kinds) do
     I.all[#I.all + 1] = { id = "talisman_" .. kind.planet, name = kind.name,

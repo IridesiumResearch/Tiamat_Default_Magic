@@ -91,7 +91,9 @@ All are namespaced `tiamat_default_magic:` by the engine.
   `basilisk_egg` (used, a familiar wakes), `basilisk_ash`, and
   `beast_essence` (its detail `k=<kind>` names the creature); and tier
   7's `rebis` and the four `quintessence_<element>` (`fire`, `water`,
-  `air`, `earth`), in the group `#magic_elemental_quintessence`.
+  `air`, `earth`), in the group `#magic_elemental_quintessence`; and
+  `salamander_wool` (by hand from World's `hot_fiber_stone`; in
+  `#magic_blast`).
 - **Into Progress:** the path `magic`, "The Hermetic Art", whose door is
   `emerald_tablet` (Progress registers its recipe as
   `tiamat_default_progress:door_magic`: the Keystone, 27 units of crystal,

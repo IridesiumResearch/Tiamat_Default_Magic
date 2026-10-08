@@ -27,7 +27,7 @@ and what came of it. The design reasons are in `docs/brief.md` §14.
 | L-M6 air | Life | answered (Life `87a95f6`) | the undine's gift (tier 5) |
 | L-M7 the phoenix | Life | answered (Life `87a95f6`) | the phoenix (tier 6) |
 | W-M1 cinnabar | World | answered (1d50d64) | quicksilver (tier 4) |
-| W-M2 the magical shells | World | not built; optional | nothing waits on it |
+| W-M2 the magical shells | World | answered (the shells' materials generate) | **adopted**: salamander's wool; a caul at the Loom |
 | W-M3 pyrite's random tick | World | answered: it is ours | **adopted**: pyrite weathers in the rain |
 | U-M1 shape-crafter presets | Interface | answered (ae8954a) | **adopted**: the seven sigils |
 | U-M2 widgets are views | Interface | answered (ae8954a) | the book copies them |
@@ -95,7 +95,12 @@ a change:* the world does not tick pyrite, so this mod takes the handler.
 
 **W-M2 (optional), the magical shells.** If World builds `hot_magical` /
 `cold_magical`, this mod reads `hot_fiber_stone` as salamander's wool and
-`caul` as the world-egg's membrane. *Not built;* nothing waits on it.
+`caul` as the world-egg's membrane. *Answered 2026-10-08:* the materials
+generate in the core's shells, though the shells' biomes are not built.
+*Adopted:* `hot_fiber_stone` teased by hand is `salamander_wool`, a 4th-degree
+blast in an athanor's vessel slot (`#magic_blast`, beside bellows and the
+ember); a block of `caul` stands at the Loom for the block of prima materia
+a weaving takes, when the weaver carries too little.
 
 **W-M1, cinnabar**, round Volcanic Foothills fumaroles and Geyser Basin
 throats, and in Mineral Vein Tunnels seams. *Answered.*

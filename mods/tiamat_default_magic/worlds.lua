@@ -349,7 +349,7 @@ local function weave_tree(uuid)
     rows[#rows + 1] = label("Its sea:")
     rows[#rows + 1] = row({ button("sea:low", "low", s.sea == "low"), button("sea:mid", "middling", s.sea == "mid"),
         button("sea:high", "high", s.sea == "high") })
-    rows[#rows + 1] = label("It takes the Rebis, the four quintessences, a block of prima materia and a Red Stone.", 13)
+    rows[#rows + 1] = label("It takes the Rebis, the four quintessences, a block of prima materia (or of caul) and a Red Stone.", 13)
     rows[#rows + 1] = row({ button("weave", "Weave") })
     return column(rows)
 end
@@ -372,13 +372,20 @@ end
 
 local function show(uuid, tree) game.show_dialog{ player = uuid, form = FORM, tree = tree } end
 
---- Takes every cost of a weaving, or nothing.
+--- Takes every cost of a weaving, or nothing. A cost with an `instead`
+--- (prima materia: a block of caul) takes that when the first falls short.
 local function take_costs(uuid)
     local taken = {}
     for _, cost in ipairs(K.costs) do
         local id = U.id(cost[1])
         local want = cost.units or cost.count * U.UNITS
         local got = game.take(uuid, { material = id, units = want })
+        local other = K.instead[cost[1]]
+        if got < want and other and U.material(U.id(other[1])) then
+            if got > 0 then game.give(uuid, { material = id, units = got }) end
+            id, want = U.id(other[1]), other.units
+            got = game.take(uuid, { material = id, units = want })
+        end
         taken[#taken + 1] = { material = id, units = got }
         if got < want then
             for _, t in ipairs(taken) do
