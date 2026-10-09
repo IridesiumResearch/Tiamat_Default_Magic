@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 """Generates the placeholder models for mods/tiamat_default_magic/models:
 the familiars, and the blocks drawn as models (the athanor, the Tablet).
+The homunculus is the designer's own (`homunculus_1`) and is not written here.
 
 A familiar is a few boxes: rigid (no clips, so the engine draws it still),
 self-contained .glb with no image inside it (the engine refuses one that
@@ -174,20 +175,6 @@ def face(c, skin):
     c.rect(10, 10, 13, 10, (120, 60, 60))
 
 
-def homunculus():
-    """Paracelsus' little helper: a small, round, cheerful figure."""
-    boxes = [
-        ((-0.3, 0.0, -0.25), (0.3, 0.8, 0.25), HIDE),       # body
-        ((-0.28, 0.8, -0.28), (0.28, 1.3, 0.28), FACE),     # head
-        ((0.3, 0.3, -0.1), (0.42, 0.7, 0.1), HIDE),         # arms
-        ((-0.42, 0.3, -0.1), (-0.3, 0.7, 0.1), HIDE),
-    ]
-    c = Canvas((190, 120, 90))
-    c.rect(0, 0, 7, 4, (90, 60, 120))                      # a little cloak
-    face(c, (240, 200, 180))
-    return boxes, c
-
-
 def basilisk():
     """Theophilus' basilisk: a grumpy rooster-lizard, not a monster."""
     boxes = [
@@ -248,7 +235,7 @@ def emerald_tablet():
 
 
 MODELS = {"salamander": salamander, "undine": undine, "gnome": gnome, "sylph": sylph,
-          "homunculus": homunculus, "basilisk": basilisk,
+          "basilisk": basilisk,
           "athanor": lambda: athanor_of((24, 16, 14), None),
           "athanor_lit": lambda: athanor_of((90, 30, 10), (250, 170, 40)),
           "emerald_tablet": emerald_tablet}

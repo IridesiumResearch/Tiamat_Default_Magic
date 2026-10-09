@@ -21,6 +21,7 @@ fn main() {
     the_tree();
     the_door();
     the_blocks();
+    the_models();
     the_athanor();
     spagyrics();
     glyphs();
@@ -361,6 +362,30 @@ fn the_blocks() {
     let tree = of("arbor_dianae");
     assert!(!tree.whole && tree.model.is_none(), "the Tree of Diana grows by the cell");
     println!("the blocks: ok");
+}
+
+/// Every model the mod ships, through the engine's own loader with the
+/// limits a client gets on a server's push: it parses (no embedded picture),
+/// and the homunculus, the designer's own, has the clips the engine plays.
+fn the_models() {
+    let dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../mods/tiamat_default_magic/models");
+    let mut seen = 0;
+    for entry in std::fs::read_dir(&dir).expect("the models") {
+        let path = entry.unwrap().path();
+        if path.extension().is_some_and(|e| e == "glb") {
+            let bytes = std::fs::read(&path).unwrap();
+            let model = tiamat_core::model::load_isolated(&bytes, &tiamat_core::model::Limits::default())
+                .unwrap_or_else(|e| panic!("{} will not load: {e}", path.display()));
+            if path.file_stem().is_some_and(|s| s == "homunculus_1") {
+                for clip in ["idle", "walk", "run", "swing"] {
+                    assert!(model.clip(clip).is_some(), "the homunculus's {clip}");
+                }
+            }
+            seen += 1;
+        }
+    }
+    assert_eq!(seen, 9, "nine models");
+    println!("the models: ok");
 }
 
 /// A player on the magic path, holding `nodes` (granted by an operator).

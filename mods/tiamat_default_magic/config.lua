@@ -924,7 +924,9 @@ C.wedding = { node = "magic.chymical_wedding", crown = "wedding_crown", discover
 -- The living works of tier 6 (brief §6.9): two familiars made, not found.
 C.homunculus = {
     node = "magic.homunculus", made = true,
-    model = { id = "homunculus", file = "models/homunculus.glb", texture = "models/homunculus.png" },
+    -- The designer's own model (idle, walk, run and swing clips), drawn 0.93
+    -- cells tall as exported: scaled to stand about the collider's height.
+    model = { id = "homunculus", file = "models/homunculus_1.glb", texture = "models/homunculus_1.png", scale = 1.45 },
     name = "Homunculus", collider = { width = 0.8, height = 1.4 }, health = 12, speed = 1.0,
     vial = "homunculus_vial", food = {}, food_units = 0, discovery = 50,
     satchel = 27,                   -- slots in the satchel it carries

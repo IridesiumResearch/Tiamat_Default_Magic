@@ -46,7 +46,8 @@ local FOOD = {}             -- kind -> { numeric material = true }
 
 for _, kind in ipairs(F.ORDER) do
     local K = F.KINDS[kind]
-    local ok, why = pcall(game.register_model, { id = K.model.id, file = K.model.file, texture = K.model.texture })
+    local ok, why = pcall(game.register_model, { id = K.model.id, file = K.model.file, texture = K.model.texture,
+        scale = K.model.scale })
     if not ok then game.log("tiamat_default_magic: the " .. kind .. "'s model was refused: " .. tostring(why)) end
     MODELS[U.id(K.model.id)] = kind
     FOOD[kind] = {}
