@@ -1,12 +1,11 @@
 # Tiamat Default Magic — the Hermetic Art: the magic door of Progress's
 # Fork, and everything behind it (docs/brief.md).
 #
-# Built so far: the Apothecary's Bench, five shared nodes a child can reach
-# long before the Fork (brief §4). The door, the tree and the Art behind it
-# follow in the brief's build order (§17).
+# Built: the Apothecary's Bench (brief §4), the Emerald Tablet's door, and
+# the whole tree behind it, tiers 3 to 7 (brief §17).
 id = "tiamat_default_magic"
 name = "Tiamat Default Magic"
-version = "0.1.0"
+version = "1.0.0"
 description = "The Hermetic Art: the athanor, the Twelve Gates, spagyrics, elementals and the Philosophers' Stone."
 license = "GPL-3.0-only"
 # Without any of these there is no Art to practise: the world's plants and
