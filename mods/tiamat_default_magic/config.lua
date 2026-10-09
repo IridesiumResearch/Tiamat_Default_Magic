@@ -937,7 +937,9 @@ C.homunculus = {
 }
 C.basilisk = {
     node = "magic.basilisk", made = true,
-    model = { id = "basilisk", file = "models/basilisk.glb", texture = "models/basilisk.png" },
+    -- The designer's own model (idle, walk, run and swing clips), 1.46 cells
+    -- tall as exported: scaled to stand about the collider's height.
+    model = { id = "basilisk", file = "models/basilisk_1.glb", texture = "models/basilisk_1.png", scale = 0.85 },
     name = "Basilisk", collider = { width = 1.0, height = 1.2 }, health = 14, speed = 0.9,
     egg = "basilisk_egg", food = {}, food_units = 0, discovery = 50,
     stare = 6,                      -- blocks: hostile creatures it sees are frozen

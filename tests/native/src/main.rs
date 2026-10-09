@@ -366,7 +366,8 @@ fn the_blocks() {
 
 /// Every model the mod ships, through the engine's own loader with the
 /// limits a client gets on a server's push: it parses (no embedded picture),
-/// and the homunculus, the designer's own, has the clips the engine plays.
+/// and the designer's own, the homunculus and the basilisk, have the clips
+/// the engine plays.
 fn the_models() {
     let dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../mods/tiamat_default_magic/models");
     let mut seen = 0;
@@ -376,9 +377,9 @@ fn the_models() {
             let bytes = std::fs::read(&path).unwrap();
             let model = tiamat_core::model::load_isolated(&bytes, &tiamat_core::model::Limits::default())
                 .unwrap_or_else(|e| panic!("{} will not load: {e}", path.display()));
-            if path.file_stem().is_some_and(|s| s == "homunculus_1") {
+            if path.file_stem().is_some_and(|s| s == "homunculus_1" || s == "basilisk_1") {
                 for clip in ["idle", "walk", "run", "swing"] {
-                    assert!(model.clip(clip).is_some(), "the homunculus's {clip}");
+                    assert!(model.clip(clip).is_some(), "{}'s {clip}", path.display());
                 }
             }
             seen += 1;

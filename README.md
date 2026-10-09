@@ -93,7 +93,8 @@ all 97 nodes ship.
 | `tools/make_textures.py` | Draws the placeholder textures. Standard library only; the same bytes on every machine. |
 | `tools/check_tree.py` | Proves the tree sound from `tree.lua` and prints the pacing table (brief §13). |
 | `tools/glyphs.py` | Proves the glyph table sound from `glyph_table.lua`: no clash in any orientation. |
-| `tools/make_models.py` | Draws the placeholder familiars: boxes, as `.glb`, with a PNG beside each. |
+| `tools/make_models.py` | Draws the placeholder models still in use (four elementals, the athanor, the Tablet): boxes, as `.glb`, with a PNG beside each. |
+| `tools/strip_glb_images.py` | Takes an exported model's embedded picture out of its `.glb`, which the engine refuses, once it matches the PNG beside it. |
 | `tests/native/` | The mod run in the engine's real script VM, beside the REAL sibling mods, with a fake server around it. |
 | `docs/brief.md` | The design, and §2.1: what was checked and what changed. |
 | `docs/exports.md` | What other mods may call, and every id this mod registers. |

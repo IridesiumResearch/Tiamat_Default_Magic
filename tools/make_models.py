@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 """Generates the placeholder models for mods/tiamat_default_magic/models:
 the familiars, and the blocks drawn as models (the athanor, the Tablet).
-The homunculus is the designer's own (`homunculus_1`) and is not written here.
+The homunculus and the basilisk are the designer's own (`homunculus_1`,
+`basilisk_1`) and are not written here.
 
 A familiar is a few boxes: rigid (no clips, so the engine draws it still),
 self-contained .glb with no image inside it (the engine refuses one that
@@ -175,24 +176,6 @@ def face(c, skin):
     c.rect(10, 10, 13, 10, (120, 60, 60))
 
 
-def basilisk():
-    """Theophilus' basilisk: a grumpy rooster-lizard, not a monster."""
-    boxes = [
-        ((-0.35, 0.3, -0.6), (0.35, 0.8, 0.5), HIDE),       # body
-        ((-0.25, 0.6, 0.5), (0.25, 1.1, 0.95), FACE),       # head
-        ((-0.05, 1.1, 0.6), (0.05, 1.25, 0.85), HIDE),      # comb
-        ((-0.15, 0.4, -1.2), (0.15, 0.6, -0.6), HIDE),      # tail
-        ((0.15, 0.0, -0.1), (0.3, 0.3, 0.1), HIDE),         # legs
-        ((-0.3, 0.0, -0.1), (-0.15, 0.3, 0.1), HIDE),
-    ]
-    c = Canvas((90, 140, 70))
-    for x, y in [(1, 2), (5, 5), (2, 10), (6, 12)]:
-        c.dot(x, y, (200, 60, 40))                          # red scales here and there
-    face(c, (120, 160, 90))
-    c.rect(10, 11, 13, 11, (60, 40, 30))                    # a frown
-    return boxes, c
-
-
 # Blocks drawn as models (Sub-Node Contract §8.6): the same units, so a block
 # is -1.5..1.5 across, 0..3 tall, its front +Z. Their texture is split as a
 # familiar's is: the left half the body, the right half the face that shows.
@@ -235,7 +218,6 @@ def emerald_tablet():
 
 
 MODELS = {"salamander": salamander, "undine": undine, "gnome": gnome, "sylph": sylph,
-          "basilisk": basilisk,
           "athanor": lambda: athanor_of((24, 16, 14), None),
           "athanor_lit": lambda: athanor_of((90, 30, 10), (250, 170, 40)),
           "emerald_tablet": emerald_tablet}

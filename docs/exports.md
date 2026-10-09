@@ -52,8 +52,8 @@ All are namespaced `tiamat_default_magic:` by the engine.
   satchel (27 slots).
 - **Models and entities:** the familiars `salamander`, `undine`, `gnome`,
   `sylph`, `homunculus` and `basilisk`, each drawn from `models/<kind>.glb` with the picture beside
-  it (the homunculus from the designer's `models/homunculus_1.glb`, animated: idle,
-  walk, run, swing), spawned by this mod and named for their kind.
+  it (the homunculus and the basilisk from the designer's
+  `models/homunculus_1.glb` and `models/basilisk_1.glb`, animated: idle, walk, run, swing), spawned by this mod and named for their kind.
 - **Items:** `mutus_liber`, `mortar`, `copper_still`; the simples
   `simple_chamomile`, `simple_mint`, `simple_bramble`, `simple_mantle`; the
   flame powders `flame_powder_blue`, `_green`, `_yellow`, `_white`; and,
