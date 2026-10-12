@@ -53,7 +53,9 @@ All are namespaced `tiamat_default_magic:` by the engine.
 - **Models and entities:** the familiars `salamander`, `undine`, `gnome`,
   `sylph`, `homunculus` and `basilisk`, each drawn from `models/<kind>.glb` with the picture beside
   it (the homunculus and the basilisk from the designer's
-  `models/homunculus_1.glb` and `models/basilisk_1.glb`, animated: idle, walk, run, swing), spawned by this mod and named for their kind.
+  `models/homunculus_1.glb` and `models/basilisk_1.glb`, animated: idle, walk, run, swing), spawned by this mod and named for their kind;
+  by day, save every ninth, each is its shade instead, `shade_<kind>` — a
+  model id no mod registers, so the body is drawn as its shadow alone.
 - **Items:** `mutus_liber`, `mortar`, `copper_still`; the simples
   `simple_chamomile`, `simple_mint`, `simple_bramble`, `simple_mantle`; the
   flame powders `flame_powder_blue`, `_green`, `_yellow`, `_white`; and,
@@ -201,6 +203,7 @@ took), `kills:<uuid>:<creature>` (towards the next essence),
 `microreturn:<uuid>` (where a player stood before the Egg),
 `gatepair:x,y,z` and `gateowner:x,y,z` (a correspondence gate's twin and
 who linked it), `wedded:<container>` (an athanor whose Wedding has crowned),
+`sunday` (the world's days, counted as the clock wraps: every ninth, familiars are seen by day),
 `eqdrawn:<uuid>:<kind>` (ticks an elemental has spent in the Circle
 towards its next quintessence), `woven:<key>` (a woven world: its
 archetype, weaver, sky and the Loom it was woven at), `wovencount:<uuid>`

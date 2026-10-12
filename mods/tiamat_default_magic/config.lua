@@ -1064,6 +1064,14 @@ C.familiars = {
     orphans = 64,                   -- blocks: an untracked familiar this near a joining player is cleared
     per_server = 60,                -- familiars, wild and bound, in the whole world
     base = 1,                       -- bound at once, before `magic.familiars`
+    -- Spirits are of the night. By day a familiar is only its shadow on the
+    -- ground — it walks, works and can be used as ever, unseen — save on every
+    -- `seen_every`th day, when the veil is thin and it is seen in the sun too.
+    -- Night is the day's clock before `dawn` or from `dusk` on (0 midnight,
+    -- 0.5 noon); days are counted as the clock wraps, so a bed's skipped night
+    -- counts as one.
+    seen_every = 9, dawn = 0.25, dusk = 0.75,
+    look_every = 20,                -- ticks between looks at the clock
 }
 C.salamander = {
     node = "magic.salamander",

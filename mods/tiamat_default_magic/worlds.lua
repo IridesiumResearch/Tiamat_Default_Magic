@@ -567,6 +567,27 @@ function W.release_spirits(domain)
     spirits[domain] = nil
 end
 
+--- Every wild spirit remade as familiars are now seen (by day a shade,
+--- only its shadow), in its own world.
+function W.unveil()
+    for domain, list in pairs(spirits) do
+        local moved = {}
+        for id in pairs(list) do moved[#moved + 1] = id end
+        for _, id in ipairs(moved) do
+            local e = game.entity(id)
+            local kind = e and tdm.familiars.kind_of(e.model)
+            list[id], W.spirit[id] = nil, nil
+            if kind then
+                local new = tdm.familiars.remake(id, kind, nil)
+                if new then
+                    game.transfer_entity(new, domain, e.pos)
+                    list[new], W.spirit[new] = true, domain
+                end
+            end
+        end
+    end
+end
+
 local KINDS4 = { "salamander", "undine", "gnome", "sylph" }
 local since_spirits = 0
 tdm.on_tick(function(dt)
@@ -587,7 +608,7 @@ tdm.on_tick(function(dt)
             if me then
                 for _, id in ipairs(game.entities_in_radius(me.pos, K.spirit_reach, game.mod_id)) do
                     local e = game.entity(id)
-                    if e and not list[id] and type(e.nametag) == "string" and string.sub(e.nametag, 1, 5) == "Wild " then
+                    if e and not list[id] and tdm.familiars.kind_of(e.model) and not tdm.familiars.owned(id) then
                         list[id], W.spirit[id] = true, domain
                     end
                 end
@@ -602,8 +623,9 @@ tdm.on_tick(function(dt)
                 local F = tdm.familiars.KINDS[kind]
                 local rng = (n * 7 + 3) % 9 - 4
                 local pos = { x = me.pos.x + rng, y = me.pos.y + 1, z = me.pos.z + 4 - rng }
-                local id = game.spawn_entity{ pos = pos, model = U.id(F.model.id), health = F.health, speed = F.speed,
-                    nametag = "Wild " .. string.lower(F.name), collider = F.collider }
+                local model, name = tdm.familiars.look(kind)
+                local id = game.spawn_entity{ pos = pos, model = model, health = F.health, speed = F.speed,
+                    nametag = name and ("Wild " .. string.lower(name)) or nil, collider = F.collider }
                 if id then
                     game.transfer_entity(id, domain, pos)
                     list[id] = true

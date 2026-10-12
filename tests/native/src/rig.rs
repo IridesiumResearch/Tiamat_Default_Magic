@@ -764,9 +764,14 @@ impl Rig {
         vm.set_light_source(world.clone());
         vm.set_world_edit(world.clone());
 
+        // The binding Fork (Progress's `exclusive_paths`, off by default since
+        // its 8f24c1d): the rules this suite was written against. Both paths
+        // side by side is Magic's own work to adopt, not yet done.
+        let mut options = vec![("tiamat_default_progress:exclusive_paths".to_owned(), WorldOptionValue::Toggle(true))];
         if let Some(mode) = &setup.mode {
-            vm.set_world_options(&[("tiamat_default_life:mode".to_owned(), WorldOptionValue::Choice(mode.clone()))]);
+            options.push(("tiamat_default_life:mode".to_owned(), WorldOptionValue::Choice(mode.clone())));
         }
+        vm.set_world_options(&options);
 
         let mut loaded: Vec<String> = Vec::new();
         for (id, repo) in SIBLINGS {

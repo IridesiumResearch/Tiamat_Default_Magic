@@ -41,7 +41,9 @@ F.KINDS = { salamander = C.salamander, undine = C.undine, gnome = C.gnome, sylph
     homunculus = C.homunculus, basilisk = C.basilisk }
 F.ORDER = { "salamander", "undine", "gnome", "sylph", "homunculus", "basilisk" }
 
-local MODELS = {}           -- qualified model id -> kind
+local MODELS = {}           -- qualified model id -> kind (the shades' too)
+local SHADE = {}            -- kind -> its shade: a model id nobody registers, so the
+                            -- client draws no body, only the shadow under it
 local FOOD = {}             -- kind -> { numeric material = true }
 
 for _, kind in ipairs(F.ORDER) do
@@ -50,6 +52,8 @@ for _, kind in ipairs(F.ORDER) do
         scale = K.model.scale })
     if not ok then game.log("tiamat_default_magic: the " .. kind .. "'s model was refused: " .. tostring(why)) end
     MODELS[U.id(K.model.id)] = kind
+    SHADE[kind] = U.id("shade_" .. kind)
+    MODELS[SHADE[kind]] = kind
     FOOD[kind] = {}
     for _, id in ipairs(K.food) do
         local m = U.material(U.id(id))
@@ -104,7 +108,35 @@ local function where(uuid)
     return e and e.pos or nil, e
 end
 
-local function spawn(kind, pos, uuid)
+-- Seen or a shade ----------------------------------------------------------------------------
+
+local FC = C.familiars
+local day = nil             -- the world's days, counted as the clock wraps; read on the first look
+local last_time = nil
+local seen = true           -- until the first look at the clock, a tick after the world opens
+
+--- Whether familiars are seen now: by night, and all through every
+--- `seen_every`th day.
+local function seen_now()
+    local t = game.time_of_day()
+    return t < FC.dawn or t >= FC.dusk or (day or 1) % FC.seen_every == 0
+end
+
+--- Whether familiars are seen now, or only their shadows.
+function F.seen() return seen end
+
+--- The kind a model id draws (a familiar's own, or its shade), or nil.
+function F.kind_of(model) return MODELS[model] end
+
+--- What a familiar of `kind` is drawn as, now, and its name tag: none on a
+--- shade, which would hang a name over nothing.
+function F.look(kind)
+    local K = F.KINDS[kind]
+    if seen then return U.id(K.model.id), K.name end
+    return SHADE[kind], nil
+end
+
+local function spawn(kind, pos, uuid, health_now)
     if count() >= C.familiars.per_server then return nil end
     local K = F.KINDS[kind]
     -- A familiar's traits, from the essences it was given (essences.lua).
@@ -114,9 +146,26 @@ local function spawn(kind, pos, uuid)
         speed = speed * (t.speed or 1)
         health = math.tointeger(health * (t.health or 1)) or health
     end
-    return game.spawn_entity{ pos = pos, model = U.id(K.model.id), health = health, speed = speed,
-        nametag = K.name, collider = K.collider }
+    local model, nametag = F.look(kind)
+    return game.spawn_entity{ pos = pos, model = model, health = health_now or health, speed = speed,
+        nametag = nametag, collider = K.collider }
 end
+
+--- A familiar's body made again where it stands, as it is now seen: the
+--- engine cannot change a body's model, so a body is replaced. Answers the
+--- new entity, or nil if the old was gone.
+local function remake(id, kind, uuid)
+    local e = game.entity(id)
+    if not e then return nil end
+    game.despawn_entity(id)
+    local new = spawn(kind, e.pos, uuid, e.health)
+    if new and e.yaw then game.set_entity(new, { yaw = e.yaw }) end
+    return new
+end
+F.remake = remake
+
+--- Whether an entity is one of familiars.lua's own: bound, or wild in the overworld.
+function F.owned(id) return owner_of[id] ~= nil or wild[id] ~= nil end
 
 
 local function body_of(uuid, kind)
@@ -668,6 +717,46 @@ local function clear_orphans(pos)
             and not (tdm.worlds and tdm.worlds.spirit[id]) then game.despawn_entity(id) end
     end
 end
+
+--- Every familiar remade as it is now seen: the bound, the wild, and (by
+--- worlds.lua's own hand) the wild spirits of woven worlds.
+local function unveil()
+    for uuid, kinds in pairs(bodies) do
+        for kind, id in pairs(kinds) do
+            local new = remake(id, kind, uuid)
+            owner_of[id] = nil
+            kinds[kind] = new
+            if new then owner_of[new] = { uuid = uuid, kind = kind } end
+        end
+    end
+    local moved = {}
+    for id, w in pairs(wild) do moved[id] = w end
+    for id, w in pairs(moved) do
+        wild[id] = nil
+        local new = remake(id, w.kind, nil)
+        if new then wild[new] = w end
+    end
+    if tdm.worlds and tdm.worlds.unveil then tdm.worlds.unveil() end
+end
+
+local looked = 0
+tdm.on_tick(function(dt)
+    looked = looked + (math.tointeger(dt) or 1)
+    if looked < FC.look_every then return end
+    looked = 0
+    day = day or math.tointeger(game.storage.get("sunday")) or 1
+    local t = game.time_of_day()
+    if last_time and t < last_time - 0.5 then           -- the clock wrapped: a new day
+        day = day + 1
+        game.storage.set("sunday", day)
+    end
+    last_time = t
+    local now = seen_now()
+    if now ~= seen then
+        seen = now
+        unveil()
+    end
+end)
 
 tdm.on_join(function(event)
     local pos = where(event.player)

@@ -1234,6 +1234,32 @@ fn homunculus_and_basilisk() {
     r.hold(PLAYER, "basilisk_egg");
     assert!(r.use_at_nothing(PLAYER), "hatched");
     assert_eq!(r.with_model(&format!("{MOD}:basilisk")).len(), 1, "three may walk now");
+
+    // Spirits of the night: by day only their shadows, a shade's body the
+    // client draws nothing of; seen again at dusk, and all through every ninth day.
+    let set_time = |r: &mut Rig, t: f32| {
+        *r.sounds.time.lock().unwrap() = t;
+        r.tick(25);
+    };
+    set_time(&mut r, 0.5);
+    assert!(r.with_model(&model).is_empty(), "no homunculus at noon");
+    assert_eq!(r.with_model(&format!("{MOD}:shade_homunculus")).len(), 1, "only its shade");
+    assert_eq!(r.with_model(&format!("{MOD}:shade_basilisk")).len(), 1);
+    set_time(&mut r, 0.8);
+    assert_eq!(r.with_model(&model).len(), 1, "seen again at dusk");
+    assert!(r.with_model(&format!("{MOD}:shade_homunculus")).is_empty());
+    for _ in 0..7 {                                           // to the ninth day, a wrap at a time
+        set_time(&mut r, 0.1);
+        set_time(&mut r, 0.9);
+    }
+    set_time(&mut r, 0.1);
+    set_time(&mut r, 0.5);
+    assert_eq!(r.stored("sunday").as_deref(), Some("Number(9.0)"));
+    assert_eq!(r.with_model(&model).len(), 1, "the ninth day: seen at noon");
+    set_time(&mut r, 0.9);
+    set_time(&mut r, 0.1);
+    set_time(&mut r, 0.5);
+    assert!(r.with_model(&model).is_empty(), "the tenth: a shade again");
     println!("homunculus and basilisk: ok");
 }
 
