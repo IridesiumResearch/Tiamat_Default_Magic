@@ -21,7 +21,9 @@
 -- block of prima materia and a Red Stone; dissolving (Solve et Coagula)
 -- carries everyone inside back out, ends the world and gives half the prima
 -- materia back. A world's door stays shut while its weaver has left the
--- Art (a repath seals it; it is never destroyed for that).
+-- Art — no longer holds the Oath, which only a repath where one path binds
+-- takes — and it is never destroyed for that. Studying science beside the
+-- Art, or even more of it, seals nothing.
 --
 -- **Leaving** is the Philosophers' Egg, used inside, or `magic leave` for a
 -- guest who carries none; either goes back to where the traveller stood.
@@ -276,7 +278,7 @@ local function allow_key(owner, uuid) return "worldallow:" .. owner .. ":" .. uu
 --- Whether `uuid` may go into a world: its weaver (while they walk the
 --- Art), or someone they allow.
 local function may_enter(uuid, r)
-    if progress and progress.path(r.owner) ~= C.path.id then return false, "That world is sealed: its weaver has left the Art." end
+    if progress and not U.adept(r.owner) then return false, "That world is sealed: its weaver has left the Art." end
     if uuid == r.owner or game.storage.get(allow_key(r.owner, uuid)) == true then return true end
     return false, "That world is not open to you."
 end

@@ -69,6 +69,24 @@ function U.station_pos(name, station)
         domain = domain or "overworld" }
 end
 
+--- Whether a player walks the Hermetic Art: holds the Oath, its first node.
+--- Not Progress's `path`, which since its 8f24c1d is the path a player is
+--- DEEPEST in: by default both paths are open, and a scientist who has sworn
+--- the Oath is an adept too. Where one path binds and a player repaths away,
+--- Progress takes the Oath with the rest, so this answers false then as well.
+function U.adept(uuid)
+    local progress = U.exports("tiamat_default_progress")
+    return progress ~= nil and progress.has(uuid, tdm.config.path.oath) == true
+end
+
+--- What a node costs a player now, by Progress's own reckoning (a path not
+--- pursued is dearer), or its listed price from an older Progress.
+function U.cost(uuid, node, listed)
+    local progress = U.exports("tiamat_default_progress")
+    local price = progress and progress.cost and progress.cost(uuid, node)
+    return math.tointeger(price) or listed
+end
+
 --- A key for something placed at `x, y, z` in `domain`: `prefix:x,y,z` in
 --- the overworld (as every key was before place and dig events named their
 --- domain), `prefix:<domain>@x,y,z` anywhere else — a woven world's block

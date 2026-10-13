@@ -157,7 +157,7 @@ function P.build(uuid)
                 end
                 if C.book_notes[node.id] then page[#page + 1] = text(C.book_notes[node.id]) end
             else
-                page[#page + 1] = hint(string.format("Learn it at the research table for %d insight.", node.cost))
+                page[#page + 1] = hint(string.format("Learn it at the research table for %d insight.", U.cost(uuid, node.id, node.cost)))
             end
             pages[#pages + 1] = column(page, 4)
         end

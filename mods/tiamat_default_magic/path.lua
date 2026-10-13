@@ -4,13 +4,21 @@
 -- The magic path: the door (brief §3) and the tree (§5), into Progress.
 --
 -- Progress owns the graph, the insight and the lock: this file registers
--- into it and keeps no second copy of who chose what. A path node is `false`
--- to every player of the other path, and "lies beyond the Fork" to a player
--- with none, whatever this mod does.
+-- into it and keeps no second copy of who chose what.
 --
--- Choosing the Emerald Tablet gives the Oath, free, and the Mute Book to a
--- player who has none. `on_choose` also runs when a player repaths INTO
--- magic, which is right: the Oath went with the old path and comes back.
+-- By default (Progress 8f24c1d) every path is open to everybody: a player
+-- who knows the Keystone may study magic beside science, the path they are
+-- deepest in the one they pursue, the other dearer. So "an adept" here is a
+-- player who holds the Oath (`util.adept`), never `progress.path` — a
+-- scientist who has sworn it is an adept too. Where the world binds one path
+-- a player (`exclusive_paths`), the old Fork holds: a node of the other path
+-- is refused them, and "lies beyond the Fork" to a player with none.
+--
+-- `on_choose` runs the first time a player takes the Art — at the Tablet, or
+-- by learning its first node on the Research tab — and gives the Oath, free,
+-- and the Mute Book to a player who has none. Where one path binds it runs
+-- too when a player repaths INTO magic: the Oath went with the old path and
+-- comes back.
 -- Repathing away needs nothing from this mod yet — Progress takes the path's
 -- nodes itself, and nothing the Art has built so far belongs to a player.
 -- The Quintessence bar is set here once there is one (brief §6.8, waiting

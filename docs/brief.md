@@ -184,6 +184,8 @@ The *Tabula Smaragdina* is the founding text of Hermetic alchemy (Arabic by the 
 
 `progress.on_repath(fn(uuid, old, new))`, when `old == "magic"`: familiars despawned (records kept, marked dormant), Quintessence to 0, the player's woven worlds **sealed not destroyed** (entry refused, contents kept — a repath is reversible by repathing back, and destroying someone's world on a rules toggle is not acceptable), wards lifted. Nothing crafted is taken back: items are the world's, not the path's.
 
+**Both paths side by side (2026-10-13, Progress 8f24c1d).** Progress now opens every path to everybody by default: the path a player pursues is the one they are deepest in, the other costs more and fades from the Research tab, and `on_repath` is not called when the lead passes. So this mod's "adept" is a player who **holds the Oath** (`util.adept`), not one whose `progress.path` is magic: a scientist who has sworn it has the Quintessence bar, and a weaver who studies more science than magic keeps their woven worlds. `on_choose` runs on the first magic node learned, at the Tablet or on the Research tab, and gives the Oath and the Mute Book as before. The binding Fork above holds where the world sets `exclusive_paths`; there a repath away takes the Oath, and with it the bar and the worlds' doors, and `on_repath` still sends the familiars to sleep. The Mute Book quotes Progress's own `cost` for a node, so it shows the dearer price of a path not pursued.
+
 ---
 
 ## 4. The children's door — the Apothecary's Bench (shared, tiers 1–2)

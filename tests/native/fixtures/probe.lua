@@ -21,11 +21,20 @@
 --   t band <x> <y> <z>   the world's depth band there
 --   t q                  the speaker's quintessence, "amount/ceiling"
 --   t hurry <box> <n>    Craft's add_progress: n ticks more on a station's job
+--   t cost <node>        what a node costs the speaker now
 
 local p = game.exports("tiamat_default_progress")
 local c = game.exports("tiamat_default_craft")
 local m = game.exports("tiamat_default_magic")
 assert(p and c and m, "the probe sees Progress, Craft and Magic")
+
+-- A second path, the other side of the Fork, so a player can pursue
+-- something else and still study the Art (Progress 8f24c1d).
+game.register_block{ id = "loom_of_iron", name = "Engine" }
+assert(p.register_path{ id = "tech", label = "Technology", door = "probe:loom_of_iron" } == true, "a second path")
+assert(p.register_node{ id = "tech.steam", tier = 3, requires = "shared.fork", label = "Steam" } == true)
+assert(p.register_node{ id = "tech.gears", tier = 4, requires = "tech.steam", label = "Gears" } == true)
+assert(p.register_node{ id = "tech.dynamo", tier = 5, requires = "tech.gears", label = "Dynamo" } == true)
 
 local FIRE = "tiamat_default_craft:campfire:5,64,5"
 
@@ -46,6 +55,8 @@ game.register_on_chat(function(e)
         for _, n in ipairs(p.nodes()) do
             if n.id == rest then say = tostring(n.branch) .. "/" .. tostring(n.reveal) end
         end
+    elseif word == "cost" then
+        say = tostring(p.cost(e.player, rest))
     elseif word == "has" then
         say = tostring(p.has(e.player, rest))
     elseif word == "award" then

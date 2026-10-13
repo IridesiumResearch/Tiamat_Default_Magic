@@ -380,6 +380,9 @@ pub struct Dialogs {
 }
 
 impl uihost::Access for Dialogs {
+    fn set_hover(&self, _: &str, _: Vec<(MaterialId, String)>) -> bool {
+        true
+    }
     fn show(&self, request: &ShowRequest) -> bool {
         tiamat_core::ui::check(&request.tree, tiamat_core::ui::Limits::default())
             .expect("every tree the mod sends passes the engine's checker");
@@ -705,11 +708,15 @@ pub struct Setup {
     pub weather: bool,
     /// Life's world option, "Default", "Creative" or "Adventure".
     pub mode: Option<String>,
+    /// Progress's `exclusive_paths`: one path per player, the binding Fork.
+    /// Most of this suite is written for it; `false` is the default world,
+    /// where magic and another path are studied side by side.
+    pub exclusive: bool,
 }
 
 impl Default for Setup {
     fn default() -> Self {
-        Setup { ui: true, weather: true, mode: None }
+        Setup { ui: true, weather: true, mode: None, exclusive: true }
     }
 }
 
@@ -765,9 +772,8 @@ impl Rig {
         vm.set_world_edit(world.clone());
 
         // The binding Fork (Progress's `exclusive_paths`, off by default since
-        // its 8f24c1d): the rules this suite was written against. Both paths
-        // side by side is Magic's own work to adopt, not yet done.
-        let mut options = vec![("tiamat_default_progress:exclusive_paths".to_owned(), WorldOptionValue::Toggle(true))];
+        // its 8f24c1d) unless a check asks for the default world.
+        let mut options = vec![("tiamat_default_progress:exclusive_paths".to_owned(), WorldOptionValue::Toggle(setup.exclusive))];
         if let Some(mode) = &setup.mode {
             options.push(("tiamat_default_life:mode".to_owned(), WorldOptionValue::Choice(mode.clone())));
         }
@@ -1062,6 +1068,7 @@ impl Rig {
             mod_id: mod_id.into(),
             form: format!("{mod_id}:{form}"),
             event: proto::DialogEvent::Pressed { name: name.into(), click: proto::Press::Left },
+            dropped: None,
         });
         self.assert_healthy("a press");
     }

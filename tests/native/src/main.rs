@@ -20,6 +20,7 @@ fn main() {
     creative();
     the_tree();
     the_door();
+    paths_side_by_side();
     the_blocks();
     the_models();
     the_athanor();
@@ -387,6 +388,30 @@ fn the_models() {
     }
     assert_eq!(seen, 9, "nine models");
     println!("the models: ok");
+}
+
+/// The default world (Progress 8f24c1d): both paths open. A player who
+/// pursues another path may still swear the Oath and is an adept for it:
+/// the Mute Book, and a Quintessence bar; the Art's nodes cost them more,
+/// and the book says what they cost.
+fn paths_side_by_side() {
+    let mut r = Rig::new(Setup { exclusive: false, ..Setup::default() });
+    ready(&mut r, 20000);
+    assert_eq!(r.ask("progress grant shared.keystone"), "Learned: The Keystone");
+    for node in ["tech.steam", "tech.gears", "tech.dynamo"] {
+        let answer = r.ask(&format!("t learn {node}"));
+        assert!(answer.starts_with("true"), "{node}: {answer}");
+    }
+    assert_eq!(r.ask("t path"), "tech", "pursuing the other path");
+    let answer = r.ask("t learn magic.hermetic_oath");
+    assert!(answer.starts_with("true"), "the Oath, beside it: {answer}");
+    assert_eq!(r.ask("t path"), "tech", "still pursuing it");
+    assert_eq!(r.units(PLAYER, "mutus_liber"), 27, "the Mute Book");
+    r.tick(5);
+    assert_eq!(r.ask("t q"), "0/10", "an adept's bar, though magic is not their deepest path");
+    let cost: i64 = r.ask("t cost magic.athanor").parse().expect("a price");
+    assert!(cost > 100, "dearer on the path not pursued: {cost}");
+    println!("paths side by side: ok");
 }
 
 /// A player on the magic path, holding `nodes` (granted by an operator).

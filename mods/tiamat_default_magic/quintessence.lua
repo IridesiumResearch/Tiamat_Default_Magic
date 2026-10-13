@@ -31,9 +31,10 @@ local ok = life and life.add_stat and life.set_stat_max
 Q.available = ok and true or false
 if life and not ok then game.log("tiamat_default_magic: Life did not take the Quintessence bar") end
 
---- A player's ceiling: 0 off the path, so the bar is not drawn for them.
+--- A player's ceiling: 0 for anyone who has not sworn the Oath, so the bar
+--- is not drawn for them (a scientist who has is an adept as well).
 function Q.ceiling(uuid)
-    if not (progress and progress.path(uuid) == C.path.id) then return 0 end
+    if not (progress and U.adept(uuid)) then return 0 end
     return K.base + (progress.effects_of(uuid, "magic.")["magic.quintessence_max"] or 0)
 end
 
