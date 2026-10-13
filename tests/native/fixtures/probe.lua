@@ -57,6 +57,33 @@ game.register_on_chat(function(e)
         end
     elseif word == "cost" then
         say = tostring(p.cost(e.player, rest))
+    elseif word == "audit" then
+        -- Every input and tool of a magic recipe that no recipe makes: a
+        -- material of the Art's own (another mod's are the world's to give),
+        -- or a group no recipe output belongs to.
+        local made, all = {}, c.recipes()
+        for _, r in ipairs(all) do
+            for _, o in ipairs(r.outputs or {}) do made[o.name] = true end
+        end
+        local missing, seen = {}, {}
+        local function check(name)
+            if seen[name] then return end
+            seen[name] = true
+            if string.sub(name, 1, 1) == "#" then
+                for out in pairs(made) do if c.in_group(name, out) then return end end
+                missing[#missing + 1] = name .. "(group, no made member)"
+            elseif string.match(name, "^tiamat_default_magic:") and not made[name] then
+                missing[#missing + 1] = name
+            end
+        end
+        for _, r in ipairs(all) do
+            if string.match(r.id, "^tiamat_default_magic:") then
+                for _, i in ipairs(r.inputs or {}) do check(i.name) end
+                for _, i in ipairs(r.tools or {}) do check(i.name) end
+            end
+        end
+        table.sort(missing)
+        say = #missing .. " " .. table.concat(missing, " ")
     elseif word == "has" then
         say = tostring(p.has(e.player, rest))
     elseif word == "award" then

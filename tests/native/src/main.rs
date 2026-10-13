@@ -268,6 +268,14 @@ fn the_tree() {
     let mut r = Rig::new(Setup::default());
     ready(&mut r, 5000);
     assert_eq!(r.ask("t count"), "97", "Progress validated what ships: tiers 3 to 7");
+    // Every ingredient and tool of every recipe of the Art is made by some
+    // recipe, or is another mod's (the world's to give), save these: what a
+    // mechanic gives (the basilisk sheds ash, the alkahest melts rock to prima
+    // materia, the Wedding crowns, the Circle draws the Four's quintessences)
+    // and what the world grows or leaves (fruit; ash, Craft's and the volcano's).
+    assert_eq!(r.ask("t audit"), concat!("6 #ash(group, no made member) #fruit(group, no made member) ",
+        "#magic_elemental_quintessence(group, no made member) tiamat_default_magic:basilisk_ash ",
+        "tiamat_default_magic:prima_materia tiamat_default_magic:wedding_crown"), "nothing the Art needs is unobtainable");
     let answer = r.ask("t learn magic.athanor");
     assert!(answer.starts_with("nil") && answer.contains("lies beyond the Fork"), "{answer}");
     let answer = r.ask("t learn magic.hermes_trismegistus");
