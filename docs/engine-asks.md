@@ -12,6 +12,17 @@ finds every mod's open asks in one place.
 
 Nothing open as of 2026-09-30: E-M1 and E-M2 landed and E-M3 was answered.
 
+## Milestone 0.5.0's asks of every mod — adopted 2026-10-15
+
+Not an ask; the engine's three for every mod (its `docs/milestone-0.5.0.md`,
+2026-10-13). **A4:** `stubs/game.lua` and `AGENTS.md` re-vendored from the
+engine's `api/` at 5049d115 (API 1.0; only additions since the last copy).
+**A3 / E8:** `.github/workflows/conform.yml` is the engine's
+`docs/mod-conformance.md` workflow, run on every push and nightly against
+the engine's `main`: `scripts/conform.sh mods/tiamat_default_magic`. Locally,
+`--check-mods game` from a server rebuilt past 6423b50d (the link files) is
+OK, all 18 mods loaded. The nightly soak needs nothing from this repo.
+
 ## Model and whole blocks — landed on main 2026-10-05
 
 Not an ask; a dependency. The athanor (cold and lit) and the Emerald Tablet
