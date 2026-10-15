@@ -423,6 +423,8 @@ Two vessel slots (5–6): Craft's slot roles all take ranges. The group `#magic_
 
 The athanor's screen (Craft's) gains a tab from this mod: a dial of the long work, its stage colour, and the historical sentence for that stage (*"The Raven's head appears"*).
 
+*As built (2026-10-14):* Craft offers no tab on a station's screen to another mod and keeps a furnace's job and progress to itself, so the dial is asked of Craft (C-M11) and stands alone until then: `magic athanor`, looking at one, shows its fire and fuel, the stage colour and sentence (`config.lua`, `C.dial`), and the work's whole length. The work is told by what the athanor holds, as the Peacock's Tail is: the most particular recipe the player knows whose inputs and vessels are all in place.
+
 ### 6.2 The Twelve Gates (the spine)
 
 Ripley's *Compound of Alchymy* (1471) names twelve gates in this order, and the tree keeps it: **Calcination, Solution, Separation, Conjunction, Putrefaction, Congelation, Cibation, Sublimation, Fermentation, Exaltation, Multiplication, Projection.** Each gate is one node and one family of recipes; the first time a player completes one it is a discovery worth 25 × the gate's number (Gate XII: 300).
@@ -712,8 +714,8 @@ Groups registered with Craft: `#saltpeter`, `#oil_of_vitriol`, `#quicksilver` (s
 ### 10.3 Screens
 
 - **The *Mutus Liber*** (action `mutus_liber`, default key **J**; also opened by using the book, or `magic book` in chat): pages of pictures, one per node the player holds or can next learn — never the whole tree at once. Text line under each picture for readers.
-- **Familiars** (a UI tab): each bound familiar, its traits, dismiss/summon buttons; action `familiar` (default key **K**, once actions work) summons the first.
-- **Athanor dial** (a tab beside Craft's station screen): the long work's stage, colour, time left.
+- **Familiars** (action `familiars`, default key **L**; also `magic familiars` in chat): each bound familiar, whether it walks or rests, the essences it has taken, an undine's water, and Rest / Walk buttons; the homunculus's opens its satchel. A dialog, not a UI tab, for the Mute Book's reason: a tab is drawn for every player. Action `familiar` (default key **K**) still calls the next bound one to walk.
+- **Athanor dial** (a tab beside Craft's station screen): the long work's stage, colour, time left. Until Craft answers C-M11, a dialog of its own on `magic athanor` (§6.1).
 - **The Loom** (dialog).
 - **No HUD script of its own.** Quintessence is Life's bar. Toasts use Progress's discovery flash and chat.
 

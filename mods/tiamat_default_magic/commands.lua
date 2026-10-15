@@ -21,6 +21,12 @@ tdm.on_chat("magic", function(player, rest)
             if A.has(player, node.id) then held = held + 1 end
         end
         return string.format("The Apothecary's Bench: %d of %d learned.", held, #C.bench_nodes)
+    elseif word == "familiars" then
+        if not tdm.util.adept(player) then return "You have sworn no Oath, and no familiar would come." end
+        tdm.screens.open_familiars(player)
+        return nil
+    elseif word == "athanor" then
+        return tdm.screens.athanor_command(player)
     elseif string.sub(word, 1, 9) == "familiar " or word == "familiar" then
         return tdm.familiars.command(player, string.sub(rest, 10))
     elseif string.sub(word, 1, 5) == "seal " or word == "seal" then

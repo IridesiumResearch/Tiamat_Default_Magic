@@ -46,6 +46,7 @@ fn main() {
     alkahest_and_panacea();
     phoenix_and_wedding();
     homunculus_and_basilisk();
+    the_screens();
     microcosm_and_gates();
     rose_garden();
     world_projection_and_the_assay();
@@ -1294,6 +1295,79 @@ fn homunculus_and_basilisk() {
     set_time(&mut r, 0.5);
     assert!(r.with_model(&model).is_empty(), "the tenth: a shade again");
     println!("homunculus and basilisk: ok");
+}
+
+/// The adept's screens: the Familiars screen lists who walks and who rests,
+/// and its buttons send one to rest or call it to walk; the athanor's dial
+/// tells the work an athanor holds by its stage.
+fn the_screens() {
+    let mut r = Rig::new(Setup::default());
+    adept(&mut r, &["magic.homunculus", "magic.basilisk", "magic.gate_putrefaction"]);
+    let form = format!("{MOD}:familiars");
+
+    assert_eq!(r.ask("magic familiars"), "", "opened, and nothing said");
+    let (shown, tree) = r.last_dialog().expect("the Familiars screen");
+    assert_eq!(shown, form);
+    assert!(tree.contains("You have no familiar."), "{tree}");
+
+    r.give(PLAYER, "homunculus_vial", 27);
+    r.hold(PLAYER, "homunculus_vial");
+    assert!(r.use_at_nothing(PLAYER), "woken");
+    r.dialogs.shown.lock().unwrap().clear();
+    r.action(PLAYER, &format!("{MOD}:familiars"));
+    let (shown, tree) = r.last_dialog().expect("on L");
+    assert_eq!(shown, form);
+    assert!(tree.contains("Homunculus") && tree.contains("It walks with you"), "{tree}");
+    assert!(tree.contains("rest:homunculus") && tree.contains("satchel"), "{tree}");
+    assert!(tree.contains("1 may walk with you at once; 1 walks now."), "{tree}");
+
+    // One may walk: the basilisk, hatched, walks, and the homunculus rests.
+    r.give(PLAYER, "basilisk_egg", 27);
+    r.hold(PLAYER, "basilisk_egg");
+    assert!(r.use_at_nothing(PLAYER), "hatched");
+    let helper = format!("{MOD}:homunculus");
+    let guard = format!("{MOD}:basilisk");
+    assert!(r.with_model(&helper).is_empty(), "resting");
+    r.press(PLAYER, MOD, "familiars", "walk:homunculus");
+    let (_, tree) = r.last_dialog().unwrap();
+    assert!(tree.contains("rest:homunculus") && tree.contains("walk:basilisk"), "redrawn: {tree}");
+    assert_eq!(r.with_model(&helper).len(), 1, "the homunculus walks");
+    assert!(r.with_model(&guard).is_empty(), "the basilisk rests");
+    let hex = rig::hex(PLAYER);
+    assert_eq!(r.stored(&format!("familiar:{hex}:basilisk")).as_deref(), Some("Text(\"resting\")"));
+
+    r.press(PLAYER, MOD, "familiars", "rest:homunculus");
+    assert!(r.with_model(&helper).is_empty(), "sent to rest");
+    assert_eq!(r.stored(&format!("familiar:{hex}:homunculus")).as_deref(), Some("Text(\"resting\")"));
+    r.press(PLAYER, MOD, "familiars", "walk:salamander");
+    assert!(r.stored(&format!("familiar:{hex}:salamander")).is_none(), "none is called that was never bound");
+    r.press(PLAYER, MOD, "familiars", "satchel");
+    assert!(r.boxes.exists(&format!("{MOD}:satchel:{hex}")), "the satchel, from the screen");
+
+    // The dial: nothing looked at, then an athanor holding the nigredo.
+    assert_eq!(r.ask("magic athanor"), "Look at an athanor, and say it again.");
+    let at = (60, 64, 60);
+    let name = athanor(&mut r, at, &[
+        (2, "conjoined_matter", 27),
+        (5, "philosophers_egg", 27),
+        (6, "bain_marie", 27),
+    ]);
+    r.aim(at.0, at.1, at.2);
+    assert_eq!(r.ask("magic athanor"), "", "opened, and nothing said");
+    let (shown, tree) = r.last_dialog().expect("the dial");
+    assert_eq!(shown, format!("{MOD}:athanor"));
+    assert!(tree.contains("Nigredo: the black") && tree.contains("The Raven's Head appears"), "{tree}");
+    assert!(tree.contains("3 philosophical days (4½ minutes)"), "{tree}");
+    assert!(tree.contains("It is cold, and nothing to burn."), "{tree}");
+
+    // Without the Egg it is no work; with coal and fire, it burns.
+    r.boxes.set(&name, 5, None);
+    r.boxes.set(&name, 1, Some(tiamat_core::inventory::Stack::new(r.material("tiamat_default_world:coal"), 27 * 2).unwrap()));
+    r.press(PLAYER, MOD, "athanor", "again");
+    let (_, tree) = r.last_dialog().unwrap();
+    assert!(tree.contains("Nothing in it is a work you know."), "{tree}");
+    assert!(tree.contains("with 2 blocks of fuel by it"), "{tree}");
+    println!("the screens: ok");
 }
 
 /// The microcosm: the Egg in hand makes its owner's island (an instance

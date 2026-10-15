@@ -76,6 +76,51 @@ C.bench_items = {
 C.book_key = "KeyJ"
 -- The familiars' key: each press calls the next bound familiar to walk.
 C.familiar_key = "KeyK"
+-- The Familiars screen's key: who walks, who rests, and each one's traits.
+C.familiars_screen_key = "KeyL"
+
+-- The athanor's dial (brief §6.1, §10.3), read with `magic athanor` while
+-- looking at one: the colour stage of the work it holds, and what the texts
+-- say of it. A work is told by what the athanor HOLDS — its inputs and
+-- vessels — as the Peacock's Tail is, since Craft keeps a furnace's job and
+-- progress to itself (C-M11). `stages` names a long work's stage by recipe;
+-- any other work is told by its degree of fire.
+C.dial = {
+    stages = {
+        nigredo = { name = "Nigredo: the black", colour = { 34, 30, 38 },
+            said = "The Raven's Head appears: the matter rots black in the sealed Egg." },
+        peacock = { name = "Cauda pavonis: the Peacock's Tail", colour = { 40, 130, 140 },
+            said = "The black is washed, and every colour shimmers over it." },
+        albedo = { name = "Albedo: the white", colour = { 232, 232, 224 },
+            said = "The matter whitens: the swan, the White Queen, the moon." },
+        citrinitas = { name = "Citrinitas: the yellow", colour = { 226, 188, 58 },
+            said = "The yellowing: the sun's light dawns in the Egg." },
+        rubedo = { name = "Rubedo: the red", colour = { 172, 34, 36 },
+            said = "The Red King rises from his bath." },
+    },
+    by_recipe = {
+        conjunction = "nigredo", putrefaction = "nigredo",
+        ablution = "peacock",
+        cibation = "albedo", albedo = "albedo",
+        citrinitas = "citrinitas",
+        fermentation = "rubedo", rubedo = "rubedo", exaltation = "rubedo", multiplication = "rubedo",
+        rebis = "rubedo",
+    },
+    -- A work's own sentence, over its stage's or its degree's.
+    said = {
+        homunculus_vial = "Something small turns over in the sealed Egg.",
+        basilisk_egg = "The egg warms under its vermilion.",
+        alkahest = "The universal solvent gathers in the Egg.",
+    },
+    -- Any other work, by its degree of fire.
+    degrees = {
+        { colour = { 120, 150, 170 }, said = "It digests in Maria's bath, a heat that never scorches." },
+        { colour = { 150, 140, 130 }, said = "It circulates over the ash bath." },
+        { colour = { 190, 130, 70 }, said = "It distils over the sand bath." },
+        { colour = { 230, 120, 40 }, said = "It burns at naked fire, the bellows blowing." },
+    },
+    idle = "Nothing in it is a work you know.",
+}
 
 -- The Bench's one block: light from mushrooms in a jar.
 C.hermetic_lamp = {
@@ -1314,5 +1359,7 @@ C.book_notes["magic.worldgate"] = "use a correspondence gate's emerald with the 
 C.book_notes["magic.solve_et_coagula"] = "at the Loom, dissolve a world: everyone in it comes home, and half its prima materia returns"
 C.book_notes["magic.universal_medicine"] = "friends within eight blocks of you slowly heal"
 C.book_notes["magic.hermes_trismegistus"] = "magic tablet: the Emerald Tablet's whole text"
+C.book_notes["magic.athanor"] = "look at an athanor and say magic athanor: its dial tells the work it holds"
+C.book_notes["magic.salamander"] = "your familiars: the L key, or magic familiars"
 
 return C

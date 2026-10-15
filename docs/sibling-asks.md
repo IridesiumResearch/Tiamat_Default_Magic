@@ -19,6 +19,7 @@ and what came of it. The design reasons are in `docs/brief.md` §14.
 | C-M8 `fuel_percent` at every heat station | Craft | answered (0.5.0) | the Salamander's node now helps its athanor too |
 | C-M9 which fire burnt a powder | Craft | answered (0.5.0), option (b) | **adopted**: the flare is over its own campfire |
 | C-M10 an athanor's slow fire | Craft | withdrawn | a philosophical day is 1,800 ticks instead |
+| C-M11 a station's job, and a tab on its screen | Craft | **open** (2026-10-14) | the dial stands alone on `magic athanor`, the work told by what the athanor holds |
 | L-M1 per-player stat ceiling | Life | answered (Life `87a95f6`) | Quintessence, with tier 5 |
 | L-M2 effects and health on others | Life | answered (Life `87a95f6`) | sprayed elixirs, the panacea, talismans (tiers 4–7) |
 | L-M3 composed abilities | Life | answered (Life `87a95f6`) | **adopted**: the elixir of swiftness |
@@ -42,6 +43,30 @@ nothing else.
 ## The asks, as they were made
 
 ### Tiamat Default Craft
+
+**C-M11, a station's job, and a tab on its screen** — *open, asked
+2026-10-14.* The brief's athanor dial (§6.1, §10.3) is a tab beside the
+athanor's own screen: the long work's colour stage, the texts' sentence for
+it, and the time it has left. Two things stand in its way, both Craft's:
+
+1. *What a station is working.* `furnace.lua` keeps each heat station's
+   job and progress in this mod's private storage, and nothing in the
+   exports answers them. Asked: `status(container)` answering
+   `{ job = recipe id | nil, progress = ticks, ticks = the job's whole length }`
+   for a heat or running station (`nil` for any other name) — the same
+   numbers `FU.status` already works out for the screen.
+2. *A tab on a station's screen.* The station screen is Craft's own dialog,
+   and the interface's `add_tab` has no `station` option for another mod.
+   Asked: `add_station_tab{ station, label, build = fn(player, container) ->
+   widget, on_event? }`, drawn as a tab of that station's screen alone, run
+   in the caller's sandbox like the interface's.
+
+*Stands in:* the dial is a dialog of this mod's, opened by `magic athanor`
+while looking at an athanor. The work is told by what the athanor holds —
+the most particular recipe the player knows whose inputs and vessels are all
+in its slots, Craft's own rule, without the heat — and the time shown is the
+work's whole length. With (1) the dial says what Craft is actually working
+and how long is left; with (2) it moves onto the athanor's screen.
 
 **C-M10, an athanor's slow fire** — *withdrawn 2026-09-30.* A station field
 `burn_percent`. With a philosophical day of 1,800 ticks (brief §6.1) a Red

@@ -58,6 +58,7 @@ tdm.worlds = load("worlds")             -- tier 7: the Loom, woven worlds, Solve
 tdm.gates = load("gates")               -- Ripley's Gates as discoveries; every tier's studies (after the last tier)
 tdm.tree = load("tree")                 -- the magic tree, tiers 3 to 7, as data
 tdm.primer = load("primer")             -- the Mute Book
+tdm.screens = load("screens")           -- the Familiars screen, and the athanor's dial
 tdm.path = load("path")                 -- the Emerald Tablet's path, and the tree, into Progress
 load("commands")                        -- `magic`, in chat
 

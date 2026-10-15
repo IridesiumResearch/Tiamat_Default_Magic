@@ -216,13 +216,22 @@ function F.walk(uuid, kind)
     come(uuid, kind)
 end
 
---- Every familiar a player has bound, walking or resting, as `{ { kind, entity } }`
---- (entity nil for one not here).
+--- Sends a player's familiar of `kind` to rest: bound still, but not walking.
+function F.rest(uuid, kind)
+    if record(uuid, kind) ~= true then return end
+    set_record(uuid, kind, "resting")
+    go(uuid, kind)
+end
+
+--- Every familiar a player has bound, walking or resting, as
+--- `{ { kind, entity, walking } }` (entity nil for one not here).
 function F.list(uuid)
     local out = {}
     for _, kind in ipairs(F.ORDER) do
         local r = record(uuid, kind)
-        if r == true or r == "resting" then out[#out + 1] = { kind = kind, entity = body_of(uuid, kind) } end
+        if r == true or r == "resting" then
+            out[#out + 1] = { kind = kind, entity = body_of(uuid, kind), walking = r == true }
+        end
     end
     return out
 end
@@ -368,6 +377,9 @@ end)
 -- Binding, and using one ------------------------------------------------------------------------
 
 local function water_key(uuid) return "undine_water:" .. uuid end
+
+--- Blocks of water a player's undine carries.
+function F.carried(uuid) return game.storage.get(water_key(uuid)) or 0 end
 
 tdm.on_use_entity(function(e)
     local w = wild[e.target]

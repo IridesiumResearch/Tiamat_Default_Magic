@@ -53,6 +53,13 @@ the Hermetic Seal wards ground; the Ouroboros hurries an athanor. And
 three more elementals: the undine in still water at night, the gnome in
 the deep caves, the sylph on peaks and in storms.
 
+Since 1.0.0: **the adept's screens.** The Familiars screen (L, or `magic
+familiars`) lists who walks and who rests, their essences and the undine's
+water, and sends one to rest or calls it to walk. The athanor's dial
+(`magic athanor`, looking at one) shows the colour stage of the work it
+holds and what the texts say of it; it moves onto Craft's station screen,
+with the time left, when Craft answers C-M11.
+
 **What ships** is gated: `built_tier` in `config.lua` (7 today: the whole tree) is the last
 tier whose Art is built, and nodes above it are not registered, so nobody
 meets a node that does nothing.
